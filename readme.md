@@ -61,7 +61,7 @@ In your ImGui window, for a 3 axes widget, simply:
 
 For a directional arrow:
 ```cpp
-    // I assume, for a vec3 a direction starting from origin, 
+    // I assume, for a vec3, a direction starting from origin, 
     // so if you use a vec3 to identify a light spot
     // need to change direction toward origin
     glm::vec3 light(-getLight()));
@@ -88,7 +88,7 @@ And in your render function (or where you prefer) you can get the transformation
 
 Look in *imGuIZMO.h*, *imGuIZMO.cpp* and example source code *uiMainDlg.cpp*, for more personalizations: they are well commented.
 
-This are all possible widget calls:
+These are all possible widget calls:
 ```cpp
 IMGUI_API bool gizmo3D(const char*, glm::quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
 IMGUI_API bool gizmo3D(const char*, glm::vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
