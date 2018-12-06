@@ -22,11 +22,12 @@ And with full configurable: lenght, thickness, dimensions, number of polygon sli
 ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D001.jpg)![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D002.jpg)![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D003.jpg)
 
 ### Live WebGL2 demo
-You can run/test two emscripten **WebGL 2** example of **imGuIZMO** from following link:
+You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
 - [imGuIZMO ImGui widget manipulator (only)](https://www.michelemorrone.eu/emsExamples/qjSetWidget.html)
 - [imGuIZMO ImGui widget + 3D (dolly/zoom) screen manipulator](https://www.michelemorrone.eu/emsExamples/qjSetScreen.html)
 
-It works only on browsers with **WebGl 2** support (FireFox/Chrome/Opera)
+There is way to test all available options and settings.
+It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Chrome/Opera)
 ( test here if your browser supports it: [WebGL 2 Report](http://webglreport.com/?v=2) )
 
 
@@ -102,9 +103,9 @@ IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec3&, float=IMGUIZMO_DEF_S
 
 The example shown in the screenshot is provided.
 To build it you can use CMake (3.10 or higher) or the Visual Studio solution project (for VS 2017) in Windows.
-You need to have installed [**GLFW**](https://www.glfw.org/) and [**glm**](https://github.com/g-truc/glm) in your compiler search path (LIB/INCLUDE). and obviously [**ImGui**](https://github.com/ocornut/imgui)
+You need to have installed [**GLFW**](https://www.glfw.org/) and [**glm**](https://github.com/g-truc/glm) in your compiler search path (LIB/INCLUDE). and obviously [**ImGui**](https://github.com/ocornut/imgui) (a copy is attached, and alredy included in the project/CMakeList.txt)
 
 The CMake file is able to build also an [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html) version, obviously you need to have installed EMSCRIPTEN SDK on your computer (1.38.10 or higher): look at or use the helper batch/script files, in main example folder, to pass appropriate defines/patameters to CMake command line.
 
-To build the EMSCRIPTEN version, in Windows, with CMake, need to have **mingw32-make.exe** in your computer and search PATH (only the make utility is enough): it is a condition of EMSDK tool to build with CMake.
+To build the EMSCRIPTEN version, in Windows, with CMake, need to have **mingw32-make.exe** in your computer and search PATH (only the make utility is enough): it is a condition of EMSDK tool to build with CMake in Windows.
 
