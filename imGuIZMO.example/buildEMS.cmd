@@ -1,0 +1,3 @@
+if "%EMSDK%" == "" call D:\Lang\emsdk\emsdk_env.bat
+
+emcc libs\ImGui\imgui.cpp libs\ImGui\imgui_demo.cpp libs\ImGui\imgui_draw.cpp libs\ImGui\imgui_impl_glfw_gl3.cpp ui\uiMainDlg.cpp ui\uiSettings.cpp ui\imguiGizmo.cpp glApp.cpp glslProgramObject.cpp glslShaderObject.cpp glWindow.cpp qJulia.cpp -I D:\Lang\emsdk\emscripten\1.37.37\system\include -I./libs -I D:\Lang\DeV\Inc -D _USE_GLFW_ -D GLM_ENABLE_EXPERIMENTAL -D GLFW_INCLUDE_ES3 -s USE_GLFW=3 -s USE_WEBGL2=1 -s FULL_ES3=1 -s USE_GLFW=3 -s OFFSCREENCANVAS_SUPPORT=1  -s LEGACY_GL_EMULATION=0 -o qjSet.html --shell-file very_minimal.html -std=c++11 --embed-file Shaders\qjVert.glsl --embed-file Shaders\qjFragES2.glsl
