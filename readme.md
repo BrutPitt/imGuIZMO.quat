@@ -27,7 +27,7 @@ You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
 - [imGuIZMO ImGui widget + 3D (dolly/zoom) screen manipulator](https://www.michelemorrone.eu/emsExamples/qjSetScreen.html)
 
 There is way to test all available options and settings.
-It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Chrome/Opera)
+It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Opera/Chrome and Chromium based).
 ( test here if your browser supports it: [WebGL 2 Report](http://webglreport.com/?v=2) )
 
 
