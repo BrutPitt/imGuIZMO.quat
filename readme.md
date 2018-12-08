@@ -31,7 +31,7 @@ It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Op
 ( test here if your browser supports it: [WebGL 2 Report](http://webglreport.com/?v=2) )
 
 
-### How to use
+### How to use imGuIZMO in your code
 
 In this example I use GLFW and openGL, but it is simple to change this if you use Vulkan/DirectX/etc, SDL/GLUT/etc, or native OS access.
 
