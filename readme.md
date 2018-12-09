@@ -27,8 +27,9 @@ You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
 - [imGuIZMO ImGui widget + 3D (dolly/zoom) screen manipulator](https://www.michelemorrone.eu/emsExamples/qjSetScreen.html)
 
 There is way to test all available options and settings.
-It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Opera/Chrome and Chromium based).
-( test here if your browser supports it: [WebGL 2 Report](http://webglreport.com/?v=2) )
+It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Opera/Chrome and Chromium based)
+
+Test if your browser supports WebGL 2, here: [WebGL2 Report](http://webglreport.com/?v=2)
 
 
 ### How to use imGuIZMO in your code
@@ -109,3 +110,8 @@ The CMake file is able to build also an [**EMSCRIPTEN**](https://kripken.github.
 
 To build the EMSCRIPTEN version, in Windows, with CMake, need to have **mingw32-make.exe** in your computer and search PATH (only the make utility is enough): it is a condition of EMSDK tool to build with CMake in Windows.
 
+
+**For windows users that use vs2017 project solution:**
+The current VisualStudio project solution refers to my environment variable RAMDISK (`R:`), and subsequent VS intrinsic variables to generate binary output:
+`$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\` 
+Even without a RAMDISK variable, executable and binary files are outputted in base to the values of these VS variables, starting from root of current drive.
