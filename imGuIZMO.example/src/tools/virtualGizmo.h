@@ -452,11 +452,11 @@ public:
     //  Set the Dolly to a specified distance.
     //////////////////////////////////////////////////////////////////
     void setDollyPosition(T pos)             { dolly.z = pos; }
-    void setDollyPosition(glm::tvec3<T> pos) { dolly   = pos; }
+    void setDollyPosition(glm::tvec3<T> pos) { dolly.z = pos.z; }
 
     //  Set the Dolly to a specified distance.
     //////////////////////////////////////////////////////////////////
-    void setPanPosition(glm::tvec3<T> pos) { pan = pos; }
+    void setPanPosition(glm::tvec3<T> pos) { pan.x = pos.x; pan.y = pos.y;}
 
     //  Get dolly pos... use as Zoom factor
     //////////////////////////////////////////////////////////////////
