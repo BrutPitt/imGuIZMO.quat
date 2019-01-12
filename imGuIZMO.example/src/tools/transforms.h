@@ -59,7 +59,7 @@ struct transfMatrix {
 };
 
 class transformsClass {
-#define SZ sizeof(glm::mat4)*3 
+#define SZ (sizeof(glm::mat4)*3)
 public:
     transformsClass() {
         //setView(attractorsList.get()->getPOV(), attractorsList.get()->getTGT());         
@@ -98,6 +98,7 @@ public:
 #endif
     void blockBinding(GLuint prog) {
         blockIndex = glGetUniformBlockIndex(prog, "_tMat");
+        glGetActiveUniformBlockiv(prog, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &minSize);
         glUniformBlockBinding(prog, blockIndex, bind::bindIdx);
     }
 
@@ -151,8 +152,8 @@ public:
                                   vec3(0.0f, 1.0f, 0.0f));
     }
 
-    void setPerspective(float angle, float aspect, float _near, float _far) {
-        pAngle = angle; pAspect = aspect; pNear = _near; pFar = _far;
+    void setPerspective(float angle, float aspect, float _near, float _far) {        
+        pAngle = angle; pAspect = aspect; pNear = _near <= 0.0 ? FLT_EPSILON : _near; pFar = _far;
         tM.pMatrix  = glm::perspective(glm::radians(angle),aspect,_near, _far); //the projection matrix
     }
     void setPerspective(float aspect) {
@@ -160,7 +161,7 @@ public:
         tM.pMatrix  = glm::perspective(glm::radians(pAngle),pAspect,pNear, pFar); //the projection matrix
     }
     void setPerspective(float angle, float _near, float _far) {
-        pAngle = angle; pNear = _near; pFar = _far;
+        pAngle = angle; pNear = _near <= 0.0 ? FLT_EPSILON : _near; pFar = _far;
         tM.pMatrix  = glm::perspective(glm::radians(pAngle),pAspect,pNear, pFar); //the projection matrix
     }
 
@@ -183,7 +184,7 @@ private:
     vfGizmo3DClass trackball; 
 
     float pAngle=30, pNear=.01, pFar=2.0, pAspect = 1.0;
-    vec3 povVec, tgtVec;
+    vec3 povVec=vec3(7.0), tgtVec=vec3(0.0);
 
     GLuint blockIndex;
     GLuint uBlockSize;    
@@ -191,5 +192,6 @@ private:
     glm::uint8* ptrBuff;
     enum bind { bindIdx=4 };
     enum loc { pMat = 3, mvMat = 4, mvpMat = 5 };
+    GLint minSize;
 #undef SZ
 };
