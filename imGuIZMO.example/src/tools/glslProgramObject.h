@@ -209,12 +209,13 @@ public:
     mainProgramObj() { } 
     virtual ~mainProgramObj() { deleteAll(); }
 
+    void useVertex(VertexShader *VS) { vertObj = VS; vsCloned = true; }
     void useVertex()   { vertObj = new VertexShader; }
     void useFragment() { fragObj = new FragmentShader; }
     void useAll()      { useVertex(); useGeometry(); useFragment(); }
 
-    void deleteVertex()   { delete vertObj; vertObj = nullptr;}
-    void deleteFragment() { delete fragObj; fragObj = nullptr;}
+    void deleteVertex()   { if(!vsCloned) { delete vertObj; vertObj = nullptr; } }
+    void deleteFragment() { if(!fsCloned) { delete fragObj; fragObj = nullptr; } }
     void deleteAll()      { deleteVertex(); deleteFragment(); deleteGeometry(); }
 
     void addVertex()      { addShader(vertObj); }
@@ -227,14 +228,18 @@ public:
 
 #if !defined(__EMSCRIPTEN__)
     void useGeometry() { geomObj = new GeometryShader; }
-    void deleteGeometry() { delete geomObj; geomObj = nullptr;}
+    void deleteGeometry() { if(!gsCloned) { delete geomObj; geomObj = nullptr; } }
     void addGeometry()    { addShader(geomObj); }
 
     GeometryShader *getGeometry() { return geomObj; }
+
+    bool gsCloned = false;
 #else
     void useGeometry() {}
     void deleteGeometry() {}
 #endif
+
+    bool vsCloned = false,  fsCloned = false;
 
 };
 
@@ -242,7 +247,7 @@ public:
 class uniformBlocksClass {
 public:
 
-     uniformBlocksClass() { glGenBuffers(1,    &uBuffer); }
+     uniformBlocksClass() { }
     ~uniformBlocksClass() { glDeleteBuffers(1, &uBuffer); }
 
 // getting aligment for min size block allocation
@@ -259,6 +264,8 @@ public:
     void create(GLuint size, void *pData, GLuint prog, const char *nameUBlock)
 #endif
     {
+        glGenBuffers(1,    &uBuffer);
+
         realDataSize = size;
         ptrData = pData;
 
