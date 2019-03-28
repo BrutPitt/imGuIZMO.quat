@@ -48,7 +48,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // if you want use also the virtualGizmo3D, screen manipulator, uncomment this:
 
-//#define GLAPP_USE_VIRTUALGIZMO
+#define GLAPP_USE_VIRTUALGIZMO
 
 // Global variable or member class
 #ifdef GLAPP_USE_VIRTUALGIZMO 
@@ -185,9 +185,10 @@ void glWindow::onRender()
 
 #ifdef GLAPP_USE_VIRTUALGIZMO 
     float zoom = getGizmo().getDollyPosition().z;
+/*
     if(zoom < .9)       { zoom =.9;   getGizmo().setDollyPosition(zoom); }
     else if (zoom>1.5)  { zoom = 1.5; getGizmo().setDollyPosition(zoom); }
-
+*/
     qjSet->matOrientation = getGizmo().getTransform() * zoom;
 #else
 ////////////////////////////////////////////////////////////////////
