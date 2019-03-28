@@ -37,7 +37,7 @@ uniform float epsilon;
 //uniform vec3 LightColor;
 //uniform float zzzz;
 
-const vec3 Eye = vec3(0, 0, 2.2);
+const vec3 Eye = vec3(0, 0, 2.);
 //mat3 Orientation = mat3(1);
 //mat3 Orientation = mat3(qjR,0.,0., qjB,qjG,0., 0.,0.,1.0);
 //const vec3 Light = vec3(3., 3., 3.);
@@ -49,8 +49,8 @@ const int maxIterations = 10;
 //bool isFullRender = true;
 
 const float BOUNDING_RAD = 8.0;
-const float ESCAPE_THRESHOLD = 1e1;
-const float D_EPS = 1e-4;
+const float ESCAPE_THRESHOLD = 1e4;
+const float D_EPS = 1e-3;
 
 vec4 QuatMul(vec4 q1, vec4 q2) {
     vec4 r;
@@ -172,7 +172,7 @@ float IntersectQJulia(inout vec3 rO, inout vec3 rD, vec4 c, float slice, out flo
         vec4 zp = vec4(1., 0., 0., 0.);
         IterateIntersect(z, zp, c, trap);
         float normZ = length(z);      
-        dist = 0.5 * normZ * log(normZ) / length(zp);
+        dist = 0.15 * normZ * log(normZ) / length(zp);
         rO += rD * dist;
         ao += dist;
         if (dist < epsilon || dot(rO, rO) > BOUNDING_RAD) break;
@@ -225,7 +225,7 @@ void main() {
 
         vec2 coord = (gl_FragCoord.xy*2. + sampleCoord[i].xy) / resolution.xy - vec2(1.);
 
-        vec3 ray = vec3(coord.x * resolution.z, coord.y, -1.);
+        vec3 ray = vec3(coord.x * resolution.z, coord.y, -2.5);
         vec3 dir = orient * ray;
         vec3 origin = orient * Eye;
         vec4 col;
