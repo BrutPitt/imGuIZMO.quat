@@ -29,7 +29,9 @@ And with full configurable: lenght, thickness, dimensions, number of polygon sli
 | --- | --- |
 | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D003.jpg) | |
 
+
 ### Live WebGL2 demo
+
 You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
 - [imGuIZMO ImGui widget manipulator (only)](https://www.michelemorrone.eu/emsExamples/qjSetWidget.html)
 - [imGuIZMO ImGui widget + 3D (dolly/zoom) screen manipulator](https://www.michelemorrone.eu/emsExamples/qjSetScreen.html)
@@ -39,6 +41,7 @@ It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Op
 
 Test if your browser supports WebGL 2, here: [WebGL2 Report](http://webglreport.com/?v=2)
 
+**imGuIZMO** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject: you can consult the source code for more examples.
 
 ### How to use imGuIZMO in your code
 
