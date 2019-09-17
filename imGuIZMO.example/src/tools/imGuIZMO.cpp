@@ -1,19 +1,15 @@
-////////////////////////////////////////////////////////////////////////////////
-//
+//------------------------------------------------------------------------------
 //  Copyright (c) 2018-2019 Michele Morrone
 //  All rights reserved.
 //
-//  mailto:me@michelemorrone.eu
-//  mailto:brutpitt@gmail.com
+//  https://michelemorrone.eu - https://BrutPitt.com
+//
+//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//
+//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
 //  
-//  https://github.com/BrutPitt
-//
-//  https://michelemorrone.eu
-//  https://BrutPitt.com
-//
 //  This software is distributed under the terms of the BSD 2-Clause license
-//  
-////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
 #include "imGuIZMO.h"
 
 ImVector<glm::vec3> imguiGizmo::sphereVtx;
@@ -22,6 +18,8 @@ ImVector<glm::vec3> imguiGizmo::arrowVtx[4];
 ImVector<glm::vec3> imguiGizmo::arrowNorm[4];
 ImVector<glm::vec3> imguiGizmo::cubeVtx;
 ImVector<glm::vec3> imguiGizmo::cubeNorm;
+ImVector<glm::vec3> imguiGizmo::planeVtx;
+ImVector<glm::vec3> imguiGizmo::planeNorm;
 bool imguiGizmo::solidAreBuilded = false;
 bool imguiGizmo::dragActivate = false;
 //
@@ -60,27 +58,37 @@ int imguiGizmo::sphereTessFactor = imguiGizmo::sphereTess4;
 
 // Cube components
 ///////////////////////////////////////
-float imguiGizmo::cubeSide     = .05f;
+float imguiGizmo::cubeSize     = .05f;
+
+// Plane components
+///////////////////////////////////////
+float imguiGizmo::planeSize      = .33f;
+float imguiGizmo::planeThickness = .015f;
 
 // Axes resize
 ///////////////////////////////////////
 glm::vec3 imguiGizmo::axesResizeFactor(.95,1.0,1.0);
-glm::vec3 imguiGizmo::savedAxesResizeFactor;
+glm::vec3 imguiGizmo::savedAxesResizeFactor = imguiGizmo::axesResizeFactor;
 
 // Solid resize
 ///////////////////////////////////////
-float imguiGizmo::solidResizeFactor= 1.0;
-float imguiGizmo::savedSolidResizeFactor;
+float imguiGizmo::solidResizeFactor = 1.0;
+float imguiGizmo::savedSolidResizeFactor = imguiGizmo::solidResizeFactor;
 
 // Direction arrow color
 ///////////////////////////////////////
 ImVec4 imguiGizmo::directionColor(1.0f, 1.0f, 0.0, 1.0f);
-ImVec4 imguiGizmo::savedDirectionColor;
+ImVec4 imguiGizmo::savedDirectionColor = imguiGizmo::directionColor;
+
+// Plane color
+///////////////////////////////////////
+ImVec4 imguiGizmo::planeColor(1.0f, 1.0f, 0.0, STARTING_ALPHA_PLANE);
+ImVec4 imguiGizmo::savedPlaneColor = imguiGizmo::planeColor;
 
 // Sphere Colors 
 ///////////////////////////////////////
-ImU32 imguiGizmo::sphereColors[2]= { 0xff401010, 0xffc0a0a0 }; // Tessellation colors
-ImU32 imguiGizmo::savedSphereColors[2]; 
+ImU32 imguiGizmo::sphereColors[2] = { 0xff401010, 0xffc0a0a0 }; // Tessellation colors
+ImU32 imguiGizmo::savedSphereColors[2]  = { 0xff401010, 0xffc0a0a0 }; 
 //ImU32 spherecolorA=0xff005cc0, spherecolorB=0xffc05c00;
 
 //
@@ -146,7 +154,7 @@ bool gizmo3D(const char* label, glm::vec4& axis_angle, float size, const int mod
 bool gizmo3D(const char* label, glm::vec3& dir, float size, const int mode)
 {
     imguiGizmo g;
-    g.modeSettings(imguiGizmo::modeDirection); 
+    g.modeSettings(mode & (imguiGizmo::modeDirection | imguiGizmo::modeDirPlane) ? mode : imguiGizmo::modeDirection); 
 
     return g.getTransforms(g.qtV, label, dir, size);
 
@@ -232,33 +240,42 @@ inline ImU32 addLightEffect(ImU32 color, float light)
     float l = ((light<.6) ? .6 : light) * .8;  
     float lc = light * 80.f;                    // ambient component 
     return   clamp(ImU32((( color      & 0xff)*l + lc)),0,255)        |
-            (clamp(ImU32((((color>>8)  & 0xff)*l + lc)),0,255) <<  8) | 
-            (clamp(ImU32((((color>>16) & 0xff)*l + lc)),0,255) << 16) |        
-            (ImU32(ImGui::GetStyle().Alpha * 0xff000000) & 0xff000000);  
+            (clamp(ImU32((((color>>8)  & 0xff)*l + lc)),0,255) <<  8) |
+            (clamp(ImU32((((color>>16) & 0xff)*l + lc)),0,255) << 16) |
+            (ImU32(ImGui::GetStyle().Alpha * (color>>24))  << 24);  
 }
 //
 //  LightEffect
 //      with distance attenuatin
 ////////////////////////////////////////////////////////////////////////////
-inline ImU32 addLightEffect(const glm::vec3 &color, float light, float atten)
+inline ImU32 addLightEffect(const glm::vec4 &color, float light, float atten)
 {                          
     glm::vec3 l((light<.5) ? .5f : light); 
     glm::vec3 a(atten>.25  ? .25f : atten);
-    glm::vec3 c(((color + l*.5f) * l) *.75f + a*color*.45f +a*.25f);
+    glm::vec3 c(((glm::vec3(color) + l*.5f) * l) *.75f + a*glm::vec3(color)*.45f +a*.25f);
 
-    const float alpha = ImGui::GetStyle().Alpha; //ImGui::GetCo(ImGuiCol_FrameBg).w;
+    const float alpha = color.a * ImGui::GetStyle().Alpha; //ImGui::GetCo(ImGuiCol_FrameBg).w;
     return ImGui::ColorConvertFloat4ToU32(ImVec4(c.x, c.y, c.z, alpha));
 }
 
 inline ImU32 addLightEffect(ImU32 color, float light,  float atten)
 {                        
-    glm::vec3 c(float(color & 0xff)/255.f,float((color>>8) & 0xff)/255.f,float((color>>16) & 0xff)/255.f);
+    glm::vec4 c(float(color & 0xff)/255.f,float((color>>8) & 0xff)/255.f,float((color>>16) & 0xff)/255.f, 1.0);
     return addLightEffect(c, light, atten);
 }
 
 //  inline helper drawing functions
 ////////////////////////////////////////////////////////////////////////////
 typedef glm::vec3 & (*ptrFunc)(glm::vec3 &);
+
+
+inline glm::vec3 &adjustPlane(glm::vec3 &coord)
+{
+    coord.x = (coord.x > 0) ? ( 2.5f * coord.x - 1.6f) : coord.x ;
+    coord.x = (coord.x)*.5+.5 + (coord.x>0.0 ? -imguiGizmo::planeThickness : imguiGizmo::planeThickness) * imguiGizmo::solidResizeFactor;
+    coord *= glm::vec3(1.f, 2.f, 2.f);
+    return coord;
+}
 
 inline glm::vec3 &adjustDir(glm::vec3 &coord)
 {
@@ -299,7 +316,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     const float arrowStartingPoint = (axesOriginType & imguiGizmo::sphereAtOrigin) ? sphereRadius * solidResizeFactor:
-                                    ((axesOriginType & imguiGizmo::cubeAtOrigin  ) ? cubeSide     * solidResizeFactor: 
+                                    ((axesOriginType & imguiGizmo::cubeAtOrigin  ) ? cubeSize     * solidResizeFactor: 
                                                                                    cylRadius * .5);
     // if modeDual... leave space for draw light arrow
     glm::vec3 resizeAxes( ((drawMode&modeDual) && (axesResizeFactor.x>.75)) ? glm::vec3(.75,axesResizeFactor.y, axesResizeFactor.z) : axesResizeFactor);
@@ -312,7 +329,8 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         buildCone    (arrowEnd - coneLength, arrowEnd, coneRadius, coneSlices);
         buildCylinder(arrowBgn, arrowEnd - coneLength, cylRadius , cylSlices );
         buildSphere(sphereRadius, sphereTessFactor);
-        buildCube(cubeSide);
+        buildCube(cubeSize);
+        buildPlane(planeSize);
         solidAreBuilded = true;
     }
 
@@ -444,7 +462,23 @@ bool imguiGizmo::drawFunc(const char* label, float size)
                 coord = quat  * (*itVtx++ * solidResizeFactor);                        
                 uv[i++] = normalizeToControlSize(coord.x,coord.y);
             }                    
-            addQuad(addLightEffect(glm::abs(*itNorm++), norm.z, coord.z));
+            addQuad(addLightEffect(glm::vec4(glm::abs(*itNorm++),1.0), norm.z, coord.z));
+        }
+    };
+
+    //////////////////////////////////////////////////////////////////
+    auto drawPlane = [&] ()  
+    {
+        draw_list->PrimReserve(planeNorm.size()*6, planeNorm.size()*4); // num vert/indices 
+        for(auto itNorm = planeNorm.begin(), itVtx  = planeVtx.begin() ; itNorm != planeNorm.end();) {
+            glm::vec3 coord;
+            glm::vec3 norm = quat * *itNorm;
+            for (int i = 0; i<4; ) {
+                coord = quat  * (*itVtx++ * solidResizeFactor);                        
+                uv[i++] = normalizeToControlSize(coord.x,coord.y);
+            }                    
+            itNorm++;
+            addQuad(addLightEffect(glm::vec4(planeColor.x, planeColor.y, planeColor.z, planeColor.w), norm.z, coord.z));
         }
     };
 
@@ -487,7 +521,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
                         glm::vec3 norm( quat * fastRotate(arrowAxis, *itNorm++));
 #endif                  
                         //col[h] = addLightEffect(ImU32(0xFF) << arrowAxis*8, float(0xa0)*norm.z+.5f);
-                        col[h] = addLightEffect(glm::vec3(float(arrowAxis==axisIsX),float(arrowAxis==axisIsY),float(arrowAxis==axisIsZ)), norm.z, coord.z);
+                        col[h] = addLightEffect(glm::vec4(float(arrowAxis==axisIsX),float(arrowAxis==axisIsY),float(arrowAxis==axisIsZ), 1.0), norm.z, coord.z);
                     }
                     addTriangle();
                 }
@@ -513,7 +547,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
                 uv[h] = normalizeToControlSize(coord.x,coord.y);
                 //col[h] = addLightEffect(color, float(0xa0)*norm.z+.5f);
-                col[h] = addLightEffect(glm::vec3(directionColor.x, directionColor.y, directionColor.z), norm.z, coord.z>0 ? coord.z : coord.z*.5);
+                col[h] = addLightEffect(glm::vec4(directionColor.x, directionColor.y, directionColor.z, 1.0), norm.z, coord.z>0 ? coord.z : coord.z*.5);
             }
             addTriangle();
         }
@@ -521,12 +555,14 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     };
 
     //////////////////////////////////////////////////////////////////
-    auto dirArrow = [&] (const glm::quat &q) 
+    auto dirArrow = [&] (const glm::quat &q, int mode) 
     {
         glm::vec3 arrowCoord(quat * glm::vec3(1.0f, 0.0f, 0.0f));
 
-        if(arrowCoord.z <= 0) for(int i = 0; i <  4; i++) drawComponent(i, q, adjustDir);
-        else                  for(int i = 3; i >= 0; i--) drawComponent(i, q, adjustDir);
+        ptrFunc func = (mode == modeDirPlane) ? adjustPlane : adjustDir;
+
+        if(arrowCoord.z <= 0) { for(int i = 0; i <  4; i++) drawComponent(i, q, func); if(mode == modeDirPlane) drawPlane(); }
+        else                  { if(mode == modeDirPlane) drawPlane(); for(int i = 3; i >= 0; i--) drawComponent(i, q, func); }
             
     };
     
@@ -554,7 +590,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
     //  ... and now..  draw the widget!!!
     ///////////////////////////////////////
-    if(drawMode == modeDirection) dirArrow(quat);
+    if(drawMode & (modeDirection | modeDirPlane)) dirArrow(quat, drawMode);
     else { // draw arrows & sphere
         if(drawMode == modeDual) {
             glm::vec3 spot(qtV2 * glm::vec3(-1.0f, 0.0f, .0f)); // versus opposite
@@ -570,17 +606,17 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 }
 
 //
-//  Cube
+//  Polygon
 //
 ////////////////////////////////////////////////////////////////////////////
-void imguiGizmo::buildCube(const float size)
+void imguiGizmo::buildPolygon(const glm::vec3 &size, ImVector<glm::vec3> &vtx, ImVector<glm::vec3> &norm)
 {
 
-    cubeVtx .clear();
-    cubeNorm.clear(); 
+    vtx .clear();
+    norm.clear(); 
 
-#define V(x,y,z) cubeVtx.push_back(glm::vec3(x size, y size, z size))
-#define N(x,y,z) cubeNorm.push_back(glm::vec3(x, y, z))
+#define V(a,b,c) vtx.push_back(glm::vec3(a size.x, b size.y, c size.z))
+#define N(x,y,z) norm.push_back(glm::vec3(x, y, z))
 
     N( 1.0, 0.0, 0.0); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+);
     N( 0.0, 1.0, 0.0); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+);
