@@ -1,38 +1,15 @@
-///////////////////////////////////////////////////////////////////////////////
-//
-//  Copyright (c) 2018 Michele Morrone
+//------------------------------------------------------------------------------
+//  Copyright (c) 2018-2019 Michele Morrone
 //  All rights reserved.
 //
-//  mailto:me@michelemorrone.eu
-//  mailto:brutpitt@gmail.com
-//  
-//  https://github.com/BrutPitt
+//  https://michelemorrone.eu - https://BrutPitt.com
 //
-//  https://michelemorrone.eu
-//  
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//     * Redistributions of source code must retain the above copyright
-//       notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright
-//       notice, this list of conditions and the following disclaimer in the
-//       documentation and/or other materials provided with the distribution.
-//     * Neither the name of the <organization> nor the
-//       names of its contributors may be used to endorse or promote products
-//       derived from this software without specific prior written permission.
-//  
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF 
-// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
 //
-///////////////////////////////////////////////////////////////////////////////
+//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
+//  
+//  This software is distributed under the terms of the BSD 2-Clause license
+//------------------------------------------------------------------------------
 #include <sstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -68,6 +45,7 @@ void mainImGuiDlgClass::renderImGui()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+
     ImGuiStyle& style = ImGui::GetStyle();
            
 
@@ -204,7 +182,8 @@ void mainImGuiDlgClass::renderImGui()
     static float axesLen = .95;
     static float axesThickness = 1.0;
     glm::vec3 resAxes(axesLen,axesThickness,axesThickness);
-    static glm::vec3 dirCol(1.0,.5,0.0);
+    static glm::vec3 dirCol(1.0,1.0,1.0);
+    static glm::vec4 planeCol(.75,.0,0.0, STARTING_ALPHA_PLANE);
     static ImVec4 sphCol1(ImGui::ColorConvertU32ToFloat4(0xff0080ff));
     static ImVec4 sphCol2(ImGui::ColorConvertU32ToFloat4(0xffff8000));
 
@@ -285,8 +264,9 @@ void mainImGuiDlgClass::renderImGui()
 
         imguiGizmo::resizeAxesOf(resAxes);
         //this is only direction!!!... and i can change color
-        imguiGizmo::setDirectionColor(ImVec4(dirCol.x,dirCol.y, dirCol.z, 1.0));
-        if( ImGui::gizmo3D("##RotA", a,sz,0)) {}   
+
+        imguiGizmo::setDirectionColor(ImGui::ColorConvertU32ToFloat4(0xff0080ff), ImGui::ColorConvertU32ToFloat4(0xc0ff8000));
+        if( ImGui::gizmo3D("##RotA", a,sz, imguiGizmo::modeDirPlane)) {}   
         imguiGizmo::restoreDirectionColor();
         imguiGizmo::restoreAxesSize();
 
@@ -322,6 +302,7 @@ void mainImGuiDlgClass::renderImGui()
 
             if (ImGui::Combo("Modes##combo", &mode_idx, "Axes (default)\0"\
                                                               "Direction\0"\
+                                                              "Plane Direction\0"\
                                                               "Dual mode\0"\
                             )) 
             {
@@ -329,7 +310,8 @@ void mainImGuiDlgClass::renderImGui()
                 {
                     case 0: mode = imguiGizmo::mode3Axes; break;
                     case 1: mode = imguiGizmo::modeDirection; break;
-                    case 2: mode = imguiGizmo::modeDual;  break;
+                    case 2: mode = imguiGizmo::modeDirPlane; break;
+                    case 3: mode = imguiGizmo::modeDual;  break;
 
                 }
             }
@@ -361,16 +343,23 @@ void mainImGuiDlgClass::renderImGui()
             ImGui::PopItemWidth();
 
             if(!(mode & imguiGizmo::mode3Axes) ) {
-                ImGui::Text(" Color singleDirection");
-                ImGui::ColorEdit3("##Direction",glm::value_ptr(dirCol));
+                if(mode & imguiGizmo::modeDirection) {
+                    ImGui::Text(" Direction color");
+                    ImGui::ColorEdit3("##Direction",glm::value_ptr(dirCol));
+                } else if(mode & imguiGizmo::modeDirPlane) {
+                    ImGui::Text(" Arrow color");
+                    ImGui::ColorEdit3("##Direction",glm::value_ptr(dirCol));
+                    ImGui::Text(" Plane color");
+                    ImGui::ColorEdit4("##Plane",glm::value_ptr(planeCol));
+                }
             }
     
             if((draw & imguiGizmo::sphereAtOrigin) && !(mode & imguiGizmo::modeDirection)) {
                 ImGui::Text(" Color Sphere");
                 ImGui::PushItemWidth(half);    
-                ImGui::ColorEdit3("##Sph1",(float *) &sphCol1);
+                ImGui::ColorEdit4("##Sph1",(float *) &sphCol1);
                 //ImGui::SameLine();
-                ImGui::ColorEdit3("##Sph2",(float *) &sphCol2);
+                ImGui::ColorEdit4("##Sph2",(float *) &sphCol2);
                 ImGui::PopItemWidth();
             }
 
@@ -390,8 +379,9 @@ void mainImGuiDlgClass::renderImGui()
             ImGui::NextColumn();
             imguiGizmo::resizeAxesOf(resAxes);
             imguiGizmo::resizeSolidOf(resSolid); // sphere bigger
-            imguiGizmo::setSphereColors(ImGui::ColorConvertFloat4ToU32(sphCol1), ImGui::ColorConvertFloat4ToU32(sphCol2));
-            imguiGizmo::setDirectionColor(ImVec4(dirCol.x,dirCol.y, dirCol.z, 1.0));
+            imguiGizmo::setSphereColors(ImGui::ColorConvertFloat4ToU32(sphCol1), ImGui::ColorConvertFloat4ToU32(sphCol2));            
+            imguiGizmo::setDirectionColor(ImVec4(dirCol.x,dirCol.y, dirCol.z, 1.0),ImVec4(planeCol.x,planeCol.y, planeCol.z, planeCol.w));
+            //plane & dir with same color - > imguiGizmo::setDirectionColor(ImVec4(dirCol.x,dirCol.y, dirCol.z, 1.0)); 
 
 
             if(mode != imguiGizmo::modeDual) ImGui::gizmo3D("##gizmoV1", qv1, w, mode|draw );
@@ -463,7 +453,6 @@ Anyhow the static variables can be modified to change the 3d aspect of all solid
         if(metricW) ImGui::ShowMetricsWindow(&metricW);
         ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
         if(demosW) ImGui::ShowDemoWindow(&demosW);
-
 
 
     ImGui::Render();

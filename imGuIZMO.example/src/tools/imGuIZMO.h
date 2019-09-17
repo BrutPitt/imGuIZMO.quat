@@ -1,19 +1,15 @@
-////////////////////////////////////////////////////////////////////////////////
-//
+//------------------------------------------------------------------------------
 //  Copyright (c) 2018-2019 Michele Morrone
 //  All rights reserved.
 //
-//  mailto:me@michelemorrone.eu
-//  mailto:brutpitt@gmail.com
+//  https://michelemorrone.eu - https://BrutPitt.com
+//
+//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//
+//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
 //  
-//  https://github.com/BrutPitt
-//
-//  https://michelemorrone.eu
-//  https://BrutPitt.com
-//
 //  This software is distributed under the terms of the BSD 2-Clause license
-//  
-////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------------------------------------
 #pragma once
 #include <algorithm>
 
@@ -46,6 +42,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #define imguiGizmo_INTERPOLATE_NORMALS
+#define STARTING_ALPHA_PLANE .75f
 
 typedef float tbT;
 
@@ -76,6 +73,7 @@ struct imguiGizmo
     enum      {                            //0b0000'0000, //C++14 notation
                 mode3Axes          = 0x01, //0b0000'0001, 
                 modeDirection      = 0x02, //0b0000'0010,
+                modeDirPlane       = 0x04, //0b0000'0010,
                 modeDual           = 0x08, //0b0000'1000,
                 modeMask           = 0x0f, //0b0000'1111,
                 
@@ -98,9 +96,17 @@ struct imguiGizmo
     static ImVector<int>       sphereTess;
     static ImVector<glm::vec3> cubeVtx;
     static ImVector<glm::vec3> cubeNorm;
+    static ImVector<glm::vec3> planeVtx;
+    static ImVector<glm::vec3> planeNorm;
     static ImVector<glm::vec3> arrowVtx[4];
     static ImVector<glm::vec3> arrowNorm[4];
-    static void buildCube    (const float side);
+    static void buildPlane   (const float size, const float thickness = planeThickness) {
+        buildPolygon(glm::vec3(thickness,size,size), planeVtx, planeNorm);
+    }
+    static void buildCube    (const float size) {
+        buildPolygon(glm::vec3(size), cubeVtx, cubeNorm);
+    }
+    static void buildPolygon (const glm::vec3& size,ImVector<glm::vec3>& vtx,ImVector<glm::vec3>& norm);
     static void buildSphere  (const float radius, const int tessFactor);
     static void buildCone    (const float x0, const float x1, const float radius, const int slices);
     static void buildCylinder(const float x0, const float x1, const float radius, const int slices);
@@ -118,10 +124,14 @@ struct imguiGizmo
     static void restoreSolidSize() {
         solidResizeFactor = savedSolidResizeFactor; }
 
-    static void setDirectionColor(const ImVec4 &color) {
-        savedDirectionColor = directionColor; directionColor = color; }
+    static void setDirectionColor(const ImVec4 &dColor, const ImVec4 &pColor) {
+        savedDirectionColor = directionColor; savedPlaneColor = planeColor; 
+        directionColor = dColor; planeColor = pColor;
+    }
+    static void setDirectionColor(const ImVec4& color) { setDirectionColor(color,ImVec4(color.x, color.y, color.z, STARTING_ALPHA_PLANE));  }
     static void restoreDirectionColor() {
-        directionColor = savedDirectionColor; }
+        directionColor = savedDirectionColor; 
+        planeColor     = savedPlaneColor;     }
 
     static void setSphereColors(ImU32 a, ImU32 b) {
         savedSphereColors[0] = sphereColors[0]; savedSphereColors[1] = sphereColors[1];
@@ -215,7 +225,13 @@ struct imguiGizmo
 
     // Cube components
     ///////////////////////////////////////
-    static float cubeSide    ;
+    static float cubeSize;
+
+    // Plane components
+    ///////////////////////////////////////
+    static float planeSize;
+    static float planeThickness;
+
 
     //
     //  Resizing and color settings
@@ -240,6 +256,9 @@ struct imguiGizmo
     
     static ImVec4 directionColor;
     static ImVec4 savedDirectionColor;
+
+    static ImVec4 planeColor;
+    static ImVec4 savedPlaneColor;
 
     static const int imguiGizmoDefaultSize;
 };

@@ -248,7 +248,7 @@ GLFWmonitor* getCurrentMonitor(GLFWwindow *window)
     #define USE_GLSL_VERSION   "#version 300 es\n\n"
     #define USE_GLSL_PRECISION "precision highp float;\n"
 #else
-    #define USE_GLSL_VERSION   "#version 430"
+    #define USE_GLSL_VERSION   "#version 410"
     #define USE_GLSL_PRECISION 
 
 #endif
@@ -298,12 +298,11 @@ void mainGLApp::glfwInit()
     #ifdef GLAPP_REQUIRE_OGL45
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     #else
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     #endif
-
+#endif    
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-#endif    
     glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
     
 
@@ -436,11 +435,12 @@ void newFrame()
 
     // Rendering
 //        int display_w, display_h;
-    //glViewport(0, 0, width, width);
-    //glClearColor(0,0,0,0);
+    //glViewport(0, 0, theApp->GetWidth(), theApp->GetHeight());
+    //glClearColor(1,0,0,0);
     //glClear(GL_COLOR_BUFFER_BIT);
 
     theDlg.renderImGui();
+    glfwMakeContextCurrent(theApp->getGLFWWnd());
     glfwSwapBuffers(theApp->getGLFWWnd());
 
 }
@@ -451,10 +451,12 @@ void mainGLApp::mainLoop()
     while (!glfwWindowShouldClose(getGLFWWnd())) {          
 
         glfwPollEvents();
+        newFrame();
+/*
         if (!glfwGetWindowAttrib(getGLFWWnd(), GLFW_ICONIFIED)) {
-            newFrame();
 
         }
+*/
 /*
         static int cnt=0;
         glfwMakeContextCurrent(secondary);
