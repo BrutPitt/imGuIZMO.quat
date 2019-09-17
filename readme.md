@@ -36,7 +36,7 @@ Test if your browser supports WebGL 2, here: [WebGL2 Report](http://webglreport.
 | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B003.jpg) |
 | --- | --- | --- |
 
-### Plane direction
+### Plane direction 
 | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0006.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0008.jpg) | 
 | --- | --- |
 
@@ -56,13 +56,15 @@ Lenght, thickness, dimensions, number of polygon slices, colors and sphere tesse
 
 ## How to use imGuIZMO in your code
 
-In this example I use GLFW and openGL, but it is simple to change this if you use Vulkan/DirectX/etc, SDL/GLUT/etc, or native OS access.
+In this example I use **GLFW** or **SDL2** (`#define GLAPP_USE_SDL`) with **OpenGL**, but it is simple to change if you use Vulkan/DirectX/etc, other frameworks (like GLUT) or native OS access.
 
-To use imGuIZMO need to include imGuIZMO.h file in your code, then an possible use can be to declare an object of type glm::quat (quaternion), global or as member of your class, to mantain track of rotations:
-
+To use imGuIZMO need to include imGuIZMO.h file in your code.
 ```cpp
 #include "imGuIZMO.h"
+```
+A possible use can be to declare an object of type glm::quat (quaternion), global or as member of your class, to mantain track of rotations:
 
+```cpp
 /////////////////////////////////////////////////////////////////////////////
 // For imGuIZMO, declare global variable or member class quaternion
     glm::quat qRot = glm::quat(1.f, 0.f, 0.f, 0.f);
@@ -139,8 +141,11 @@ IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec3&, float=IMGUIZMO_DEF_S
 ### Building Example
 
 The example shown in the screenshot is provided.
+
+To use SDL framework instead of GLFW, uncomment `#define GLAPP_USE_SDL` in `glApp.h` file, or pass `-DGLAPP_USE_SDL` directly to compiler.
+
 To build it you can use CMake (3.10 or higher) or the Visual Studio solution project (for VS 2017) in Windows.
-You need to have installed [**GLFW**](https://www.glfw.org/) and [**glm**](https://github.com/g-truc/glm) in your compiler search path (LIB/INCLUDE). and obviously [**ImGui**](https://github.com/ocornut/imgui) (a copy is attached, and already included in the project/CMakeList.txt)
+You need to have [**GLFW**](https://www.glfw.org/) (or [**SDL**](https://libsdl.org/)) in your compiler search path (LIB/INCLUDE). Instead copy of [**glm**](https://github.com/g-truc/glm) and [**ImGui**](https://github.com/ocornut/imgui) are attached and included in the example.
 
 The CMake file is able to build also an [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html) version, obviously you need to have installed EMSCRIPTEN SDK on your computer (1.38.10 or higher): look at or use the helper batch/script files, in main example folder, to pass appropriate defines/patameters to CMake command line.
 
