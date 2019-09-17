@@ -78,6 +78,9 @@
     <ClCompile Include="..\src\tools\imGuIZMO.cpp">
       <Filter>Tools\imguiTools</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\libs\ImGui\imgui_impl_sdl.cpp">
+      <Filter>libs\imGui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\glApp.h">

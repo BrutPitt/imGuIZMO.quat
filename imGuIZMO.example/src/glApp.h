@@ -10,14 +10,26 @@
 //  
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
+
 #pragma once
 #include <string>
 #include <sstream>
 #include <vector>
 #include <iomanip>
 #include <iostream>
-#include <GLFW/glfw3.h>
-#include "ui\uiMainDlg.h"
+
+#if !defined(__EMSCRIPTEN__)
+    //#define GLAPP_USE_SDL
+#endif
+
+#ifdef GLAPP_USE_SDL
+    #include <SDL.h>
+    #include <SDL_opengl.h>
+#else
+    #include <GLFW/glfw3.h>
+#endif
+
+#include "ui/uiMainDlg.h"
 
 
 
@@ -66,10 +78,15 @@ public:
     void mainLoop();
 ////////////////////////////////
 //GLFW Utils
-    GLFWwindow* getGLFWWnd()  const { return(mainGLFWwnd);  }
 
     glWindow *getEngineWnd() { return glEngineWnd; }
+#ifdef GLAPP_USE_SDL
+    SDL_Window* getSDLWWnd()  const { return(mainSDLWwnd);  }
+    void setSDLWWnd(SDL_Window* wnd) { mainSDLWwnd = wnd; }
+#else
+    GLFWwindow* getGLFWWnd()  const { return(mainGLFWwnd);  }
     void setGLFWWnd(GLFWwindow* wnd) { mainGLFWwnd = wnd; }
+#endif
 
 	int getXPosition() const { return(xPosition); }
     int getYPosition() const { return(yPosition); }
@@ -104,11 +121,18 @@ private:
 
 // glfw utils
 /////////////////////////////////////////////////
-    void glfwInit();
-    int glfwExit();
+#ifdef GLAPP_USE_SDL
+    void frameInit();
+    int frameExit();
+    SDL_Window* mainSDLWwnd;
+    SDL_GLContext gl_context;
+#else
+    void frameInit();
+    int frameExit();
+    GLFWwindow* mainGLFWwnd;
+#endif
     int getModifier();
 
-    GLFWwindow* mainGLFWwnd;
     glWindow *glEngineWnd;
 
 friend class glWindow;

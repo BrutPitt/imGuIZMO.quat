@@ -13,7 +13,11 @@
 #pragma once
 
 #include <ImGui/imgui.h>
+#ifdef GLAPP_USE_SDL
+#include <ImGui/imgui_impl_sdl.h>
+#else
 #include <ImGui/imgui_impl_glfw.h>
+#endif
 #include <ImGui/imgui_impl_opengl3.h>
 
 

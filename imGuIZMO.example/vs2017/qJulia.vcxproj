@@ -67,7 +67,7 @@
     <LinkIncremental>true</LinkIncremental>
     <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath);$(Include)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
     <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
   </PropertyGroup>
@@ -75,21 +75,21 @@
     <LinkIncremental>true</LinkIncremental>
     <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath);$(Include)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
     <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath);$(Include)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
     <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath);$(Include)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
     <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
   </PropertyGroup>
@@ -100,13 +100,13 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>NotSet</SubSystem>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -115,7 +115,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -123,28 +123,31 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL;</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\libs\ImGui\imgui_impl_sdl.cpp" />
     <ClCompile Include="..\src\tools\glslProgramObject.cpp" />
     <ClCompile Include="..\src\tools\glslShaderObject.cpp" />
     <ClCompile Include="..\src\glApp.cpp" />
