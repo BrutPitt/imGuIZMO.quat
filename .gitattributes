@@ -1,3 +1,13 @@
 *.c linguist-language=cpp
 *.h linguist-language=cpp
 *.html binary
+*.exe binary
+*.json binary
+*.ttf binary
+*.sca binary
+*.so binary
+*.a binary
+*.dylib binary 
+*.js linguist-language=cpp
+.suo binary
+WebGL/ export-ignore
