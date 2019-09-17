@@ -1,54 +1,60 @@
-# imGuIZMO
+# imGuIZMO.quat
 **imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget. it provides a way to rotate models, lights, or objects with mouse, and graphically visualize their position in space. It uses **quaternions** algebra, internally, to manage rotations, but offers the possibility also to interfacing with **vec3**, **vec4** or **mat4x4** (rotation)
 
 **imGuIZMO** is written in C++ (C++14) and consist of only two files (*imGuIZMO.h* and *imGuIZMO.cpp*) that you can simply add to your project.
 It uses [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D): my *header only* 3D GIZMO manipulator tool (in *Immediate Mode* without pan and dolly functions) and [**glm** mathematics library](https://github.com/g-truc/glm) (0.9.9 or higher), also it an *header only* tool.
 
+### Live WebGL2 demo
 
-![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/imGuIZMO.gif)
+You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
+- [**imGuIZMO.quat** ImGui widget + 3D (dolly/zoom) screen manipulator](https://brutpitt.github.io/imGuIZMO.quat/imGuIZMO.example/WebGL/qjSetVG.html)
+- [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/imGuIZMO.quat/imGuIZMO.example/WebGL/qjSet.html)
 
-**It was originally developed for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject, and still used in it, while [**ImGui**](https://github.com/ocornut/imgui) is Immediate Mode Graphics User Interface library*
+<p align="center"><a href="https://brutpitt.github.io/imGuIZMO.quat/imGuIZMO.example/WebGL/qjSetVG.html"> 
+<img src="https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/imGuIZMO.gif"></a>
+</p>
 
+It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Opera/Chrome and Chromium based)
 
-Three widget types are prvided, (six function calls with different parameters: *quaternion, vec4, vec3* for different uses) each of them personalizable with several graphics options:
+Test if your browser supports WebGL 2, here: [WebGL2 Report](http://webglreport.com/?v=2)
+
+****imGuIZMO.quat** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject: consult the source code for more examples.*
+
+**[**ImGui**](https://github.com/ocornut/imgui) is Immediate Mode Graphics User Interface library*
+<p>&nbsp;<br>&nbsp;<br></p>
+
+## imGuIZMO.quat Description
+
+**FOUR** widget types are prvided, (six function calls with different parameters: *quaternion, vec4, vec3* for different uses) each of them personalizable with several graphics options:
 
 ### Axes mode
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A002.jpg) |
-| --- | --- |
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A004.jpg) |
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A004.jpg) |
+| --- | --- | --- | --- |
+
 
 ### Directional arrow
 | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B003.jpg) |
 | --- | --- | --- |
 
+### Plane direction
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0006.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0008.jpg) | 
+| --- | --- |
 
 ### Axes + spot
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/C001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/C002.jpg) | 
-| --- | --- |
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/C003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/C004.jpg) |
-
-And with full configurable: lenght, thickness, dimensions, number of polygon slices, colors and sphere tesselation:
-
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D002.jpg) |
-| --- | --- |
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D003.jpg) | |
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/C003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/C004.jpg) |
+| --- | --- | --- | --- |
 
 
-### Live WebGL2 demo
+### Full configurable
+Lenght, thickness, dimensions, number of polygon slices, colors and sphere tesselation:
 
-You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
-- [imGuIZMO ImGui widget + 3D (dolly/zoom) screen manipulator](https://www.michelemorrone.eu/emsExamples/qjSetScreen.html)
-- [imGuIZMO ImGui widget manipulator (only)](https://www.michelemorrone.eu/emsExamples/qjSetWidget.html)
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0007.jpg)|
+| --- | --- | --- | --- |
 
 
-There is way to test all available options and settings.
-It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Opera/Chrome and Chromium based)
+<p>&nbsp;<br>&nbsp;<br></p>
 
-Test if your browser supports WebGL 2, here: [WebGL2 Report](http://webglreport.com/?v=2)
-
-**imGuIZMO** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject: consult the source code for more examples.
-
-### How to use imGuIZMO in your code
+## How to use imGuIZMO in your code
 
 In this example I use GLFW and openGL, but it is simple to change this if you use Vulkan/DirectX/etc, SDL/GLUT/etc, or native OS access.
 
@@ -115,6 +121,7 @@ IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::quat&, float=IMGUIZMO_DEF_S
 IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 ```
+<p>&nbsp;<br>&nbsp;<br></p>
 
 ### Building Example
 
