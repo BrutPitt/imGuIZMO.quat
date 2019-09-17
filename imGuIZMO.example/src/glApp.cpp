@@ -48,10 +48,10 @@
 #include "glApp.h"
 #include "glWindow.h"
 
-//#include "libs/ImGui/imgui.h"
-//#include "libs/ImGui/imgui_impl_glfw_gl3.h"
+// Set the application to null for the linker
+mainGLApp* mainGLApp::theMainApp = 0;
 
-
+#if !defined(GLAPP_USE_SDL)
 #ifndef __EMSCRIPTEN__
     GLFWmonitor* getCurrentMonitor(GLFWwindow *window);
     void toggleFullscreenOnOff(GLFWwindow* window);
@@ -59,8 +59,6 @@
 #endif
 
 
-// Set the application to null for the linker
-mainGLApp* mainGLApp::theMainApp = 0;
 
 bool        ImGui_ImplGlfwGL3_Init(GLFWwindow* , bool , const char* );
 
@@ -243,6 +241,7 @@ GLFWmonitor* getCurrentMonitor(GLFWwindow *window)
     return bestmonitor;
 }
 #endif
+#endif
 
 #ifdef __EMSCRIPTEN__
     #define USE_GLSL_VERSION   "#version 300 es\n\n"
@@ -260,7 +259,11 @@ void mainGLApp::imguiInit()
     // Setup ImGui binding
         ImGui::CreateContext();
         //ImGuiIO& io = ImGui::GetIO(); (void)io;
+#ifdef GLAPP_USE_SDL
+        ImGui_ImplSDL2_InitForOpenGL(mainSDLWwnd, gl_context);
+#else
         ImGui_ImplGlfw_InitForOpenGL(mainGLFWwnd, false);
+#endif
         ImGui_ImplOpenGL3_Init(USE_GLSL_VERSION);
         //ImGui::StyleColorsDark();
         setGUIStyle();
@@ -274,16 +277,76 @@ int mainGLApp::imguiExit()
 {
 // need to test exit wx ... now 0!
     ImGui_ImplOpenGL3_Shutdown();
+#ifdef GLAPP_USE_SDL
+    ImGui_ImplSDL2_Shutdown();
+#else
     ImGui_ImplGlfw_Shutdown();
+#endif
     ImGui::DestroyContext();
     return 0;
 }
 
-GLFWwindow *secondary;
+
+#ifdef GLAPP_USE_SDL
+void mainGLApp::frameInit()
+{
+    // Setup SDL
+    if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0)
+    {
+        printf("Error: %s\n", SDL_GetError());
+        return ;
+    }
+
+    // Decide GL+GLSL versions
+#if __APPLE__
+    // GL 3.2 Core + GLSL 150
+    const char* glsl_version = "#version 150";
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+#else
+    // GL 3.0 + GLSL 130
+    const char* glsl_version = "#version 130";
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+#endif
+
+    // Create window with graphics context
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+    SDL_DisplayMode current;
+    SDL_GetCurrentDisplayMode(0, &current);
+    mainSDLWwnd = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GetWidth(), GetHeight(), SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+    gl_context = SDL_GL_CreateContext(mainSDLWwnd);
+    SDL_GL_SetSwapInterval(1); // Enable vsync
+
+    gladLoadGL();
+}
+
+int mainGLApp::frameExit()
+{
+    SDL_GL_DeleteContext(gl_context);
+    SDL_DestroyWindow(mainSDLWwnd);
+    SDL_Quit();
+    return 0;
+
+}
+int mainGLApp::getModifier() {
+    SDL_Keymod key = SDL_GetModState();
+    if(key & KMOD_ALT) return KMOD_ALT;
+    else if(key & KMOD_SHIFT) return KMOD_SHIFT;
+    else if(key & KMOD_CTRL) return KMOD_CTRL;
+    else return 0;
+}
+#else
 
 // glfw utils
 /////////////////////////////////////////////////
-void mainGLApp::glfwInit()
+void mainGLApp::frameInit()
 {
     glfwSetErrorCallback(glfwErrorCallback);
 
@@ -354,7 +417,7 @@ void mainGLApp::glfwInit()
 
 }
 
-int mainGLApp::glfwExit()
+int mainGLApp::frameExit()
 {
 
     glfwDestroyWindow(getGLFWWnd());
@@ -375,6 +438,9 @@ int mainGLApp::getModifier() {
             return GLFW_MOD_ALT;
     else return 0;
 }
+
+#endif
+
 
 
 mainGLApp::mainGLApp() 
@@ -402,7 +468,7 @@ void mainGLApp::onInit()
 
 
 // Imitialize both FrameWorks
-    glfwInit();
+    frameInit();
 
 // Imitialize both GL engine
     glEngineWnd->onInit();
@@ -417,7 +483,7 @@ int mainGLApp::onExit()
 // Exit from both FrameWorks
     imguiExit();
 
-    glfwExit();
+    frameExit();
 
 // need to test returns code... now 0!        
     return 0;
@@ -440,41 +506,55 @@ void newFrame()
     //glClear(GL_COLOR_BUFFER_BIT);
 
     theDlg.renderImGui();
+#ifdef GLAPP_USE_SDL
+    SDL_GL_SwapWindow(theApp->getSDLWWnd());
+#else
     glfwMakeContextCurrent(theApp->getGLFWWnd());
     glfwSwapBuffers(theApp->getGLFWWnd());
+#endif
 
 }
 
 
 void mainGLApp::mainLoop() 
 {
+
+#ifdef GLAPP_USE_SDL
+
+        // Main loop
+    bool done = false;
+    while (!done)
+    {
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_QUIT)
+                done = true;
+            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(mainSDLWwnd))
+                done = true;
+            if (event.type == SDL_MOUSEBUTTONDOWN) {
+                theWnd->onMouseButton(event.button.button, SDL_MOUSEBUTTONDOWN, event.button.x, event.button.y); 
+            }
+            if (event.type == SDL_MOUSEBUTTONUP) {
+                theWnd->onMouseButton(event.button.button, SDL_MOUSEBUTTONUP, event.button.x, event.button.y);
+            }
+            if (event.type == SDL_MOUSEMOTION) {
+                theWnd->onMotion(event.motion.x, event.motion.y);
+            }
+
+
+        }
+        newFrame();
+    }
+
+#else
     while (!glfwWindowShouldClose(getGLFWWnd())) {          
 
         glfwPollEvents();
         newFrame();
-/*
-        if (!glfwGetWindowAttrib(getGLFWWnd(), GLFW_ICONIFIED)) {
-
-        }
-*/
-/*
-        static int cnt=0;
-        glfwMakeContextCurrent(secondary);
-
-        glClearColor(0.0, 0.0, 0.0, 0.1);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        
-        glfwSwapBuffers(secondary);
-
-        glfwMakeContextCurrent(getGLFWWnd());
-*/
-
-        //if(!(cnt++%10)) 
-
-
     }
-
+#endif
 }
     
 

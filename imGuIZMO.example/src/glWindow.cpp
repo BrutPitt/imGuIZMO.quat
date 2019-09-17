@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // if you want use also the virtualGizmo3D, screen manipulator, uncomment this:
 
-//#define GLAPP_USE_VIRTUALGIZMO
+#define GLAPP_USE_VIRTUALGIZMO
 
 // Global variable or member class
 #ifdef GLAPP_USE_VIRTUALGIZMO 
@@ -114,6 +114,16 @@ void glWindow::onInit()
     glViewport(0,0,theApp->GetWidth(), theApp->GetHeight());
 
 #ifdef GLAPP_USE_VIRTUALGIZMO 
+#ifdef GLAPP_USE_SDL
+    getGizmo().setGizmoRotControl( (vgButtons) SDL_BUTTON_LEFT, (vgModifiers) 0 /* evNoModifier */ );
+
+    getGizmo().setGizmoRotXControl((vgButtons) SDL_BUTTON_LEFT, (vgModifiers) KMOD_SHIFT);
+    getGizmo().setGizmoRotYControl((vgButtons) SDL_BUTTON_LEFT, (vgModifiers) KMOD_CTRL);
+    getGizmo().setGizmoRotZControl((vgButtons) SDL_BUTTON_LEFT, (vgModifiers) KMOD_ALT);
+
+    getGizmo().setDollyControl((vgButtons) SDL_BUTTON_RIGHT, (vgModifiers) 0);
+    getGizmo().setPanControl(  (vgButtons) SDL_BUTTON_RIGHT, (vgModifiers) KMOD_CTRL|KMOD_SHIFT);
+#else
     getGizmo().setGizmoRotControl( (vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) 0 /* evNoModifier */ );
 
     getGizmo().setGizmoRotXControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SHIFT);
@@ -122,6 +132,7 @@ void glWindow::onInit()
 
     getGizmo().setDollyControl((vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) 0);
     getGizmo().setPanControl(  (vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) GLFW_MOD_CONTROL|GLFW_MOD_SHIFT);
+#endif
     //getGizmo().setPanControls(  (vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) GLFW_MOD_SHIFT);
 
     // viewportSize  is need to set mouse sensitivity for rotation
@@ -250,7 +261,11 @@ void glWindow::onMouseButton(int button, int upOrDown, int x, int y)
 #ifdef GLAPP_USE_VIRTUALGIZMO 
     getGizmo().mouse((vgButtons) (button),
                     (vgModifiers) theApp->getModifier(),
+#ifdef GLAPP_USE_SDL
+                    upOrDown==SDL_MOUSEBUTTONDOWN, x, y);
+#else
                     upOrDown==GLFW_PRESS, x, y);
+#endif
 #endif
 
 }

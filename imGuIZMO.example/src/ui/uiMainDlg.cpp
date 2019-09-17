@@ -43,7 +43,11 @@ void mainImGuiDlgClass::renderImGui()
     if(!visible()) return;
 
     ImGui_ImplOpenGL3_NewFrame();
+#ifdef GLAPP_USE_SDL
+    ImGui_ImplSDL2_NewFrame(theApp->getSDLWWnd());
+#else
     ImGui_ImplGlfw_NewFrame();
+#endif
     ImGui::NewFrame();
 
     ImGuiStyle& style = ImGui::GetStyle();
