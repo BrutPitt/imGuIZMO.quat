@@ -1,10 +1,14 @@
 # imGuIZMO
-**imGuIZMO** is an widget for [**dear ImGui**](https://github.com/ocornut/imgui) (Immediate Mode Graphics User Interface) library. it provides a way to rotate model, light, or object with mouse, and graphically visualize its position in space. 
-
-![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/imGuIZMO.gif)
+**imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget. it provides a way to rotate models, lights, or objects with mouse, and graphically visualize their position in space. It uses **quaternions** algebra, internally, to manage rotations, but offers the possibility also to interfacing with **vec3**, **vec4** or **mat4x4** (rotation)
 
 **imGuIZMO** is written in C++ (C++14) and consist of only two files (*imGuIZMO.h* and *imGuIZMO.cpp*) that you can simply add to your project.
 It uses [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D): my *header only* 3D GIZMO manipulator tool (in *Immediate Mode* without pan and dolly functions) and [**glm** mathematics library](https://github.com/g-truc/glm) (0.9.9 or higher), also it an *header only* tool.
+
+
+![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/imGuIZMO.gif)
+
+**It was originally developed for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject, and still used in it, while [**ImGui**](https://github.com/ocornut/imgui) is Immediate Mode Graphics User Interface library*
+
 
 Three widget types are prvided, (six function calls with different parameters: *quaternion, vec4, vec3* for different uses) each of them personalizable with several graphics options:
 
@@ -33,15 +37,16 @@ And with full configurable: lenght, thickness, dimensions, number of polygon sli
 ### Live WebGL2 demo
 
 You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
-- [imGuIZMO ImGui widget manipulator (only)](https://www.michelemorrone.eu/emsExamples/qjSetWidget.html)
 - [imGuIZMO ImGui widget + 3D (dolly/zoom) screen manipulator](https://www.michelemorrone.eu/emsExamples/qjSetScreen.html)
+- [imGuIZMO ImGui widget manipulator (only)](https://www.michelemorrone.eu/emsExamples/qjSetWidget.html)
+
 
 There is way to test all available options and settings.
 It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Opera/Chrome and Chromium based)
 
 Test if your browser supports WebGL 2, here: [WebGL2 Report](http://webglreport.com/?v=2)
 
-**imGuIZMO** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject: you can consult the source code for more examples.
+**imGuIZMO** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject: consult the source code for more examples.
 
 ### How to use imGuIZMO in your code
 
@@ -115,7 +120,7 @@ IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec3&, float=IMGUIZMO_DEF_S
 
 The example shown in the screenshot is provided.
 To build it you can use CMake (3.10 or higher) or the Visual Studio solution project (for VS 2017) in Windows.
-You need to have installed [**GLFW**](https://www.glfw.org/) and [**glm**](https://github.com/g-truc/glm) in your compiler search path (LIB/INCLUDE). and obviously [**ImGui**](https://github.com/ocornut/imgui) (a copy is attached, and alredy included in the project/CMakeList.txt)
+You need to have installed [**GLFW**](https://www.glfw.org/) and [**glm**](https://github.com/g-truc/glm) in your compiler search path (LIB/INCLUDE). and obviously [**ImGui**](https://github.com/ocornut/imgui) (a copy is attached, and already included in the project/CMakeList.txt)
 
 The CMake file is able to build also an [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html) version, obviously you need to have installed EMSCRIPTEN SDK on your computer (1.38.10 or higher): look at or use the helper batch/script files, in main example folder, to pass appropriate defines/patameters to CMake command line.
 
