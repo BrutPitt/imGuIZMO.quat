@@ -72,26 +72,39 @@ To use imGuIZMO need to include imGuIZMO.h file in your code, then an possible u
     void setRotation(const glm::quat &q) { qRot = q; }
     glm::quat& getRotation() { return qRot; }
  ```
+In your ImGui window you call/declare...
 
-In your ImGui window, for a 3 axes widget, simply:
+**Axes widget:**
 ```cpp
     glm::quat qt = getRotation();
     if(ImGui::gizmo3D("##gizmo1", qt /*, size,  mode */)) {  setRotation(qt); }
+    // or explicitly
+    if(ImGui::gizmo3D("##Dir1", light, 100, imguiGizmo::mode3Axes|guiGizmo::cubeAtOrigin)  setLight(-light);
 
     // Default size: ImGui::GetFrameHeightWithSpacing()*4
     // Default mode: guiGizmo::mode3Axes|guiGizmo::cubeAtOrigin -> 3 Axes with cube @ origin
 ```
 
-For a directional arrow:
+**Directional arrow:**
 ```cpp
     // I assume, for a vec3, a direction starting from origin, 
     // so if you use a vec3 to identify a light spot
     // need to change direction toward origin
     glm::vec3 light(-getLight()));
-    if(ImGui::gizmo3D("##Dir1", light), /*, size,  mode */)  setLight(-light);
+    if(ImGui::gizmo3D("##Dir1", light /*, size,  mode */)  setLight(-light);
+    // or explicitly
+    if(ImGui::gizmo3D("##Dir1", light, 100, imguiGizmo::modeDirection)  setLight(-light);
+```
+**Directional plane:**
+```cpp
+    // I assume, for a vec3, a direction starting from origin, 
+    // so if you use a vec3 to identify a light spot
+    // need to change direction toward origin
+    glm::vec3 dir(1.0, 0.0, 0.0);
+    if(ImGui::gizmo3D("##Dir1", light, 100,  imguiGizmo::modeDirPlane)  { }
 ```
 
-Instead for a 3 axes widget and light spot:
+**Axes widget and light spot:**
 ```cpp
     glm::quat qt = getRotation();
     glm::vec3 light(-getLight()));
@@ -101,7 +114,7 @@ Instead for a 3 axes widget and light spot:
     }
 ```
 
-And in your render function (or where you prefer) you can get the transformations matrix
+Finally in your render function (or where you prefer) you can get the transformations matrix
 
 ```cpp
     glm::mat4 modelMatrix = glm::mat4_cast(qRot);
