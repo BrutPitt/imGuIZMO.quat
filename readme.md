@@ -29,7 +29,7 @@ Test if your browser supports WebGL 2, here: [WebGL2 Report](http://webglreport.
 
 ## How to use [imGuIZMO.quat](https://brutpitt.github.io/imGuIZMO.quat) to manipulate an object with 4 code lines 
 
-To use imGuIZMO need to include imGuIZMO.h file in your code.
+To use **imGuIZMO.quat** need to include `imGuIZMO.h` file in your code.
 ```cpp
 #include "imGuIZMO.h"
 ```
