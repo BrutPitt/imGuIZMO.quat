@@ -1,7 +1,9 @@
 # imGuIZMO.quat
 **imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget like a trackball: it provides a way to rotate models, lights, or objects with mouse, and graphically visualize their position in space. It uses **quaternions** algebra, internally, to manage rotations, but offers the possibility also to interfacing with **vec3**, **vec4** or **mat4x4** (rotation)
 
-**imGuIZMO** is written in C++ (C++14) and consist of only two files (*imGuIZMO.h* and *imGuIZMO.cpp*) that you can simply add to your project.
+With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** &nbsp; &nbsp; *(read below)*
+
+**imGuIZMO.quat** is written in C++ (C++14) and consist of only two files (*imGuIZMO.h* and *imGuIZMO.cpp*) that you can simply add to your project.
 It uses [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D): my *header only* 3D GIZMO screen manipulator tool (in *Immediate Mode* without pan and dolly functions) and [**glm** mathematics library](https://github.com/g-truc/glm) (0.9.9 or higher), also it an *header only* tool.
 
 ### Live WebGL2 demo
@@ -24,9 +26,7 @@ Test if your browser supports WebGL 2, here: [WebGL2 Report](http://webglreport.
 
 <p>&nbsp;<br>&nbsp;<br></p>
 
-## How to use imGuIZMO.quat to manipulate an object with 4 code lines 
-
-**You can manipulate an object with only **4** code lines**
+## How to use [imGuIZMO.quat](https://brutpitt.github.io/imGuIZMO.quat) to manipulate an object with 4 code lines 
 
 To use imGuIZMO need to include imGuIZMO.h file in your code.
 ```cpp
