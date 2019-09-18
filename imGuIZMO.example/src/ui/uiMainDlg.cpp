@@ -11,14 +11,6 @@
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
 #include <sstream>
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-//#include <glm/gtc/type_ptr.hpp>
-
-void setRotation(const glm::quat &q);
-glm::quat& getRotation();
-
 
 #include "../qJulia.h"
 #include "../glApp.h"
@@ -27,6 +19,11 @@ glm::quat& getRotation();
 
 #include "uiMainDlg.h"
 #include "../tools/imGuIZMO.h"
+
+
+void setRotation(const glm::quat &q);
+glm::quat& getRotation();
+
 using namespace glm;
 
 
