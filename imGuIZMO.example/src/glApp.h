@@ -119,7 +119,7 @@ public:
     mainImGuiDlgClass &getMainDlg() { return mainImGuiDlg; }
 private:
 
-// glfw utils
+// SDL / GLFW utils
 /////////////////////////////////////////////////
 #ifdef GLAPP_USE_SDL
     void frameInit();

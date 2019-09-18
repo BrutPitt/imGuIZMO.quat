@@ -67,7 +67,7 @@
     <LinkIncremental>true</LinkIncremental>
     <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath);$(Include)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
     <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
   </PropertyGroup>
@@ -75,21 +75,21 @@
     <LinkIncremental>true</LinkIncremental>
     <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath);$(Include)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
     <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath);$(Include)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
     <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath);$(Include)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration)</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
     <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
   </PropertyGroup>

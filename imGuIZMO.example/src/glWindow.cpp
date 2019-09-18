@@ -10,9 +10,6 @@
 //  
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include "qJulia.h"
 
 #include "glWindow.h"
@@ -25,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // if you want use also the virtualGizmo3D, screen manipulator, uncomment this:
 
-#define GLAPP_USE_VIRTUALGIZMO
+//#define GLAPP_USE_VIRTUALGIZMO
 
 // Global variable or member class
 #ifdef GLAPP_USE_VIRTUALGIZMO 
