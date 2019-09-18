@@ -123,10 +123,12 @@ IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::quat&, float=IMGUIZMO_DEF_S
 IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 ```
-<p>&nbsp;<br></p>
+<p> &nbsp; </p>
 
 For for more details, more personalizations, or how to change sizes, color, thickness, etc... examine the attached example source code (`uiMainDlg.cpp` file), or again `imGuIZMO.h`, `imGuIZMO.cpp` files: they are well commented.
 The widget are also used in **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject.
+
+**If you want use (also) full-screen manipulator, outside **ImGui** widget, look at [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (is its feature) and/or in attached exampe, enabling `#define GLAPP_USE_VIRTUALGIZMO` define in `glWindow.cpp` file*
 
 <p>&nbsp;<br>&nbsp;<br></p>
 
@@ -166,7 +168,7 @@ Full configurable: Lenght, thickness, dimensions, number of polygon slices, colo
 
 ### Building Example
 
-The example shown in the screenshot is provided.
+The source code example shown in the animated gif screenshot, is provided.
 
 In  example I use **GLFW** or **SDL2** (via `#define GLAPP_USE_SDL`) with **OpenGL**, but it is simple to change if you use Vulkan/DirectX/etc, other frameworks (like GLUT) or native OS access.
 
@@ -181,6 +183,7 @@ To build the EMSCRIPTEN version, in Windows, with CMake, need to have **mingw32-
 
 
 **For windows users that use vs2017 project solution:**
-The current VisualStudio project solution refers to my environment variable RAMDISK (`R:`), and subsequent VS intrinsic variables to generate binary output:
-`$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\` 
-Even without a RAMDISK variable, executable and binary files are outputted in base to the values of these VS variables, starting from root of current drive.
+
+* If you have **GLFW** and/or **SDL** headers/library directory paths added to `INCLUDE` and `LIB` environment vars, the compiler find them.
+* The current VisualStudio project solution refers to my environment variable RAMDISK (`R:`), and subsequent VS intrinsic variables to generate binary output:
+`$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\`, so without a RAMDISK variable, executable and binary files are outputted in base to the values of these VS variables, starting from root of current drive. &nbsp;&nbsp; *(you find built binary here... or change it)*
