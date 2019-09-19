@@ -312,9 +312,10 @@ void mainGLApp::frameInit()
 
     glfwMakeContextCurrent(getGLFWWnd());
 
+#if !defined(__EMSCRIPTEN__)
     //Init OpenGL
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-
+#endif
 
     glfwSetKeyCallback(getGLFWWnd(), glfwKeyCallback);
     glfwSetCharCallback(getGLFWWnd(), glfwCharCallback);
