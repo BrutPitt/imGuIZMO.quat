@@ -63,14 +63,14 @@ cd %EMS_DIR%
 echo.
 echo. Start cmake...
 echo.
-cmake -DCMAKE_TOOLCHAIN_FILE:STRING=%EMSCRIPTEN%\cmake\Modules\Platform\Emscripten.cmake -DCMAKE_BUILD_TYPE:STRING=%BUILD_TYPE% -G "MinGW Makefiles" ..
+cmake --target wgl_qjSet -DCMAKE_TOOLCHAIN_FILE:STRING=%EMSCRIPTEN%\cmake\Modules\Platform\Emscripten.cmake -DCMAKE_BUILD_TYPE:STRING=%BUILD_TYPE% -DBUILD_EMSCRIPTEN:BOOL=TRUE -G "MinGW Makefiles" ..
 echo.
 echo.
 
 echo.
 echo. Start mingw32-make... 
 echo.
-mingw32-make -j 8
+mingw32-make -j 8 wgl_qjSet
 echo.
 echo.
 

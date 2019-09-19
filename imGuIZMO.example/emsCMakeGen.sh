@@ -28,8 +28,8 @@ else
     cd $EMS_DIR
 
 
-    cmake -DCMAKE_TOOLCHAIN_FILE:STRING=$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_BUILD_TYPE:STRING=$BUILD_TYPE -G "Unix Makefiles" ..
+    cmake --target wgl_qjSet -DCMAKE_TOOLCHAIN_FILE:STRING=%EMSCRIPTEN%\cmake\Modules\Platform\Emscripten.cmake -DCMAKE_BUILD_TYPE:STRING=%BUILD_TYPE% -DBUILD_EMSCRIPTEN:BOOL=TRUE -G "Unix Makefiles" ..
 
-    make
+    make -j 8 wgl_qjSet
 fi
 

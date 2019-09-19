@@ -1,9 +1,23 @@
 cmake_minimum_required(VERSION 3.10)
-project(qjSet)
+
+set(BUILD_EMSCRIPTEN FALSE CACHE BOOL FALSE)
+
+# To build with SDL framwework and VirtualGizmo type:
+# cmake -DUSE_SDL:BOOL=TRUE -DUSE_VIRTUALGIZMO:BOOL=TRUE .
+
+set(USE_SDL FALSE CACHE BOOL FALSE)
+set(USE_VIRTUALGIZMO FALSE CACHE BOOL FALSE)
+
 
 set(CMAKE_CXX_STANDARD 14)
 
 find_package(OpenGL REQUIRED)
+
+set(M_GLOBAL_FLAGS "-DGLM_ENABLE_EXPERIMENTAL -fpermissive")
+
+if(USE_VIRTUALGIZMO)
+    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DGLAPP_USE_VIRTUALGIZMO")
+endif()
 
 # relative source directory
 set(SRC "${CMAKE_SOURCE_DIR}/src")
@@ -31,8 +45,6 @@ set(SOURCE_FILES
     ${SRC}/libs/ImGui/imgui_widgets.cpp
     ${SRC}/libs/ImGui/imgui_draw.cpp
     ${SRC}/libs/ImGui/imgui_demo.cpp
-    ${SRC}/libs/ImGui/imgui_impl_glfw.cpp
-    ${SRC}/libs/ImGui/imgui_impl_glfw.h
     ${SRC}/libs/ImGui/imgui_impl_opengl3.cpp
     ${SRC}/libs/ImGui/imgui_impl_opengl3.h
     ${SRC}/libs/ImGui/imgui_internal.h
@@ -49,10 +61,14 @@ include_directories(${SRC}/tools)
 # link_directories()
 
 
-set(M_GLOBAL_FLAGS "-DIMGUI_IMPL_OPENGL_ES3 -D_USE_GLFW_ -DGLFW_INCLUDE_NONE -DGLM_ENABLE_EXPERIMENTAL -DGLAPP_NO_OGL_DSA -DGLFW_INCLUDE_ES3 -fpermissive")
+if (${BUILD_EMSCRIPTEN})
+    project(wgl_qjSet)
 
+    add_executable(${PROJECT_NAME} ${SOURCE_FILES}
+        ${SRC}/libs/ImGui/imgui_impl_glfw.cpp
+        ${SRC}/libs/ImGui/imgui_impl_glfw.h)
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DIMGUI_IMPL_OPENGL_ES3 -DGLFW_INCLUDE_NONE -DGLAPP_NO_OGL_DSA -DGLFW_INCLUDE_ES3")
 #    set(CMAKE_C_COMPILER "emcc")
 #    set(CMAKE_CXX_COMPILER "emcc")
 
@@ -103,23 +119,26 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/${EMSOUT}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${M_GLOBAL_FLAGS} ${M_EMCC_FLAGS} ${M_EMCC_OPTIONS}")
 
-    add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 #    set_target_properties(${PROJECT_NAME}  PROPERTIES LINK_FLAGS "${M_EMCC_OPTIONS}")
 else()
-if(APPLE)
-    include_directories(src/libs/glfw/buildOSX/include)
-    link_directories(src/libs/glfw/buildOSX/lib)
-else()
-    if(WIN32)
-        include_directories(src/libs/glfw/buildWin/include)
-        link_directories(src/libs/glfw/buildWin/lib)
-    else()
-        include_directories(src/libs/glfw/buildLinux/include)
-        link_directories(src/libs/glfw/buildLinux/lib)
-    endif(WIN32)
-endif(APPLE)
+    project(qjSet)
 
+    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DIMGUI_IMPL_OPENGL_LOADER_GLAD -DGLFW_INCLUDE_NONE -DGLAPP_NO_OGL_DSA")
+    if(USE_SDL)
+        add_executable(${PROJECT_NAME} ${SOURCE_FILES} 
+            ${SRC}/libs/glad/glad.cpp
+            ${SRC}/libs/ImGui/imgui_impl_sdl.cpp
+            ${SRC}/libs/ImGui/imgui_impl_sdl.h)
+        set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DGLAPP_USE_SDL")
+        include_directories(/usr/include/SDL2)
+    else()    
+        add_executable(${PROJECT_NAME} ${SOURCE_FILES} 
+            ${SRC}/libs/glad/glad.cpp
+            ${SRC}/libs/ImGui/imgui_impl_glfw.cpp
+            ${SRC}/libs/ImGui/imgui_impl_glfw.h)
+    endif(USE_SDL)    
+    
     set(M_CXX_FLAGS "-DAPP_REQUIRE_OGL45")
 
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
@@ -127,7 +146,14 @@ endif(APPLE)
 
 #   find_package(glfw3 REQUIRED)
 
-    add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${SRC}/libs/glad/glad.cpp)
 
-    target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} glfw dl)
+    if(USE_SDL)
+        if(WIN32)
+            target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} SDL2 SDL2main)
+        else()    
+            target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} SDL2 dl)
+        endif()
+    else()
+        target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} glfw dl)
+    endif()
 endif ()
