@@ -129,7 +129,7 @@ IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec3&, float=IMGUIZMO_DEF_S
 For for more details, more personalizations, or how to change sizes, color, thickness, etc... examine the attached example source code (`uiMainDlg.cpp` file), or again `imGuIZMO.h`, `imGuIZMO.cpp` files: they are well commented.
 The widget are also used in **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject.
 
-**If you want use (also) full-screen manipulator, outside **ImGui** widget, look at [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (is its feature) and/or in attached exampe, enabling `#define GLAPP_USE_VIRTUALGIZMO` define in `glWindow.cpp` file*
+**If you want use (also) full-screen manipulator, outside **ImGui** widget, look at [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (is its feature)... also in attached example, enabling `#define GLAPP_USE_VIRTUALGIZMO` define in `glWindow.cpp` file*
 
 <p>&nbsp;<br>&nbsp;<br></p>
 
@@ -171,18 +171,29 @@ The source code example shown in the animated gif screenshot, is provided.
 
 In  example I use **GLFW** or **SDL2** (via `#define GLAPP_USE_SDL`) with **OpenGL**, but it is simple to change if you use Vulkan/DirectX/etc, other frameworks (like GLUT) or native OS access.
 
-To use SDL framework instead of GLFW, uncomment `#define GLAPP_USE_SDL` in `glApp.h` file, or pass `-DGLAPP_USE_SDL` directly to compiler.
-
 To build it you can use CMake (3.10 or higher) or the Visual Studio solution project (for VS 2017) in Windows.
 You need to have [**GLFW**](https://www.glfw.org/) (or [**SDL**](https://libsdl.org/)) in your compiler search path (LIB/INCLUDE). Instead copy of [**glm**](https://github.com/g-truc/glm) and [**ImGui**](https://github.com/ocornut/imgui) are attached and included in the example.
 
-The CMake file is able to build also an [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html) version, obviously you need to have installed EMSCRIPTEN SDK on your computer (1.38.10 or higher): look at or use the helper batch/script files, in main example folder, to pass appropriate defines/patameters to CMake command line.
+**CMake**
 
-To build the EMSCRIPTEN version, in Windows, with CMake, need to have **mingw32-make.exe** in your computer and search PATH (only the make utility is enough): it is a condition of EMSDK tool to build with CMake in Windows.
+Use the following command-line defines to enable different options:  
+  - `-DUSE_SDL:BOOL=TRUE` to enable **SDL** framwork instead of **GLFW**
+  - `-DUSE_VIRTUALGIZMO:BOOL=TRUE` to use also (together) [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) to manipulate objects
+
+**this flags are aviables also in CMakeGUI*
+
+To build [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html) example, use batch/script files:`emsCMakeGen.cmd`/`emsCMakeGen.sh`, located in root example directory, or examine them to pass appropriate defines/patameters to CMake command line.
+
+**To build with [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html), obviously you need to have installed EMSCRIPTEN SDK on your computer (1.38.10 or higher)*
+
+**Emscripten in Windows**
+
+To build the **EMSCRIPTEN** version, in Windows, with CMake, need to have **mingw32-make.exe** in your computer and search PATH (only the make utility is enough): it is a condition of EMSDK tool to build with CMake in Windows.
 
 
-**For windows users that use vs2017 project solution:**
-
-* If you have **GLFW** and/or **SDL** headers/library directory paths added to `INCLUDE` and `LIB` environment vars, the compiler find them.
+**VS2017 project solution**
+* To build **SDL** or **GLFW**, select appropriate build configuration
+* If you have **GLFW** and/or **SDL** headers and library directory paths added to `INCLUDE` and `LIB` environment vars, the compiler find them.
+* If you want use (also) full-screen manipulator [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) together with **imGuIZMO.quat**, enable `#define GLAPP_USE_VIRTUALGIZMO` define in `glWindow.cpp` file.
 * The current VisualStudio project solution refers to my environment variable RAMDISK (`R:`), and subsequent VS intrinsic variables to generate binary output:
 `$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\`, so without a RAMDISK variable, executable and binary files are outputted in base to the values of these VS variables, starting from root of current drive. &nbsp;&nbsp; *(you find built binary here... or change it)*
