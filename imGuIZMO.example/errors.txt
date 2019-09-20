@@ -1,8 +1,0 @@
-error: undefined symbol: glfwGetMonitorContentScale
-warning: To disable errors for undefined symbols use `-s ERROR_ON_UNDEFINED_SYMBOLS=0`
-error: undefined symbol: glfwSetWindowOpacity
-Error: Aborting compilation due to previous errors
-shared:ERROR: 'D:/Lang/emsdk/node/8.9.1_64bit/bin/node.exe D:\Lang\emsdk\emscripten\1.38.20\src\compiler.js R:\Temp\tmpyyln4a17.txt D:\Lang\emsdk\emscripten\1.38.20\src\library_pthread_stub.js' failed (1)
-mingw32-make[2]: *** [CMakeFiles\qjSet.dir\build.make:294: ../emsOut/MinSizeRel/qjSet.html] Error 1
-mingw32-make[1]: *** [CMakeFiles\Makefile2:72: CMakeFiles/qjSet.dir/all] Error 2
-mingw32-make: *** [Makefile:83: all] Error 2
