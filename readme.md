@@ -11,10 +11,10 @@ It uses [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D): my *he
 ### Live WebGL2 demo
 
 You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
-- [**imGuIZMO.quat** ImGui widget + 3D (dolly/zoom) screen manipulator](https://brutpitt.github.io/imGuIZMO.quat/imGuIZMO.example/WebGL/qjSetVG.html)
-- [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/imGuIZMO.quat/imGuIZMO.example/WebGL/qjSet.html)
+- [**imGuIZMO.quat** ImGui widget + 3D (dolly/zoom) screen manipulator](https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/qjSetVG.html)
+- [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/qjSet.html)
 
-<p align="center"><a href="https://brutpitt.github.io/imGuIZMO.quat/imGuIZMO.example/WebGL/qjSetVG.html"> 
+<p align="center"><a href="https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/qjSetVG.html"> 
 <img src="https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/imGuIZMO.gif"></a>
 </p>
 
@@ -182,14 +182,22 @@ Use the following command-line defines to enable different options:
 
 **this flags are aviables also in CMakeGUI*
 
-To build [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html) example, use batch/script files:`emsCMakeGen.cmd`/`emsCMakeGen.sh`, located in root example directory, or examine them to pass appropriate defines/patameters to CMake command line.
+To build [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html) example, use batch/script files:
+
+* `emsCMakeGen.cmd %EMSCRIPTEN% %BUILD_TYPE%` for **Windows** users
+* `sh emsCMakeGen.sh %EMSCRIPTEN% %BUILD_TYPE%` for **Linux** or **OS/X** users
+
+where:
+- `%EMSCRIPTEN%` is your emscripten installation path (e.g. `C:\emsdk\emscripten\1.38.10`)
+- `%BUILD_TYPE%` is build type: `Debug | Release | RelWithDebInfo | MinSizeRel` 
+
+They are located in root example directory, or examine their content to pass appropriate defines/patameters to CMake command line.
 
 **To build with [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html), obviously you need to have installed EMSCRIPTEN SDK on your computer (1.38.10 or higher)*
 
 **Emscripten in Windows**
 
 To build the **EMSCRIPTEN** version, in Windows, with CMake, need to have **mingw32-make.exe** in your computer and search PATH (only the make utility is enough): it is a condition of EMSDK tool to build with CMake in Windows.
-
 
 **VS2017 project solution**
 * To build **SDL** or **GLFW**, select appropriate build configuration
