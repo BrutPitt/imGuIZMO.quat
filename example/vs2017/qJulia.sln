@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qJulia", "qJulia.vcxproj", "{BFDC9341-6260-43C5-B7D6-9E07611C69B3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		GLFW Debug|x64 = GLFW Debug|x64
+		GLFW Debug|x86 = GLFW Debug|x86
+		GLFW Release|x64 = GLFW Release|x64
+		GLFW Release|x86 = GLFW Release|x86
+		SDL Debug|x64 = SDL Debug|x64
+		SDL Debug|x86 = SDL Debug|x86
+		SDL Release|x64 = SDL Release|x64
+		SDL Release|x86 = SDL Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.GLFW Debug|x64.ActiveCfg = Debug|x64
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.GLFW Debug|x64.Build.0 = Debug|x64
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.GLFW Debug|x86.ActiveCfg = Debug|Win32
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.GLFW Debug|x86.Build.0 = Debug|Win32
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.GLFW Release|x64.ActiveCfg = Release|x64
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.GLFW Release|x64.Build.0 = Release|x64
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.GLFW Release|x86.ActiveCfg = Release|Win32
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.GLFW Release|x86.Build.0 = Release|Win32
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.SDL Debug|x64.ActiveCfg = SDL Debug|x64
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.SDL Debug|x64.Build.0 = SDL Debug|x64
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.SDL Debug|x86.ActiveCfg = SDL Debug|Win32
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.SDL Debug|x86.Build.0 = SDL Debug|Win32
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.SDL Release|x64.ActiveCfg = SDL Release|x64
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.SDL Release|x64.Build.0 = SDL Release|x64
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.SDL Release|x86.ActiveCfg = SDL Release|Win32
+		{BFDC9341-6260-43C5-B7D6-9E07611C69B3}.SDL Release|x86.Build.0 = SDL Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EB561CCA-B767-41A2-B366-1E45975BC5C3}
+	EndGlobalSection
+EndGlobal
