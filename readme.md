@@ -151,7 +151,7 @@ Instead to change the color of a single widget:
     ImGui::gizmo3D("##Dir1", dir);                             // display widget with changed color
     imguiGizmo::restoreDirectionColor();                       // restore old color
 ```
-I's like the push/pop mechanism of ImGui, but only that I don't have a stak (for now I don't see the reason), but a single variable where save the value. The other functions work in the same way.
+It's like the push/pop mechanism used in **ImGui**, but only that I don't have a stak (for now I don't see the reason): just a single variable where to save the value. The other functions work in the same way.
 
 
 
