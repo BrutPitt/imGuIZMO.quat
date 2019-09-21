@@ -124,15 +124,20 @@ struct imguiGizmo
     static void restoreSolidSize() {
         solidResizeFactor = savedSolidResizeFactor; }
 
+    static void setDirectionColor(ImU32 dColor, const ImU32 pColor) {
+        setDirectionColor(ImGui::ColorConvertU32ToFloat4(dColor), ImGui::ColorConvertU32ToFloat4(pColor)); }
     static void setDirectionColor(const ImVec4 &dColor, const ImVec4 &pColor) {
         savedDirectionColor = directionColor; savedPlaneColor = planeColor; 
         directionColor = dColor; planeColor = pColor;
     }
+    static void setDirectionColor(ImU32 color) { setDirectionColor(ImGui::ColorConvertU32ToFloat4(color)); } 
     static void setDirectionColor(const ImVec4& color) { setDirectionColor(color,ImVec4(color.x, color.y, color.z, STARTING_ALPHA_PLANE));  }
     static void restoreDirectionColor() {
         directionColor = savedDirectionColor; 
         planeColor     = savedPlaneColor;     }
 
+    static void setSphereColors(const ImVec4& a, const ImVec4& b) {
+        setSphereColors( ImGui::ColorConvertFloat4ToU32(a), ImGui::ColorConvertFloat4ToU32(b)); }    
     static void setSphereColors(ImU32 a, ImU32 b) {
         savedSphereColors[0] = sphereColors[0]; savedSphereColors[1] = sphereColors[1];
         sphereColors[0] = a; sphereColors[1] = b; }

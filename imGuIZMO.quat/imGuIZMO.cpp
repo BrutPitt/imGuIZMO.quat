@@ -82,7 +82,7 @@ ImVec4 imguiGizmo::savedDirectionColor = imguiGizmo::directionColor;
 
 // Plane color
 ///////////////////////////////////////
-ImVec4 imguiGizmo::planeColor(1.0f, 1.0f, 0.0, STARTING_ALPHA_PLANE);
+ImVec4 imguiGizmo::planeColor(0.0f, 0.5f, 1.0, STARTING_ALPHA_PLANE);
 ImVec4 imguiGizmo::savedPlaneColor = imguiGizmo::planeColor;
 
 // Sphere Colors 
