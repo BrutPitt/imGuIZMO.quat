@@ -137,11 +137,11 @@ The widget are also used in **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)
 
 **Sizes and colors**
 
-To change size and color of a widget, **imGuIZMO.quat** have some [helper funcs](https://github.com/BrutPitt/imGuIZMO.quat/blob/master/imGuIZMO.quat/imGuIZMO.h#L115#L145)
+To change size and color of one or all widgets, **imGuIZMO.quat** have some [helper funcs](https://github.com/BrutPitt/imGuIZMO.quat/blob/master/imGuIZMO.quat/imGuIZMO.h#L115#L145)
 
 Just an example...
 
-To change the default color for all ARROW-Direction widgets call once (maybe in your ImGui style-settings func):
+To change the default color for all ARROW-Direction widgets call once (maybe in your **ImGui** style-settings func):
 ```cpp    
     imguiGizmo::setDirectionColor(ImVec4(0.5, 1.0, 0.3, 1.0));
 ```
