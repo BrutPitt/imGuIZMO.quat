@@ -18,9 +18,7 @@ You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
 <img src="https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/imGuIZMO.gif"></a>
 </p>
 
-It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Opera/Chrome and Chromium based)
-
-Test if your browser supports WebGL 2, here: [WebGL2 Report](http://webglreport.com/?v=2)
+It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Opera/Chrome and Chromium based): test if your browser supports **WebGL2**, here: [WebGL2 Report](http://webglreport.com/?v=2)
 
 ****imGuIZMO.quat** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject: consult the source code for more examples.*
 
@@ -78,7 +76,7 @@ but the essence of the speech does not change
     glm::quat qt = getRotation();
     if(ImGui::gizmo3D("##gizmo1", qt /*, size,  mode */)) {  setRotation(qt); }
     // or explicitly
-    vec3 dir;
+    static vec3 dir;
     ImGui::gizmo3D("##Dir1", dir, 100, imguiGizmo::mode3Axes|guiGizmo::cubeAtOrigin);
 
     // Default size: ImGui::GetFrameHeightWithSpacing()*4
@@ -94,14 +92,16 @@ but the essence of the speech does not change
     if(ImGui::gizmo3D("##Dir1", light /*, size,  mode */)  setLight(-light);
     // or explicitly
     if(ImGui::gizmo3D("##Dir1", light, 100, imguiGizmo::modeDirection)  setLight(-light);
+
+    // Default arrow color is YELLOW: ImVec4(1.0, 1.0, 0.0, 1.0);
 ```
 **Directional plane:**
 ```cpp
-    // I assume, for a vec3, a direction starting from origin, 
-    // so if you use a vec3 to identify a light spot
-    // need to change direction toward origin
-    glm::vec3 dir(1.0, 0.0, 0.0);
+    static glm::vec3 dir(1.0, 0.0, 0.0);
     if(ImGui::gizmo3D("##Dir1", dir, 100,  imguiGizmo::modeDirPlane)  { }
+
+    // Default direction color is same of default arrow color: YELLOW -> ImVec4(1.0, 1.0, 0.0, 1.0);
+    // Default plane color is: ImVec4(0.0f, 0.5f, 1.0f, STARTING_ALPHA_PLANE);
 ```
 
 **Axes and spot:**
@@ -112,6 +112,9 @@ but the essence of the speech does not change
         setLight(-light);
         setRotation(qt);
     }
+    // Default size: ImGui::GetFrameHeightWithSpacing()*4
+    // Default mode: guiGizmo::mode3Axes|guiGizmo::cubeAtOrigin -> 3 Axes with cube @ origin
+    // Default spot color is same of default arrow color: YELLOW -> ImVec4(1.0, 1.0, 0.0, 1.0);
 ```
 
 These are all possible widget calls:
@@ -131,7 +134,29 @@ The widget are also used in **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)
 
 **If you want use (also) full-screen manipulator, outside **ImGui** widget, look at [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (is its feature)... also in attached example, enabling `#define GLAPP_USE_VIRTUALGIZMO` define in `glWindow.cpp` file*
 
+
+**Sizes and colors**
+
+To change size and color of a widget, **imGuIZMO.quat** have some [helper funcs](https://github.com/BrutPitt/imGuIZMO.quat/blob/master/imGuIZMO.quat/imGuIZMO.h#L115#L145)
+
+Just an example...
+
+To change the default color for all ARROW-Direction widgets call once (maybe in your ImGui style-settings func):
+```cpp    
+    imguiGizmo::setDirectionColor(ImVec4(0.5, 1.0, 0.3, 1.0));
+```
+Instead to change the color of a single widget:
+```cpp    
+    imguiGizmo::setDirectionColor(ImVec4(0.5, 1.0, 0.3, 1.0)); // change color
+    ImGui::gizmo3D("##Dir1", dir);                             // display widget with changed color
+    imguiGizmo::restoreDirectionColor();                       // restore old color
+```
+I's like the push/pop mechanism of ImGui, but only that I don't have a stak (for now I don't see the reason), but a single variable where save the value. The other functions work in the same way.
+
+
+
 <p>&nbsp;<br>&nbsp;<br></p>
+
 
 ## All widgets visualization
 
@@ -204,4 +229,4 @@ To build the **EMSCRIPTEN** version, in Windows, with CMake, need to have **ming
 * If you have **GLFW** and/or **SDL** headers and library directory paths added to `INCLUDE` and `LIB` environment vars, the compiler find them.
 * If you want use (also) full-screen manipulator [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) together with **imGuIZMO.quat**, enable `#define GLAPP_USE_VIRTUALGIZMO` define in `glWindow.cpp` file.
 * The current VisualStudio project solution refers to my environment variable RAMDISK (`R:`), and subsequent VS intrinsic variables to generate binary output:
-`$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\`, so without a RAMDISK variable, executable and binary files are outputted in base to the values of these VS variables, starting from root of current drive. &nbsp;&nbsp; *(you find built binary here... or change it)*
+`$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\`, so without a RAMDISK variable, executable and binary files are outputted in base to the values of these VS variables, starting from root of current drive. &nbsp;&nbsp; *(you will find built binary here... or change it)*
