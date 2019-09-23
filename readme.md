@@ -25,7 +25,7 @@ It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Op
 ### Mouse buttons and key modifiers
 These are all mouse and keyModifiers controls internally used:
 - **leftButton** & drag -> move control in all direction
-- **rightButton** & drag -> move spot in all direction
+- **rightButton** & drag -> used only in **Axes+Spot** widget: move spot in all direction
 - **Rotation around a single axis**
   - **leftButton**+**SHIFT** & drag -> rotate around X
   - **leftButton**+**CTRL** & drag -> rotate around Y
@@ -113,7 +113,7 @@ but the essence of the code does not change
     // Default plane color is: ImVec4(0.0f, 0.5f, 1.0f, STARTING_ALPHA_PLANE);
 ```
 
-**Axes and spot:**
+**Axes + spot:**
 ```cpp
 // I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify a light spot
 // need to change direction toward origin, it's maintained for uniformity even in spot
