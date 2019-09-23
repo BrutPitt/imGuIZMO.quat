@@ -22,8 +22,16 @@ It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Op
 
 ****imGuIZMO.quat** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject: consult the source code for more examples.*
 
+### Mouse buttons and key modifiers
+These are all mouse and keyModifiers controls internally used:
+- **leftButton** & drag -> move control in all direction
+- **rightButton** & drag -> move spot in all direction
+- **Rotation around a single axis**
+  - **leftButton**+**SHIFT** & drag -> rotate around X
+  - **leftButton**+**CTRL** & drag -> rotate around Y
+  - **leftButton**+**ALT**|**SUPER** & drag -> rotate around Z
 
-<p>&nbsp;<br></p>
+<p><br></p>
 
 ## How to use [imGuIZMO.quat](https://brutpitt.github.io/imGuIZMO.quat) to manipulate an object with 4 code lines 
 
@@ -121,7 +129,7 @@ but the essence of the code does not change
     // Default spot color is same of default arrow color: YELLOW -> ImVec4(1.0, 1.0, 0.0, 1.0);
 ```
 
-These are all possible widget calls:
+**Prototypes** - all possible widget calls:
 ```cpp
 IMGUI_API bool gizmo3D(const char*, glm::quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
 IMGUI_API bool gizmo3D(const char*, glm::vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
@@ -131,6 +139,8 @@ IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::quat&, float=IMGUIZMO_DEF_S
 IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 ```
+
+
 <p> &nbsp; </p>
 
 For for more details, more personalizations, or how to change sizes, color, thickness, etc... examine the attached example source code (`uiMainDlg.cpp` file), or again `imGuIZMO.h`, `imGuIZMO.cpp` files: they are well commented.
