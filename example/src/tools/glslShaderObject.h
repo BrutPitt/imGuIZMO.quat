@@ -26,39 +26,39 @@ using namespace std;
 /////////////////////////////////////////////////
 class ShaderObject
 {
-	protected:
-		ShaderObject();
+    protected:
+        ShaderObject();
 
-	public:
-		virtual ~ShaderObject();
+    public:
+        virtual ~ShaderObject();
 
         void Load(const char *name);
         //void Load(int numShaders, ...) { Load(NULL, numShaders, ...); }
         void Load(const char *defines, int numShaders, ...);
         void Compile(const GLchar *code);
 
-		GLuint& getShader();
+        GLuint& getShader();
 
-	protected:
-		void getFileContents(const char* fileName, string &s);
+    protected:
+        void getFileContents(const char* fileName, string &s);
 
-		GLuint  shader;
+        GLuint  shader=0;
 };
 
 //  Fragment 
 /////////////////////////////////////////////////
 class FragmentShader : public ShaderObject
 {
-	public:
-		FragmentShader() : ShaderObject() { shader = glCreateShader(GL_FRAGMENT_SHADER);  }
+    public:
+        FragmentShader() : ShaderObject() { shader = glCreateShader(GL_FRAGMENT_SHADER);  }
 } ;
 
 //  Vertex
 /////////////////////////////////////////////////
 class VertexShader : public ShaderObject
 {
-	public:
-		VertexShader() : ShaderObject() { shader = glCreateShader(GL_VERTEX_SHADER);  }
+    public:
+        VertexShader() : ShaderObject() { shader = glCreateShader(GL_VERTEX_SHADER);  }
 };
 
 #ifndef __EMSCRIPTEN__
@@ -66,17 +66,17 @@ class VertexShader : public ShaderObject
 /////////////////////////////////////////////////
 class GeometryShader : public ShaderObject
 {
-	public:
-		GeometryShader() : ShaderObject() { shader = glCreateShader(GL_GEOMETRY_SHADER);  }
+    public:
+        GeometryShader() : ShaderObject() { shader = glCreateShader(GL_GEOMETRY_SHADER);  }
 };
 #endif
 
 #ifndef NDEBUG
 void CheckErrorsGL( const char* location = NULL,
-		                std::ostream& ostr = std::cerr );
+                        std::ostream& ostr = std::cerr );
 #else
 inline void CheckErrorsGL( const char* location = NULL,
-			                     std::ostream& ostr = std::cerr )
+                                 std::ostream& ostr = std::cerr )
 {}
 #endif
 
