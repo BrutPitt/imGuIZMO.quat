@@ -50,7 +50,7 @@ Finally in your render function (or where you prefer) you can get back the trans
 ```
 now you have modelMatrix with rotation then can build MV and MVP matrix
 
-### Alternately
+### alternately
 
 Maybe can be more elegant to add two helper functions
 ```cpp
@@ -64,7 +64,7 @@ And to change the widget call
     glm::quat qt = getRotation();
     if(ImGui::gizmo3D("##gizmo1", qt /*, size,  mode */)) {  setRotation(qt); }
 ```
-but the essence of the speech does not change
+but the essence of the code does not change
 
 
 <p>&nbsp;<br>&nbsp;<br></p>
@@ -74,9 +74,10 @@ but the essence of the speech does not change
 **Axes mode:**
 ```cpp
     glm::quat qt = getRotation();
+// get/setRotation are helper funcs that you have ideally defined to manage your global/member objs
     if(ImGui::gizmo3D("##gizmo1", qt /*, size,  mode */)) {  setRotation(qt); }
     // or explicitly
-    static vec3 dir;
+    static vec4 dir;
     ImGui::gizmo3D("##Dir1", dir, 100, imguiGizmo::mode3Axes|guiGizmo::cubeAtOrigin);
 
     // Default size: ImGui::GetFrameHeightWithSpacing()*4
@@ -85,10 +86,10 @@ but the essence of the speech does not change
 
 **Directional arrow:**
 ```cpp
-    // I assume, for a vec3, a direction starting from origin, 
-    // so if you use a vec3 to identify a light spot
-    // need to change direction toward origin
+// I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify a light spot
+// need to change direction toward origin
     glm::vec3 light(-getLight()));
+// get/setLigth are helper funcs that you have ideally defined to manage your global/member objs
     if(ImGui::gizmo3D("##Dir1", light /*, size,  mode */)  setLight(-light);
     // or explicitly
     if(ImGui::gizmo3D("##Dir1", light, 100, imguiGizmo::modeDirection)  setLight(-light);
@@ -106,10 +107,13 @@ but the essence of the speech does not change
 
 **Axes and spot:**
 ```cpp
-    glm::quat qt = getRotation();
+// I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify a light spot
+// need to change direction toward origin, it's maintained for uniformity even in spot
     glm::vec3 light(-getLight()));
+    glm::quat qt = getRotation();
+// get/setLigth get/setRotation are helper funcs that you have ideally defined to manage your global/member objs
     if(ImGui::gizmo3D("##gizmo1", qt, light /*, size,  mode */))  { 
-        setLight(-light);
+        setLight(-light); 
         setRotation(qt);
     }
     // Default size: ImGui::GetFrameHeightWithSpacing()*4
@@ -143,13 +147,13 @@ Just an example...
 
 To change the default color for all ARROW-Direction widgets call once (maybe in your **ImGui** style-settings func):
 ```cpp    
-    imguiGizmo::setDirectionColor(ImVec4(0.5, 1.0, 0.3, 1.0));
+    imguiGizmo::setDirectionColor(ImVec4(0.5, 1.0, 0.3, 1.0)); // change the default ArrowDirection color
 ```
 Instead to change the color of a single widget:
 ```cpp    
-    imguiGizmo::setDirectionColor(ImVec4(0.5, 1.0, 0.3, 1.0)); // change color
+    imguiGizmo::setDirectionColor(ImVec4(0.5, 1.0, 0.3, 1.0)); // change ArrowDirection color
     ImGui::gizmo3D("##Dir1", dir);                             // display widget with changed color
-    imguiGizmo::restoreDirectionColor();                       // restore old color
+    imguiGizmo::restoreDirectionColor();                       // restore old ArrowDirection color
 ```
 It's like the push/pop mechanism used in **ImGui**, but only that I don't have a stak (for now I don't see the reason): just a single variable where to save the value. The other functions work in the same way.
 

@@ -27,19 +27,19 @@ using namespace std;
 class ProgramObject
 {
 public:
-	ProgramObject();
-	virtual ~ProgramObject();
+    ProgramObject();
+    virtual ~ProgramObject();
     void createProgram();
     void deleteProgram();
 
-	void addShader(ShaderObject* shader);
-	void removeShader(ShaderObject* shader);
+    void addShader(ShaderObject* shader);
+    void removeShader(ShaderObject* shader);
 
-	void link();
+    void link();
 
     void bindPipeline();
-	void useProgram();
-	static void reset();
+    void useProgram();
+    static void reset();
 
     GLuint  getHandle() { return program; }
     GLuint  getProgram() { return program; }
@@ -169,8 +169,8 @@ public:
 
 
 protected:
-	/** The handle to the program object */
-	GLuint  program;
+    /** The handle to the program object */
+    GLuint  program;
     GLuint pipeline;
 
     VertexShader    *vertObj = nullptr;
