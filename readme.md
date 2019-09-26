@@ -11,8 +11,8 @@ It uses [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D): my *he
 ### Live WebGL2 demo
 
 You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
-- [**imGuIZMO.quat** ImGui widget + 3D (dolly/zoom) screen manipulator](https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/qjSetVG.html)
-- [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/qjSet.html)
+- [**imGuIZMO.quat** ImGui widget + 3D (dolly/zoom) screen manipulator](https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/wgl_qjSetVG.html)
+- [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/wgl_qjSet.html)
 
 <p align="center"><a href="https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/qjSetVG.html"> 
 <img src="https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/imGuIZMO.gif"></a>
