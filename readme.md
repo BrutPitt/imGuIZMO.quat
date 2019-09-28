@@ -94,8 +94,8 @@ but the essence of the code does not change
 
 **Directional arrow:**
 ```cpp
-// I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify a light spot
-// need to change direction toward origin
+// I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify 
+// a light spot toward origin need to change direction
     glm::vec3 light(-getLight()));
 // get/setLigth are helper funcs that you have ideally defined to manage your global/member objs
     if(ImGui::gizmo3D("##Dir1", light /*, size,  mode */)  setLight(-light);
@@ -115,8 +115,8 @@ but the essence of the code does not change
 
 **Axes + spot:**
 ```cpp
-// I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify a light spot
-// need to change direction toward origin, it's maintained for uniformity even in spot
+// I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify 
+// a light spot toward origin need to change direction, it's maintained for uniformity even in spot
     glm::vec3 light(-getLight()));
     glm::quat qt = getRotation();
 // get/setLigth get/setRotation are helper funcs that you have ideally defined to manage your global/member objs
