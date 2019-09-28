@@ -56,7 +56,13 @@ void mainImGuiDlgClass::renderImGui()
 
 
     bool isVisible = true;
-        
+/*
+    if(ImGui::Begin("uuu", &isVisible)) {
+        static glm::quat qt2(1.0f,0,0,0);
+        static glm::quat qt4(1.0f,0,0,0);
+        ImGui::gizmo3D("##tZ", qt2, qt4, 800);
+    } ImGui::End();
+*/        
     if(ImGui::Begin("qaternion Julia set", &isVisible)) {
         ImGui::BeginGroup(); {
 

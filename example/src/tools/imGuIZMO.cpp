@@ -400,6 +400,8 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         draw_list->AddRectFilled(controlPos, controlPos + innerSize, col, style.FrameRounding);
     }
 
+    draw_list->PushClipRect(controlPos, controlPos + innerSize, true);
+
     const ImVec2 wpUV = ImGui::GetFontTexUvWhitePixel(); //culling versus
     ImVec2 uv[4]; ImU32 col[4]; //buffers to storetransformed vtx & col for PrimVtx & PrimQuadUV
 
@@ -598,6 +600,8 @@ bool imguiGizmo::drawFunc(const char* label, float size)
             else         { spotArrow(glm::normalize(qtV2),spot.z); draw3DSystem(); }
         } else draw3DSystem();
     }
+
+    draw_list->PopClipRect();
 
     ImGui::EndGroup();
     ImGui::PopID();
