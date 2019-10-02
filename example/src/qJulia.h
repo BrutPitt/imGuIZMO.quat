@@ -12,8 +12,7 @@
 //------------------------------------------------------------------------------
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <vGizmo.h>
 
 #include <glslProgramObject.h>
 
@@ -85,22 +84,22 @@ public:
     void initShaders();
     void render();
 
-    glm::vec4 quatPt = glm::vec4(-0.65, 0.4, 0.25, 0.05);
-    glm::vec3 diffuseColor = glm::vec3(0.3,0.9,0.65);
+    vec4 quatPt = vec4(-0.65f, 0.4f, 0.25f, 0.05f);
+    vec3 diffuseColor = vec3(0.3f,0.9f,0.65f);
 
-    glm::vec3 Light =  glm::vec3(3.f,3.f,3.f);
+    vec3 Light =  vec3(3.f,3.f,3.f);
 
-    float phongMethod           = 1.0 ;
+    float phongMethod           = 1.0f ;
     float specularExponent      = 15.f;
-    float specularComponent     = .5  ;
-    float normalComponent       = .25 ;
-    float epsilon               = 0.001;
+    float specularComponent     = .5f  ;
+    float normalComponent       = .25f ;
+    float epsilon               = 0.001f;
 
     bool isFullRender = false;
     bool useShadow    = true;
     bool useAO        = false;
 
-    glm::mat3 matOrientation = glm::mat3(1.0);
+    mat3 matOrientation = mat3(1.0f);
 
     vaoClass vao;
 

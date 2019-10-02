@@ -10,14 +10,11 @@
 //  
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include "qJulia.h"
 
 #include "glApp.h"
 
-using namespace glm;
+//using namespace glm;
 
 
 #define SHADER_PATH "Shaders/"
@@ -71,10 +68,10 @@ void qJulia::render()
     bindPipeline();
     useProgram();
 
-    glUniform4fv(_quatPt            ,1  , glm::value_ptr(quatPt));
-    glUniform3fv(_Resolution        ,1  , glm::value_ptr(vec3(theApp->GetWidth(), theApp->GetHeight(),float(theApp->GetWidth())/float(theApp->GetHeight()))));
-    glUniform3fv(_diffuseColor      ,1  , glm::value_ptr(diffuseColor));
-    glUniform3fv(_Light             ,1  , glm::value_ptr(Light));
+    glUniform4fv(_quatPt            ,1  , value_ptr(quatPt));
+    glUniform3fv(_Resolution        ,1  , value_ptr(vec3(theApp->GetWidth(), theApp->GetHeight(),float(theApp->GetWidth())/float(theApp->GetHeight()))));
+    glUniform3fv(_diffuseColor      ,1  , value_ptr(diffuseColor));
+    glUniform3fv(_Light             ,1  , value_ptr(Light));
 
     glUniform1f (_phongMethod       , phongMethod      );
     glUniform1f (_specularExponent  , specularExponent );
@@ -87,7 +84,7 @@ void qJulia::render()
     glUniform1i (_useAO        , useAO       );
 
         
-    glUniformMatrix3fv(_matOrientation, 1, GL_FALSE, glm::value_ptr(inverse(matOrientation)));
+    glUniformMatrix3fv(_matOrientation, 1, GL_FALSE, value_ptr(transpose(matOrientation)));
 
     //glBindVertexArray(vao);       
         

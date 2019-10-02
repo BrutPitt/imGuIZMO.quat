@@ -53,7 +53,7 @@ void ProgramObject::addShader(ShaderObject* shader)
 /////////////////////////////////////////////////
 void ProgramObject::removeShader(ShaderObject* shader)
 {
-    if(shader!=nullptr) glDetachShader(program, shader->getShader());
+    if(shader!=nullptr)  glDetachShader(program, shader->getShader());
 }
 
 void checkProgram(GLuint program);

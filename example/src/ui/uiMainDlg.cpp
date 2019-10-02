@@ -18,14 +18,11 @@
 
 
 #include "uiMainDlg.h"
-#include "../tools/imGuIZMO.h"
+#include "../tools/imGuIZMOquat.h"
 
 
-void setRotation(const glm::quat &q);
-glm::quat& getRotation();
-
-using namespace glm;
-
+void setRotation(const quat &q);
+quat& getRotation();
 
     bool show_test_window = true;
     bool show_another_window = false;
@@ -49,7 +46,8 @@ void mainImGuiDlgClass::renderImGui()
 
     ImGuiStyle& style = ImGui::GetStyle();
            
-
+   // temporary vec3
+   vec3 tLight(theWnd->qjSet->Light.x, theWnd->qjSet->Light.y, theWnd->qjSet->Light.z);
 
    ImGui::SetNextWindowSize(ImVec2(250, 400), ImGuiCond_FirstUseEver);
    ImGui::SetNextWindowPos(ImVec2(0,0), ImGuiCond_FirstUseEver);
@@ -58,8 +56,8 @@ void mainImGuiDlgClass::renderImGui()
     bool isVisible = true;
 /*
     if(ImGui::Begin("uuu", &isVisible)) {
-        static glm::quat qt2(1.0f,0,0,0);
-        static glm::quat qt4(1.0f,0,0,0);
+        static quat qt2(1.0f,0,0,0);
+        static quat qt4(1.0f,0,0,0);
         ImGui::gizmo3D("##tZ", qt2, qt4, 800);
     } ImGui::End();
 */        
@@ -74,7 +72,7 @@ void mainImGuiDlgClass::renderImGui()
 
             ImGui::Text(" qJulia coordinates qX/qY/qZ/qW");
             ImGui::PushItemWidth(w);
-            ImGui::DragFloat4("##qwx", glm::value_ptr(theWnd->qjSet->quatPt),.001, -1.0, 1.0);
+            ImGui::DragFloat4("##qwx", value_ptr(theWnd->qjSet->quatPt),.001, -1.0, 1.0);
             ImGui::PopItemWidth();
             ImGui::Text(" ");
             ImGui::Text("rendering components:");
@@ -112,11 +110,11 @@ void mainImGuiDlgClass::renderImGui()
 
             ImGui::Text(" Diffuse Color");
             ImGui::PushItemWidth(w);
-            ImGui::ColorEdit3("##diffuse",glm::value_ptr(theWnd->qjSet->diffuseColor));
+            ImGui::ColorEdit3("##diffuse",value_ptr(theWnd->qjSet->diffuseColor));
             ImGui::PopItemWidth();
 
-            glm::vec3 vL(-theWnd->qjSet->Light);
-            if(ImGui::gizmo3D("Light dir", vL) )  theWnd->qjSet->Light = -vL;
+            vec3 vL(-tLight);
+            if(ImGui::gizmo3D("Light dir", vL) )  tLight = -vL;
 
             ImGui::PushItemWidth(half);    
             if(ImGui::Button("show metrics",ImVec2(half, 0))) metricW ^=1;   ImGui::SameLine();
@@ -131,7 +129,7 @@ void mainImGuiDlgClass::renderImGui()
 
     static bool vis = true;
     //quaternionf qt = theWnd->getTrackball().getRotation();
-    glm::quat qt = getRotation();
+    quat qt = getRotation();
 
     float sz=240;
     ImGui::SetNextWindowSize(ImVec2(sz, theApp->GetHeight()), ImGuiCond_Always);
@@ -166,31 +164,31 @@ void mainImGuiDlgClass::renderImGui()
     ImGui::PopItemWidth();
 
     //If you modify quaternion parameters outside control, with DragFloat or other, remembre to NORMALIZE it
-    if(quatChanged) setRotation(glm::normalize(qt));
-    ImGui::DragFloat3("Light",glm::value_ptr(theWnd->qjSet->Light),0.01f);
+    if(quatChanged) setRotation(normalize(qt));
+    ImGui::DragFloat3("Light",value_ptr(tLight),0.01f);
 
-    glm::vec3 lL(-theWnd->qjSet->Light);
+    vec3 lL(-tLight);
     if(ImGui::gizmo3D("##aaa", qt, lL, sz))  { 
-        theWnd->qjSet->Light = -lL;
+        tLight = -lL;
         setRotation(qt);
     }
 
     sz*=.5;
-    static glm::quat qt2(1.0f,0,0,0);
-    static glm::quat qt3(1.0f,0,0,0);
-    static glm::quat qt4(1.0f,0,0,0);
+    static quat qt2(1.0f,0,0,0);
+    static quat qt3(1.0f,0,0,0);
+    static quat qt4(1.0f,0,0,0);
 
-    static glm::vec3 a(1.f);
-    static glm::vec4 b(1.0,0.0,0.0,0.0);
-    static glm::vec4 c(1.0,0.0,0.0,0.0);
-    static glm::vec4 d(1.0,0.0,0.0,0.0);
+    static vec3 a(1.f);
+    static vec4 b(1.0,0.0,0.0,0.0);
+    static vec4 c(1.0,0.0,0.0,0.0);
+    static vec4 d(1.0,0.0,0.0,0.0);
 
     static float resSolid = 1.0;
     static float axesLen = .95;
     static float axesThickness = 1.0;
-    glm::vec3 resAxes(axesLen,axesThickness,axesThickness);
-    static glm::vec3 dirCol(1.0,1.0,1.0);
-    static glm::vec4 planeCol(.75,.0,0.0, STARTING_ALPHA_PLANE);
+    vec3 resAxes(axesLen,axesThickness,axesThickness);
+    static vec3 dirCol(1.0,1.0,1.0);
+    static vec4 planeCol(.75,.0,0.0, STARTING_ALPHA_PLANE);
     static ImVec4 sphCol1(ImGui::ColorConvertU32ToFloat4(0xff0080ff));
     static ImVec4 sphCol2(ImGui::ColorConvertU32ToFloat4(0xffff8000));
 
@@ -201,8 +199,8 @@ void mainImGuiDlgClass::renderImGui()
 
     ImGui::SameLine();
 
-    glm::vec3 vL(-theWnd->qjSet->Light);
-    if(ImGui::gizmo3D("##Dir1", vL,sz, imguiGizmo::sphereAtOrigin) )  theWnd->qjSet->Light = -vL;
+    vec3 vL(-tLight);
+    if(ImGui::gizmo3D("##Dir1", vL,sz, imguiGizmo::sphereAtOrigin) )  tLight = -vL;
 
     static bool otherExamples = false;
 
@@ -229,7 +227,7 @@ void mainImGuiDlgClass::renderImGui()
         imguiGizmo::resizeAxesOf(resAxes);
         imguiGizmo::resizeSolidOf(resSolid); // sphere bigger
         if(ImGui::gizmo3D("##RotB", b,sz, imguiGizmo::sphereAtOrigin))  {
-            setRotation(glm::angleAxis(b.w, vec3(b)));   
+            setRotation(angleAxis(b.w, vec3(b)));   
         }   //
         imguiGizmo::restoreSolidSize(); // restore at default
         imguiGizmo::restoreAxesSize();
@@ -241,11 +239,11 @@ void mainImGuiDlgClass::renderImGui()
         imguiGizmo::restoreSolidSize(); // restore at default
 
 
-        imguiGizmo::resizeAxesOf(glm::vec3(imguiGizmo::axesResizeFactor.x, 1.75, 1.75));
+        imguiGizmo::resizeAxesOf(vec3(imguiGizmo::axesResizeFactor.x, 1.75, 1.75));
         imguiGizmo::resizeSolidOf(1.5); // sphere bigger
         imguiGizmo::setSphereColors(ImGui::ColorConvertFloat4ToU32(sphCol1), ImGui::ColorConvertFloat4ToU32(sphCol2));
-        //c = glm::vec4(glm::axis(qt), glm::angle(qt)); 
-        if(ImGui::gizmo3D("##RotC", c,sz, imguiGizmo::sphereAtOrigin|imguiGizmo::modeFullAxes)) {}   //theWnd->getTrackball().setRotation(glm::angleAxis(c.w, vec3(c)));   
+        //c = vec4(axis(qt), angle(qt)); 
+        if(ImGui::gizmo3D("##RotC", c,sz, imguiGizmo::sphereAtOrigin|imguiGizmo::modeFullAxes)) {}   //theWnd->getTrackball().setRotation(angleAxis(c.w, vec3(c)));   
         imguiGizmo::restoreSolidSize(); // restore at default
         imguiGizmo::restoreSphereColors();
         imguiGizmo::restoreAxesSize();
@@ -253,7 +251,7 @@ void mainImGuiDlgClass::renderImGui()
         ImGui::SameLine();
 
 
-        //imguiGizmo::resizeAxesOf(glm::vec3(2.5, 2.5, 2.5));
+        //imguiGizmo::resizeAxesOf(vec3(2.5, 2.5, 2.5));
         imguiGizmo::resizeAxesOf(resAxes);
         imguiGizmo::resizeSolidOf(resSolid); // sphere bigger
         if(ImGui::gizmo3D("##tZ", qt2, qt4, sz, imguiGizmo::modeFullAxes)) { setRotation(qt); }
@@ -352,12 +350,12 @@ void mainImGuiDlgClass::renderImGui()
             if(!(mode & imguiGizmo::mode3Axes) ) {
                 if(mode & imguiGizmo::modeDirection) {
                     ImGui::Text(" Direction color");
-                    ImGui::ColorEdit3("##Direction",glm::value_ptr(dirCol));
+                    ImGui::ColorEdit3("##Direction",value_ptr(dirCol));
                 } else if(mode & imguiGizmo::modeDirPlane) {
                     ImGui::Text(" Arrow color");
-                    ImGui::ColorEdit3("##Direction",glm::value_ptr(dirCol));
+                    ImGui::ColorEdit3("##Direction",value_ptr(dirCol));
                     ImGui::Text(" Plane color");
-                    ImGui::ColorEdit4("##Plane",glm::value_ptr(planeCol));
+                    ImGui::ColorEdit4("##Plane",value_ptr(planeCol));
                 }
             }
     
@@ -375,8 +373,8 @@ void mainImGuiDlgClass::renderImGui()
             if(isFull) draw |= imguiGizmo::modeFullAxes;
             else       draw &= ~imguiGizmo::modeFullAxes;
 
-            static glm::quat qv1(1.0f,0,0,0);
-            static glm::quat qv2(1.0f,0,0,0);
+            static quat qv1(1.0f,0,0,0);
+            static quat qv2(1.0f,0,0,0);
 
             ImGui::SetCursorPos(ImVec2(0,dimY-ImGui::GetFrameHeightWithSpacing()));
 
@@ -460,6 +458,11 @@ Anyhow the static variables can be modified to change the 3d aspect of all solid
         if(metricW) ImGui::ShowMetricsWindow(&metricW);
         ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
         if(demosW) ImGui::ShowDemoWindow(&demosW);
+
+    //reswitch
+    theWnd->qjSet->Light.x = tLight.x;
+    theWnd->qjSet->Light.y = tLight.y;
+    theWnd->qjSet->Light.z = tLight.z;
 
 
     ImGui::Render();

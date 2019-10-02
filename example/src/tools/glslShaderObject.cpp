@@ -104,16 +104,6 @@ void checkProgram(GLuint program)
 
 
 
-ShaderObject::ShaderObject()
-{
-
-}
-
-ShaderObject::~ShaderObject()
-{
-    glDeleteShader(shader);
-}
-
 
 void ShaderObject::Load(const char *name)
 {
@@ -122,9 +112,6 @@ void ShaderObject::Load(const char *name)
     // Load shader source code
     getFileContents(name, str);
     Compile((GLchar *) str.data());
-
-
-
 }
 
 void ShaderObject::Load(const char *defines, int numShaders, ...) 
@@ -145,7 +132,6 @@ void ShaderObject::Load(const char *defines, int numShaders, ...)
     Compile((GLchar *) str.data());
 
     va_end(argList);
-
 }
 
 
@@ -154,21 +140,20 @@ void ShaderObject::Compile(const GLchar *code)
 {
 
     // Load source code into shaders
-    glShaderSource(shader, 1, &code, NULL);
+    glShaderSource(shaderID, 1, &code, NULL);
     CHECK_GL_ERROR();
 
     // Compile the shader 
-    glCompileShader(shader);
+    glCompileShader(shaderID);
     
-    checkShader(shader);
-
+    checkShader(shaderID);
 }
 
 
 
 GLuint& ShaderObject::getShader()
 {
-    return(shader);
+    return(shaderID);
 }
 
 //#define USE_STDIO_TO_LOAD_SHADERS
