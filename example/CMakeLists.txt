@@ -9,7 +9,7 @@ set(USE_SDL FALSE CACHE BOOL FALSE)
 set(USE_VIRTUALGIZMO FALSE CACHE BOOL FALSE)
 
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
 find_package(OpenGL REQUIRED)
 
@@ -36,9 +36,11 @@ set(SOURCE_FILES
     ${SRC}/tools/glslShaderObject.cpp
     ${SRC}/tools/glslProgramObject.h
     ${SRC}/tools/glslShaderObject.h    
-    ${SRC}/tools/imGuIZMO.cpp
-    ${SRC}/tools/imGuIZMO.h
-    ${SRC}/tools/virtualGizmo.h
+    ${SRC}/tools/imGuIZMOquat.cpp
+    ${SRC}/tools/imGuIZMOquat.h
+    ${SRC}/tools/vGizmo.h
+    ${SRC}/tools/vGizmoMath.h
+    ${SRC}/tools/vGizmoConfig.h
     ${SRC}/libs/ImGui/imconfig.h
     ${SRC}/libs/ImGui/imgui.h
     ${SRC}/libs/ImGui/imgui.cpp

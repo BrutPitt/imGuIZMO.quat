@@ -14,49 +14,47 @@
 
 #include "glWindow.h"
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // UNCOMMENT for screen manipulato virtualGizmo3D 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // if you want use also the virtualGizmo3D, screen manipulator, uncomment this:
 
-//#define GLAPP_USE_VIRTUALGIZMO
+#define GLAPP_USE_VIRTUALGIZMO
 
 // Global variable or member class
-#ifdef GLAPP_USE_VIRTUALGIZMO 
-    vfGizmo3DClass gizmo; 
-    vfGizmo3DClass &getGizmo() { return gizmo; }
+#ifdef GLAPP_USE_VIRTUALGIZMO
+    
+    vg::vGizmo3D gizmo; 
+    vg::vGizmo3D &getGizmo() { return gizmo; }
 
-    void setRotation(const glm::quat &q) { getGizmo().setRotation(q); }
-    glm::quat& getRotation() { return getGizmo().getRotation(); }
+    void setRotation(const quat &q) { getGizmo().setRotation(q); }
+    quat& getRotation() { return getGizmo().getRotation(); }
 #else
 /////////////////////////////////////////////////////////////////////////////
 // For imGuIZMO, declare global variable or member class quaternion
-    glm::quat qRot = glm::quat(1.f, 0.f, 0.f, 0.f);
+    quat qRot = quat(1.f, 0.f, 0.f, 0.f);
 
 /////////////////////////////////////////////////////////////////////////////
 // two helper functions, not really necessary (but comfortable)
-    void setRotation(const glm::quat &q) { qRot = q; }
-    glm::quat& getRotation() { return qRot; }
+    void setRotation(const quat &q) { qRot = q; }
+    quat& getRotation() { return qRot; }
 #endif
 
-
-using namespace glm;
+//using namespace glm;
 
 void setView()
 {
 
-    vec3 povVec( 0.f, 0, 7.f);
-    vec3 tgtVec( 0.f, 0, 0.f);
+    vec3 povVec( 0.f, 0.f, 7.f);
+    vec3 tgtVec( 0.f, 0.f, 0.f);
 
 
-    theWnd->projectionMatrix = glm::perspective(glm::radians(30.0f),(float)theApp->GetWidth()/(float)theApp->GetHeight(),0.0f,30.0f);
-    theWnd->modelMatrix      = glm::mat4(1.0f);
-    theWnd->viewMatrix       = glm::lookAt( povVec,
-                                            tgtVec,
-                                            vec3(0.0f, 1.0f, 0.0f));
+    theWnd->projectionMatrix = perspective(radians(30.0f),(float)theApp->GetWidth()/(float)theApp->GetHeight(),0.0f,30.0f);
+    theWnd->modelMatrix      = mat4(1.0f);
+    theWnd->viewMatrix       = lookAt( povVec,
+                                       tgtVec,
+                                       vec3(0.0f, 1.0f, 0.0f));
 #ifdef GLAPP_USE_VIRTUALGIZMO 
     getGizmo().applyTransform(theWnd->modelMatrix);
 #endif
@@ -70,11 +68,11 @@ void setView()
 void setViewOrtho()
 {
 
-    theWnd->projectionMatrix = glm::ortho(-1.0, 1.0, -1.0, 1.0, -2.0, 2.0);
-    theWnd->modelMatrix      = glm::mat4(1.0f);
-    theWnd->viewMatrix       = glm::lookAt( vec3(0.f, 0.f, 1.f),
-                                            vec3(0.f, 0.f, 0.f),
-                                            vec3(0.f, 1.f, 0.f));
+    theWnd->projectionMatrix = ortho(-1.0f, 1.0f, -1.0f, 1.0f, -2.0f, 2.0f);
+    theWnd->modelMatrix      = mat4(1.0f);
+    theWnd->viewMatrix       = lookAt( vec3(0.f, 0.f, 1.f),
+                                       vec3(0.f, 0.f, 0.f),
+                                       vec3(0.f, 1.f, 0.f));
 
     theWnd->mvpMatrix        = theWnd->projectionMatrix * theWnd->viewMatrix * theWnd->modelMatrix;
 
@@ -109,6 +107,8 @@ void glWindow::onInit()
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Black Background
 
     glViewport(0,0,theApp->GetWidth(), theApp->GetHeight());
+    //setViewOrtho();
+    //setView();
 
 #ifdef GLAPP_USE_VIRTUALGIZMO 
 #ifdef GLAPP_USE_SDL
@@ -171,16 +171,13 @@ void glWindow::onRender()
 
 #ifdef GLAPP_USE_VIRTUALGIZMO 
     float zoom = getGizmo().getDollyPosition().z;
-/*
-    if(zoom < .9)       { zoom =.9;   getGizmo().setDollyPosition(zoom); }
-    else if (zoom>1.5)  { zoom = 1.5; getGizmo().setDollyPosition(zoom); }
-*/
+
     qjSet->matOrientation = getGizmo().getTransform() * zoom;
 #else
 ////////////////////////////////////////////////////////////////////
 // imGuIZMO: get quaternion in to orientation Matrix
 
-    glm::mat4 modelMatrix = glm::mat4_cast(qRot);
+    mat4 modelMatrix = mat4_cast(qRot);
     qjSet->matOrientation = modelMatrix;
 
 #endif
@@ -205,7 +202,6 @@ void glWindow::onReshape(GLint w, GLint h)
 {
     glViewport(0,0,w,h);
     theApp->SetWidth(w); theApp->SetHeight(h);
-    printf("w: %d, h: %d\n", w,h);
 
 #ifdef GLAPP_USE_VIRTUALGIZMO 
     getGizmo().viewportSize(w, h);

@@ -27,10 +27,10 @@ using namespace std;
 class ShaderObject
 {
     protected:
-        ShaderObject();
+        ShaderObject() {}
 
     public:
-        virtual ~ShaderObject();
+        virtual ~ShaderObject() { glDeleteShader(shaderID); } 
 
         void Load(const char *name);
         //void Load(int numShaders, ...) { Load(NULL, numShaders, ...); }
@@ -38,11 +38,12 @@ class ShaderObject
         void Compile(const GLchar *code);
 
         GLuint& getShader();
+        void resetShader() { shaderID=0; }
 
     protected:
         void getFileContents(const char* fileName, string &s);
 
-        GLuint  shader=0;
+        GLuint  shaderID=0;
 };
 
 //  Fragment 
@@ -50,7 +51,7 @@ class ShaderObject
 class FragmentShader : public ShaderObject
 {
     public:
-        FragmentShader() : ShaderObject() { shader = glCreateShader(GL_FRAGMENT_SHADER);  }
+        FragmentShader() : ShaderObject() { shaderID = glCreateShader(GL_FRAGMENT_SHADER);  }
 } ;
 
 //  Vertex
@@ -58,7 +59,7 @@ class FragmentShader : public ShaderObject
 class VertexShader : public ShaderObject
 {
     public:
-        VertexShader() : ShaderObject() { shader = glCreateShader(GL_VERTEX_SHADER);  }
+        VertexShader() : ShaderObject() { shaderID = glCreateShader(GL_VERTEX_SHADER);  }
 };
 
 #ifndef __EMSCRIPTEN__
@@ -67,7 +68,7 @@ class VertexShader : public ShaderObject
 class GeometryShader : public ShaderObject
 {
     public:
-        GeometryShader() : ShaderObject() { shader = glCreateShader(GL_GEOMETRY_SHADER);  }
+        GeometryShader() : ShaderObject() { shaderID = glCreateShader(GL_GEOMETRY_SHADER);  }
 };
 #endif
 

@@ -75,11 +75,11 @@
     <ClCompile Include="..\src\tools\glslShaderObject.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\tools\imGuIZMO.cpp">
-      <Filter>Tools\imguiTools</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\libs\ImGui\imgui_impl_sdl.cpp">
       <Filter>libs\imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tools\imGuIZMOquat.cpp">
+      <Filter>Tools\imguiTools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -119,11 +119,17 @@
     <ClInclude Include="..\src\tools\glslShaderObject.h">
       <Filter>Tools</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\tools\virtualGizmo.h">
+    <ClInclude Include="..\src\tools\vGizmo.h">
       <Filter>Tools</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\tools\imGuIZMO.h">
+    <ClInclude Include="..\src\tools\imGuIZMOquat.h">
       <Filter>Tools\imguiTools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tools\vGizmoConfig.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tools\vGizmoMath.h">
+      <Filter>Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

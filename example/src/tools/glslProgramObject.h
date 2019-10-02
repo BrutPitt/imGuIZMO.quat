@@ -184,16 +184,20 @@ class mainProgramObj : public ProgramObject
 {
 public:
     mainProgramObj() { } 
-    virtual ~mainProgramObj() { deleteAll(); }
+    virtual ~mainProgramObj() { removeAllShaders(); deleteAllShaders(); }
 
     void useVertex(VertexShader *VS) { vertObj = VS; vsCloned = true; }
     void useVertex()   { vertObj = new VertexShader; }
     void useFragment() { fragObj = new FragmentShader; }
     void useAll()      { useVertex(); useGeometry(); useFragment(); }
 
-    void deleteVertex()   { if(!vsCloned) { removeShader(vertObj); delete vertObj; vertObj = nullptr; } }
-    void deleteFragment() { if(!fsCloned) { removeShader(fragObj); delete fragObj; fragObj = nullptr; } }
-    void deleteAll()      { deleteVertex(); deleteFragment(); deleteGeometry(); }
+    void removeVertex()     { removeShader(vertObj); }
+    void removeFragment()   { removeShader(fragObj); }
+    void removeAllShaders() { removeVertex(); removeFragment(); removeGeometry(); }
+
+    void deleteVertex()     { delete vertObj; vertObj = nullptr; }
+    void deleteFragment()   { delete fragObj; fragObj = nullptr; }
+    void deleteAllShaders() { deleteVertex(); deleteFragment(); deleteGeometry(); }
 
     void addVertex()      { addShader(vertObj); }
     void addFragment()    { addShader(fragObj); }
@@ -204,15 +208,18 @@ public:
     FragmentShader *getFragment() { return fragObj; }
 
 #if !defined(__EMSCRIPTEN__)
-    void useGeometry() { geomObj = new GeometryShader; }
-    void deleteGeometry() { if(!gsCloned) { removeShader(geomObj); delete geomObj; geomObj = nullptr; } }
-    void addGeometry()    { addShader(geomObj); }
+    void useGeometry()       { geomObj = new GeometryShader; }
+    void removeGeometry()    { if(!gsCloned) removeShader(geomObj); }
+    void deleteGeometry() { delete geomObj; geomObj = nullptr; }
+
+    void addGeometry()       { addShader(geomObj); }
 
     GeometryShader *getGeometry() { return geomObj; }
 
     bool gsCloned = false;
 #else
     void useGeometry() {}
+    void removeGeometry() {}
     void deleteGeometry() {}
 #endif
 

@@ -193,6 +193,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -255,6 +256,7 @@
     <ClCompile>
       <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -315,15 +317,17 @@
     <ClCompile Include="..\src\libs\ImGui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\src\libs\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="..\src\qJulia.cpp" />
-    <ClCompile Include="..\src\tools\imGuIZMO.cpp" />
+    <ClCompile Include="..\src\tools\imGuIZMOquat.cpp" />
     <ClCompile Include="..\src\ui\uiMainDlg.cpp" />
     <ClCompile Include="..\src\ui\uiSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\tools\glslProgramObject.h" />
     <ClInclude Include="..\src\tools\glslShaderObject.h" />
-    <ClInclude Include="..\src\tools\imGuIZMO.h" />
-    <ClInclude Include="..\src\tools\virtualGizmo.h" />
+    <ClInclude Include="..\src\tools\imGuIZMOquat.h" />
+    <ClInclude Include="..\src\tools\vGizmo.h" />
+    <ClInclude Include="..\src\tools\vGizmoConfig.h" />
+    <ClInclude Include="..\src\tools\vGizmoMath.h" />
     <ClInclude Include="..\src\glApp.h" />
     <ClInclude Include="..\src\glWindow.h" />
     <ClInclude Include="..\src\libs\glad\glad.h" />
