@@ -10,16 +10,16 @@
 //  
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
-#include "imGuIZMO.h"
+#include "imGuIZMOquat.h"
 
-ImVector<glm::vec3> imguiGizmo::sphereVtx;
-ImVector<int>       imguiGizmo::sphereTess;
-ImVector<glm::vec3> imguiGizmo::arrowVtx[4];
-ImVector<glm::vec3> imguiGizmo::arrowNorm[4];
-ImVector<glm::vec3> imguiGizmo::cubeVtx;
-ImVector<glm::vec3> imguiGizmo::cubeNorm;
-ImVector<glm::vec3> imguiGizmo::planeVtx;
-ImVector<glm::vec3> imguiGizmo::planeNorm;
+ImVector<vec3> imguiGizmo::sphereVtx;
+ImVector<int>  imguiGizmo::sphereTess;
+ImVector<vec3> imguiGizmo::arrowVtx[4];
+ImVector<vec3> imguiGizmo::arrowNorm[4];
+ImVector<vec3> imguiGizmo::cubeVtx;
+ImVector<vec3> imguiGizmo::cubeNorm;
+ImVector<vec3> imguiGizmo::planeVtx;
+ImVector<vec3> imguiGizmo::planeNorm;
 bool imguiGizmo::solidAreBuilded = false;
 bool imguiGizmo::dragActivate = false;
 //
@@ -67,22 +67,22 @@ float imguiGizmo::planeThickness = .015f;
 
 // Axes resize
 ///////////////////////////////////////
-glm::vec3 imguiGizmo::axesResizeFactor(.95,1.0,1.0);
-glm::vec3 imguiGizmo::savedAxesResizeFactor = imguiGizmo::axesResizeFactor;
+vec3 imguiGizmo::axesResizeFactor(.95f, 1.0f, 1.0f);
+vec3 imguiGizmo::savedAxesResizeFactor = imguiGizmo::axesResizeFactor;
 
 // Solid resize
 ///////////////////////////////////////
-float imguiGizmo::solidResizeFactor = 1.0;
+float imguiGizmo::solidResizeFactor = 1.0f;
 float imguiGizmo::savedSolidResizeFactor = imguiGizmo::solidResizeFactor;
 
 // Direction arrow color
 ///////////////////////////////////////
-ImVec4 imguiGizmo::directionColor(1.0f, 1.0f, 0.0, 1.0f);
+ImVec4 imguiGizmo::directionColor(1.0f, 1.0f, 0.0f, 1.0f);
 ImVec4 imguiGizmo::savedDirectionColor = imguiGizmo::directionColor;
 
 // Plane color
 ///////////////////////////////////////
-ImVec4 imguiGizmo::planeColor(0.0f, 0.5f, 1.0, STARTING_ALPHA_PLANE);
+ImVec4 imguiGizmo::planeColor(0.0f, 0.5f, 1.0f, STARTING_ALPHA_PLANE);
 ImVec4 imguiGizmo::savedPlaneColor = imguiGizmo::planeColor;
 
 // Sphere Colors 
@@ -115,9 +115,9 @@ namespace ImGui
 //
 //  Quaternion control 
 //
-//      input/output: glm::quat (quaternion) for full control
+//      input/output: quat (quaternion) for full control
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, glm::quat& quat, float size, const int mode)
+bool gizmo3D(const char* label, quat& quat, float size, const int mode)
 {
     imguiGizmo g;
     g.modeSettings(mode & ~g.modeDual);
@@ -134,9 +134,9 @@ bool gizmo3D(const char* label, glm::quat& quat, float size, const int mode)
 //  Angle/Axes control 
 //
 //      input/output: 
-//          glm::Vec4 - X Y Z vector/axes components - W angle of rotation
+//          Vec4 - X Y Z vector/axes components - W angle of rotation
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, glm::vec4& axis_angle, float size, const int mode)
+bool gizmo3D(const char* label, vec4& axis_angle, float size, const int mode)
 {
     imguiGizmo g;
     g.modeSettings(mode & ~g.modeDual);
@@ -148,10 +148,10 @@ bool gizmo3D(const char* label, glm::vec4& axis_angle, float size, const int mod
 //  Direction control : 
 //      only in directional mode! ... for obvious reasons ;-) 
 //      
-//      input/output: glm::Vec3 - X Y Z vector/axes components
+//      input/output: Vec3 - X Y Z vector/axes components
 ////////////////////////////////////////////////////////////////////////////
 
-bool gizmo3D(const char* label, glm::vec3& dir, float size, const int mode)
+bool gizmo3D(const char* label, vec3& dir, float size, const int mode)
 {
     imguiGizmo g;
     g.modeSettings(mode & (imguiGizmo::modeDirection | imguiGizmo::modeDirPlane) ? mode : imguiGizmo::modeDirection); 
@@ -163,14 +163,14 @@ bool gizmo3D(const char* label, glm::vec3& dir, float size, const int mode)
 //
 //  2 Manipulators -> 2 Quaternions 
 //
-//      input/output: glm::axes (quaternion) for full control - LeftClick 
-//                    glm::spot (quaternion) for full control - RightClick
+//      input/output: axes (quaternion) for full control - LeftClick 
+//                    spot (quaternion) for full control - RightClick
 //
 //                    both pressed buttons... rotate together
 //                    ctrl-Shift-Alt mods, for X-Y-Z rotations (respectivally)
 //                    are abilitated on both ... also together!
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, glm::quat& axes, glm::quat& spot, float size, const int mode)
+bool gizmo3D(const char* label, quat& axes, quat& spot, float size, const int mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -186,12 +186,12 @@ bool gizmo3D(const char* label, glm::quat& axes, glm::quat& spot, float size, co
 //
 //  2 Manipulators -> Quaternions and Vec3
 //
-//      input/output: glm::axes (quaternion) for full control - LeftClick 
-//                    glm::spot (vec3)       for full control - RightClick
+//      input/output: axes (quaternion) for full control - LeftClick 
+//                    spot (vec3)       for full control - RightClick
 //
 //                    read above...
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, glm::quat& axes, glm::vec3& spotDir, float size, const int mode)
+bool gizmo3D(const char* label, quat& axes, vec3& spotDir, float size, const int mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -206,12 +206,12 @@ bool gizmo3D(const char* label, glm::quat& axes, glm::vec3& spotDir, float size,
 //
 //  2 Manipulators -> Quaternions and Vec4
 //
-//      input/output: glm::axes (quaternion) for full control - LeftClick 
-//                    glm::spot (vec4 -> xyz axes, q angle)   - RightClick
+//      input/output: axes (quaternion) for full control - LeftClick 
+//                    spot (vec4 -> xyz axes, q angle)   - RightClick
 //
 //                    read above...
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, glm::quat& axes, glm::vec4& axesAngle, float size, const int mode)
+bool gizmo3D(const char* label, quat& axes, vec4& axesAngle, float size, const int mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -237,8 +237,8 @@ static inline int clamp(int v, int mn, int mx)
 ////////////////////////////////////////////////////////////////////////////
 inline ImU32 addLightEffect(ImU32 color, float light)
 {         
-    float l = ((light<.6) ? .6 : light) * .8;  
-    float lc = light * 80.f;                    // ambient component 
+    float l = ((light<.6f) ? .6f : light) * .8f;  
+    float lc = light * 80.0f;                    // ambient component 
     return   clamp(ImU32((( color      & 0xff)*l + lc)),0,255)        |
             (clamp(ImU32((((color>>8)  & 0xff)*l + lc)),0,255) <<  8) |
             (clamp(ImU32((((color>>16) & 0xff)*l + lc)),0,255) << 16) |
@@ -248,11 +248,11 @@ inline ImU32 addLightEffect(ImU32 color, float light)
 //  LightEffect
 //      with distance attenuatin
 ////////////////////////////////////////////////////////////////////////////
-inline ImU32 addLightEffect(const glm::vec4 &color, float light, float atten)
+inline ImU32 addLightEffect(const vec4 &color, float light, float atten)
 {                          
-    glm::vec3 l((light<.5) ? .5f : light); 
-    glm::vec3 a(atten>.25  ? .25f : atten);
-    glm::vec3 c(((glm::vec3(color) + l*.5f) * l) *.75f + a*glm::vec3(color)*.45f +a*.25f);
+    vec3 l((light<.5) ? .5f : light); 
+    vec3 a(atten>.25  ? .25f : atten);
+    vec3 c(((vec3(color) + l*.5f) * l) *.75f + a*vec3(color)*.45f +a*.25f);
 
     const float alpha = color.a * ImGui::GetStyle().Alpha; //ImGui::GetCo(ImGuiCol_FrameBg).w;
     return ImGui::ColorConvertFloat4ToU32(ImVec4(c.x, c.y, c.z, alpha));
@@ -260,47 +260,47 @@ inline ImU32 addLightEffect(const glm::vec4 &color, float light, float atten)
 
 inline ImU32 addLightEffect(ImU32 color, float light,  float atten)
 {                        
-    glm::vec4 c(float(color & 0xff)/255.f,float((color>>8) & 0xff)/255.f,float((color>>16) & 0xff)/255.f, 1.0);
+    vec4 c(float(color & 0xff)/255.f,float((color>>8) & 0xff)/255.f,float((color>>16) & 0xff)/255.f, 1.0f);
     return addLightEffect(c, light, atten);
 }
 
 //  inline helper drawing functions
 ////////////////////////////////////////////////////////////////////////////
-typedef glm::vec3 & (*ptrFunc)(glm::vec3 &);
+typedef vec3 & (*ptrFunc)(vec3 &);
 
 
-inline glm::vec3 &adjustPlane(glm::vec3 &coord)
+inline vec3 &adjustPlane(vec3 &coord)
 {
-    coord.x = (coord.x > 0) ? ( 2.5f * coord.x - 1.6f) : coord.x ;
-    coord.x = (coord.x)*.5+.5 + (coord.x>0.0 ? -imguiGizmo::planeThickness : imguiGizmo::planeThickness) * imguiGizmo::solidResizeFactor;
-    coord *= glm::vec3(1.f, 2.f, 2.f);
+    coord.x = (coord.x > 0.0f) ? ( 2.5f * coord.x - 1.6f) : coord.x ;
+    coord.x = (coord.x)*.5f+.5f + (coord.x>0 ? -imguiGizmo::planeThickness : imguiGizmo::planeThickness) * imguiGizmo::solidResizeFactor;
+    coord *= vec3(1.0f, 2.0f, 2.0f);
     return coord;
 }
 
-inline glm::vec3 &adjustDir(glm::vec3 &coord)
+inline vec3 &adjustDir(vec3 &coord)
 {
-    coord.x = (coord.x > 0) ? ( 2.5f * coord.x - 1.6f) : coord.x + 0.1f;
-    coord *= glm::vec3(1.f, 3.f, 3.f);
+    coord.x = (coord.x > 0.0f) ? ( 2.5f * coord.x - 1.6f) : coord.x + 0.1f;
+    coord *= vec3(1.0f, 3.0f, 3.0f);
     return coord;
 }
 
-inline glm::vec3 &adjustSpotCyl(glm::vec3 &coord)
+inline vec3 &adjustSpotCyl(vec3 &coord)
 {
-    const float halfCylMinusCone = 1. - imguiGizmo::coneLength;
-    coord.x = (coord.x*.075 - 2. +( halfCylMinusCone - halfCylMinusCone*.075)); //cyl begin where cone end
+    const float halfCylMinusCone = 1.0f - imguiGizmo::coneLength;
+    coord.x = (coord.x*.075f - 2.0f +( halfCylMinusCone - halfCylMinusCone*.075f)); //cyl begin where cone end
     return coord;
 
 }
-inline glm::vec3 &adjustSpotCone(glm::vec3 &coord)
+inline vec3 &adjustSpotCone(vec3 &coord)
 {
     coord.x-= 2.00f;
     return coord;
 }
 
-inline glm::vec3 fastRotate (int axis, glm::vec3 &v)
+inline vec3 fastRotate (int axis, vec3 &v)
 {
-    return ((axis == imguiGizmo::axisIsY) ? glm::vec3(-v.y, v.x, v.z) : // rotation Z 90'
-           ((axis == imguiGizmo::axisIsZ) ? glm::vec3(-v.z, v.y, v.x) : // rotation Y 90'                            
+    return ((axis == imguiGizmo::axisIsY) ? vec3(-v.y, v.x, v.z) : // rotation Z 90'
+           ((axis == imguiGizmo::axisIsZ) ? vec3(-v.z, v.y, v.x) : // rotation Y 90'                            
                                           v));
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -319,7 +319,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
                                     ((axesOriginType & imguiGizmo::cubeAtOrigin  ) ? cubeSize     * solidResizeFactor: 
                                                                                    cylRadius * .5);
     // if modeDual... leave space for draw light arrow
-    glm::vec3 resizeAxes( ((drawMode&modeDual) && (axesResizeFactor.x>.75)) ? glm::vec3(.75,axesResizeFactor.y, axesResizeFactor.z) : axesResizeFactor);
+    vec3 resizeAxes( ((drawMode&modeDual) && (axesResizeFactor.x>.75f)) ? vec3(.75f,axesResizeFactor.y, axesResizeFactor.z) : axesResizeFactor);
 
     //  build solids... once!
     ///////////////////////////////////////
@@ -356,7 +356,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     //      can be replaced facilly with an personal 3d manipulator which 
     //      returns rotations in a quaternion
     ////////////////////////////////////////////////////////////////////////////
-    auto setTrackball = [&] (virtualGizmoClass<tbT> &track, glm::quat &q) {
+    auto setTrackball = [&] (vg::vImGuIZMO &track, quat &q) {
         track.viewportSize(size, size);
         track.setRotation(q);
         track.setGizmoScale(size/std::max(io.DisplaySize.x,io.DisplaySize.y));
@@ -366,15 +366,15 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     //      in : q -> quaternion to which applay rotations
     //      out: q -> quaternion with rotations
     ////////////////////////////////////////////////////////////////////////////
-    auto getTrackball = [&] (glm::quat &q) {
-            virtualGizmoClass<tbT> track;
+    auto getTrackball = [&] (quat &q) {
+            vg::vImGuIZMO track;
             setTrackball(track, q);    
             
             ImVec2 mouse = ImGui::GetMousePos() - controlPos;
-            vgModifiers mod  = (io.KeyCtrl) ?  evControlModifier : evNoModifier;
-                        if(io.KeyAlt)   mod |= evAltModifier;
-                        if(io.KeyShift) mod |= evShiftModifier;
-                        if(io.KeySuper) mod |= evSuperModifier;
+            vgModifiers mod  = (io.KeyCtrl) ?  vg::evControlModifier : vg::evNoModifier;
+                        if(io.KeyAlt)   mod |= vg::evAltModifier;
+                        if(io.KeyShift) mod |= vg::evShiftModifier;
+                        if(io.KeySuper) mod |= vg::evSuperModifier;
 
             track.motionImmediateMode(mouse.x, mouse.y, io.MouseDelta.x, io.MouseDelta.y, mod);
             q = track.getRotation();
@@ -405,7 +405,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     const ImVec2 wpUV = ImGui::GetFontTexUvWhitePixel(); //culling versus
     ImVec2 uv[4]; ImU32 col[4]; //buffers to storetransformed vtx & col for PrimVtx & PrimQuadUV
 
-    glm::quat quat(glm::normalize(qtV)); 
+    quat _q(normalize(qtV)); 
 
     ////////////////////////////////////////////////////////////////////////////
     //  Just a "few" lambdas... 
@@ -418,9 +418,8 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     //////////////////////////////////////////////////////////////////
     auto addTriangle = [&] ()
     {   // test cull dir        
-        if(glm::cross(glm::vec2(uv[1].x-uv[0].x, uv[1].y-uv[0].y), 
-                      glm::vec2(uv[2].x-uv[0].x, uv[2].y-uv[0].y)) > 0.f)
-            { uv[1] = uv[2] = uv[0]; }
+        if(cross(vec2(uv[1].x-uv[0].x, uv[1].y-uv[0].y), 
+                 vec2(uv[2].x-uv[0].x, uv[2].y-uv[0].y)) > 0) { uv[1] = uv[2] = uv[0]; }
 
         for(int i=0; i<3; i++) draw_list->PrimVtx(uv[i], wpUV, col[i]);
     };
@@ -428,9 +427,8 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     //////////////////////////////////////////////////////////////////
     auto addQuad = [&] (ImU32 colLight)
     {   // test cull dir
-        if(glm::cross(glm::vec2(uv[1].x-uv[0].x, uv[1].y-uv[0].y), 
-                      glm::vec2(uv[3].x-uv[0].x, uv[3].y-uv[0].y)) > 0.f)
-            { uv[3] = uv[1] = uv[2] = uv[0]; }
+        if(cross(vec2(uv[1].x-uv[0].x, uv[1].y-uv[0].y), 
+                 vec2(uv[3].x-uv[0].x, uv[3].y-uv[0].y)) > 0) { uv[3] = uv[1] = uv[2] = uv[0]; }
 
         draw_list->PrimQuadUV(uv[0],uv[1],uv[2],uv[3], wpUV, wpUV, wpUV, wpUV, colLight); 
     };
@@ -442,7 +440,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         auto itTess = sphereTess.begin();
         for(auto itVtx = sphereVtx.begin(); itVtx != sphereVtx.end(); )  {
             for(int h=0; h<3; h++, itTess++) {
-                glm::vec3 coord = quat  * (*itVtx++ * solidResizeFactor);        //Rotate
+                vec3 coord = _q  * (*itVtx++ * solidResizeFactor);        //Rotate
 
                 uv[h] = normalizeToControlSize(coord.x,coord.y);
                 const float drawSize = sphereRadius * solidResizeFactor;
@@ -457,14 +455,14 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     auto drawCube = [&] ()  
     {
         draw_list->PrimReserve(cubeNorm.size()*6, cubeNorm.size()*4); // num vert/indices 
-        for(auto itNorm = cubeNorm.begin(), itVtx  = cubeVtx.begin() ; itNorm != cubeNorm.end();) {
-            glm::vec3 coord;
-            glm::vec3 norm = quat * *itNorm;
+        for(vec3* itNorm = cubeNorm.begin(), *itVtx  = cubeVtx.begin() ; itNorm != cubeNorm.end();) {
+            vec3 coord;
+            vec3 norm = _q * *itNorm;
             for (int i = 0; i<4; ) {
-                coord = quat  * (*itVtx++ * solidResizeFactor);                        
+                coord = _q  * (*itVtx++ * solidResizeFactor);                        
                 uv[i++] = normalizeToControlSize(coord.x,coord.y);
             }                    
-            addQuad(addLightEffect(glm::vec4(glm::abs(*itNorm++),1.0), norm.z, coord.z));
+            addQuad(addLightEffect(vec4(abs(*itNorm++),1.0f), norm.z, coord.z));
         }
     };
 
@@ -473,14 +471,14 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     {
         draw_list->PrimReserve(planeNorm.size()*6, planeNorm.size()*4); // num vert/indices 
         for(auto itNorm = planeNorm.begin(), itVtx  = planeVtx.begin() ; itNorm != planeNorm.end();) {
-            glm::vec3 coord;
-            glm::vec3 norm = quat * *itNorm;
+            vec3 coord;
+            vec3 norm = _q * *itNorm;
             for (int i = 0; i<4; ) {
-                coord = quat  * (*itVtx++ * solidResizeFactor);                        
+                coord = _q  * (*itVtx++ * solidResizeFactor);                        
                 uv[i++] = normalizeToControlSize(coord.x,coord.y);
             }                    
             itNorm++;
-            addQuad(addLightEffect(glm::vec4(planeColor.x, planeColor.y, planeColor.z, planeColor.w), norm.z, coord.z));
+            addQuad(addLightEffect(vec4(planeColor.x, planeColor.y, planeColor.z, planeColor.w), norm.z, coord.z));
         }
     };
 
@@ -489,8 +487,8 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     {   
         for(int n = 0; n < 4; n++) { //Arrow: 2 Cone -> (Surface + cap) + 2 Cyl -> (Surface + cap)
             for(int arrowAxis = 0; arrowAxis < 3; arrowAxis++) { // draw 3 axes
-                glm::vec3 arrowCoord(0, 0, 0); arrowCoord[arrowAxis] = 1.0f; // rotate on 3 axis (arrow -> X, Y, Z ) in base to current arrowAxis
-                const float arrowCoordZ = glm::vec3(quat*arrowCoord).z; //.Rotate
+                vec3 arrowCoord(0.0f, 0.0f, 0.0f); arrowCoord[arrowAxis] = 1.0f; // rotate on 3 axis (arrow -> X, Y, Z ) in base to current arrowAxis
+                const float arrowCoordZ = vec3(_q*arrowCoord).z; //.Rotate
 
                 const int i = (arrowCoordZ > 0) ? 3 - n : n; //painter algorithm: before farthest
 
@@ -507,23 +505,23 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
                 for (auto itVtx = ptrVtx->begin(), itNorm = (arrowNorm+i)->begin(); itVtx != ptrVtx->end(); ) { //for all Vtx
 #if !defined(imguiGizmo_INTERPOLATE_NORMALS)
-                    glm::vec3 norm( quat * fastRotate(arrowAxis, *itNorm++));
+                    vec3 norm( _q * fastRotate(arrowAxis, *itNorm++));
 #endif                    
                     for(int h=0; h<3; h++) {
-                        glm::vec3 coord(*itVtx++ * resizeAxes); //  reduction
+                        vec3 coord(*itVtx++ * resizeAxes); //  reduction
 
                     // reposition starting point...
                         if (!skipCone && coord.x >  0)                         coord.x = -arrowStartingPoint; 
                         if ((skipCone && coord.x <= 0) || 
                            (!showFullAxes && (coord.x < arrowStartingPoint)) ) coord.x =  arrowStartingPoint;
                         //transform
-                        coord = quat * fastRotate(arrowAxis, coord); 
+                        coord = _q * fastRotate(arrowAxis, coord); 
                         uv[h] = normalizeToControlSize(coord.x,coord.y);
 #ifdef imguiGizmo_INTERPOLATE_NORMALS
-                        glm::vec3 norm( quat * fastRotate(arrowAxis, *itNorm++));
+                        vec3 norm( _q * fastRotate(arrowAxis, *itNorm++));
 #endif                  
                         //col[h] = addLightEffect(ImU32(0xFF) << arrowAxis*8, float(0xa0)*norm.z+.5f);
-                        col[h] = addLightEffect(glm::vec4(float(arrowAxis==axisIsX),float(arrowAxis==axisIsY),float(arrowAxis==axisIsZ), 1.0), norm.z, coord.z);
+                        col[h] = addLightEffect(vec4(float(arrowAxis==axisIsX),float(arrowAxis==axisIsY),float(arrowAxis==axisIsZ), 1.0), norm.z, coord.z);
                     }
                     addTriangle();
                 }
@@ -532,24 +530,24 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     };
 
     //////////////////////////////////////////////////////////////////
-    auto drawComponent = [&] (const int idx, const glm::quat &q, ptrFunc func)
+    auto drawComponent = [&] (const int idx, const quat &q, ptrFunc func)
     {
         auto *ptrVtx = arrowVtx+idx;
         draw_list->PrimReserve(ptrVtx->size(), ptrVtx->size()); // reserve vtx
         for (auto itVtx = ptrVtx->begin(), itNorm = (arrowNorm+idx)->begin(); itVtx != ptrVtx->end(); ) { 
 #if !defined(imguiGizmo_INTERPOLATE_NORMALS)
-            glm::vec3 norm = (quat * *itNorm++);
+            vec3 norm = (_q * *itNorm++);
 #endif
             for(int h=0; h<3; h++) {
-                glm::vec3 coord = *itVtx++;
+                vec3 coord = *itVtx++;
 #ifdef imguiGizmo_INTERPOLATE_NORMALS
-                glm::vec3 norm = (q * *itNorm++);
+                vec3 norm = (q * *itNorm++);
 #endif
                 coord = q * (func(coord) * resizeAxes); // remodelling Directional Arrow (func) and transforms;
 
                 uv[h] = normalizeToControlSize(coord.x,coord.y);
                 //col[h] = addLightEffect(color, float(0xa0)*norm.z+.5f);
-                col[h] = addLightEffect(glm::vec4(directionColor.x, directionColor.y, directionColor.z, 1.0), norm.z, coord.z>0 ? coord.z : coord.z*.5);
+                col[h] = addLightEffect(vec4(directionColor.x, directionColor.y, directionColor.z, 1.0), norm.z, coord.z>0 ? coord.z : coord.z*.5);
             }
             addTriangle();
         }
@@ -557,9 +555,9 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     };
 
     //////////////////////////////////////////////////////////////////
-    auto dirArrow = [&] (const glm::quat &q, int mode) 
+    auto dirArrow = [&] (const quat &q, int mode) 
     {
-        glm::vec3 arrowCoord(quat * glm::vec3(1.0f, 0.0f, 0.0f));
+        vec3 arrowCoord(_q * vec3(1.0f, 0.0f, 0.0f));
 
         ptrFunc func = (mode == modeDirPlane) ? adjustPlane : adjustDir;
 
@@ -569,7 +567,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     };
     
     //////////////////////////////////////////////////////////////////
-    auto spotArrow = [&] (const glm::quat &q, const float arrowCoordZ) 
+    auto spotArrow = [&] (const quat &q, const float arrowCoordZ) 
     {
         if(arrowCoordZ > 0) { 
             drawComponent(CONE_SURF, q, adjustSpotCone); drawComponent(CONE_CAP , q, adjustSpotCone);
@@ -592,12 +590,12 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
     //  ... and now..  draw the widget!!!
     ///////////////////////////////////////
-    if(drawMode & (modeDirection | modeDirPlane)) dirArrow(quat, drawMode);
+    if(drawMode & (modeDirection | modeDirPlane)) dirArrow(_q, drawMode);
     else { // draw arrows & sphere
         if(drawMode == modeDual) {
-            glm::vec3 spot(qtV2 * glm::vec3(-1.0f, 0.0f, .0f)); // versus opposite
-            if(spot.z>0) { draw3DSystem(); spotArrow(glm::normalize(qtV2),spot.z); }
-            else         { spotArrow(glm::normalize(qtV2),spot.z); draw3DSystem(); }
+            vec3 spot(qtV2 * vec3(-1.0f, 0.0f, .0f)); // versus opposite
+            if(spot.z>0) { draw3DSystem(); spotArrow(normalize(qtV2),spot.z); }
+            else         { spotArrow(normalize(qtV2),spot.z); draw3DSystem(); }
         } else draw3DSystem();
     }
 
@@ -613,21 +611,21 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 //  Polygon
 //
 ////////////////////////////////////////////////////////////////////////////
-void imguiGizmo::buildPolygon(const glm::vec3 &size, ImVector<glm::vec3> &vtx, ImVector<glm::vec3> &norm)
+void imguiGizmo::buildPolygon(const vec3 &size, ImVector<vec3> &vtx, ImVector<vec3> &norm)
 {
 
     vtx .clear();
     norm.clear(); 
 
-#define V(a,b,c) vtx.push_back(glm::vec3(a size.x, b size.y, c size.z))
-#define N(x,y,z) norm.push_back(glm::vec3(x, y, z))
+#define V(a,b,c) vtx.push_back(vec3(a size.x, b size.y, c size.z))
+#define N(x,y,z) norm.push_back(vec3(x, y, z))
 
-    N( 1.0, 0.0, 0.0); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+);
-    N( 0.0, 1.0, 0.0); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+);
-    N( 0.0, 0.0, 1.0); V(+,+,+); V(-,+,+); V(-,-,+); V(+,-,+);
-    N(-1.0, 0.0, 0.0); V(-,-,+); V(-,+,+); V(-,+,-); V(-,-,-);
-    N( 0.0,-1.0, 0.0); V(-,-,+); V(-,-,-); V(+,-,-); V(+,-,+);
-    N( 0.0, 0.0,-1.0); V(-,-,-); V(-,+,-); V(+,+,-); V(+,-,-);
+    N( 1.0f, 0.0f, 0.0f); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+);
+    N( 0.0f, 1.0f, 0.0f); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+);
+    N( 0.0f, 0.0f, 1.0f); V(+,+,+); V(-,+,+); V(-,-,+); V(+,-,+);
+    N(-1.0f, 0.0f, 0.0f); V(-,-,+); V(-,+,+); V(-,+,-); V(-,-,-);
+    N( 0.0f,-1.0f, 0.0f); V(-,-,+); V(-,-,-); V(+,-,-); V(+,-,+);
+    N( 0.0f, 0.0f,-1.0f); V(-,-,-); V(-,+,-); V(+,+,-); V(+,-,-);
 
 #undef V
 #undef N
@@ -646,10 +644,10 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
     sphereVtx .clear();
     sphereTess.clear();
 
-#   define V(x,y,z) sphereVtx.push_back(glm::vec3(x, y, z))
+#   define V(x,y,z) sphereVtx.push_back(vec3(x, y, z))
 #   define T(t)     sphereTess.push_back(t)
  
-    const float incAngle = 2.f*glm::pi<float>()/(float)( meridians );
+    const float incAngle = 2.0f*T_PI/(float)( meridians );
     float angle = incAngle;
 
     // Adjust z and radius as stacks are drawn. 
@@ -662,8 +660,8 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
 
     for (int j=0; j<meridians; j++, angle+=incAngle)
     {
-        const float x0 = x1; x1 = cosf(glm::pi<float>()-angle);
-        const float y0 = y1; y1 = sinf(glm::pi<float>()-angle);
+        const float x0 = x1; x1 = cosf(T_PI-angle);
+        const float y0 = y1; y1 = sinf(T_PI-angle);
 
         const int tType = ((j>>div)&1);
         
@@ -699,7 +697,6 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
     }
 
     // The last parallel is covered with triangls
-
     z0 = z1; 
     r0 = r1;
     x1 = -1.0f; y1 = 0.f;
@@ -707,8 +704,8 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
     angle = incAngle;
     for (int j=0; j<meridians; j++,angle+=incAngle)
     {
-        const float x0 = x1; x1 = cosf(angle+glm::pi<float>());
-        const float y0 = y1; y1 = sinf(angle+glm::pi<float>());
+        const float x0 = x1; x1 = cosf(angle+T_PI);
+        const float y0 = y1; y1 = sinf(angle+T_PI);
 
         const int tType = ((parallels-1)>>div)&1 ? ((j>>div)&1) : !((j>>div)&1); 
         //color = 0xff0000ff;
@@ -737,7 +734,7 @@ void imguiGizmo::buildCone(const float x0, const float x1, const float radius, c
     const float sinn =  radius / sq;
 
 
-    const float incAngle = 2*glm::pi<float>()/(float)( slices );
+    const float incAngle = 2.0f*T_PI/(float)( slices );
     float angle = incAngle;
 
     float yt1 = sinn,  y1 = radius;// cos(0) * sinn ... cos(0) * radius 
@@ -748,8 +745,8 @@ void imguiGizmo::buildCone(const float x0, const float x1, const float radius, c
     arrowVtx[CONE_CAP ].clear(); arrowNorm[CONE_CAP ].clear();
     arrowVtx[CONE_SURF].clear(); arrowNorm[CONE_SURF].clear();
 
-#   define V(i,x,y,z) arrowVtx [i].push_back(glm::vec3(x, y, z))
-#   define N(i,x,y,z) arrowNorm[i].push_back(glm::vec3(x, y, z)) 
+#   define V(i,x,y,z) arrowVtx [i].push_back(vec3(x, y, z))
+#   define N(i,x,y,z) arrowNorm[i].push_back(vec3(x, y, z)) 
 
     for (int j=0; j<slices; j++, angle+=incAngle)
     {   
@@ -793,14 +790,14 @@ void imguiGizmo::buildCylinder(const float x0, const float x1, const float radiu
     float z1 = 0.0f, zr1 = 0.0f; // * radius
 
     
-    const float incAngle = 2*glm::pi<float>()/(float)( slices );
+    const float incAngle = 2.0f*T_PI/(float)( slices );
     float angle = incAngle;
 
     arrowVtx[CYL_CAP ].clear(); arrowNorm[CYL_CAP ].clear();
     arrowVtx[CYL_SURF].clear(); arrowNorm[CYL_SURF].clear();
 
-#   define V(i,x,y,z) arrowVtx [i].push_back(glm::vec3(x, y, z))
-#   define N(i,x,y,z) arrowNorm[i].push_back(glm::vec3(x, y, z)) 
+#   define V(i,x,y,z) arrowVtx [i].push_back(vec3(x, y, z))
+#   define N(i,x,y,z) arrowNorm[i].push_back(vec3(x, y, z)) 
 
     for (int j=0; j<slices; j++, angle+=incAngle) {
         const float y0  = y1;   y1  = cosf(angle);
