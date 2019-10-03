@@ -3,10 +3,11 @@
 
 With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** &nbsp; &nbsp; *(read below)*
 
-**imGuIZMO.quat** is written in C++ (C++14) and consist of only two files (*imGuIZMO.h* and *imGuIZMO.cpp*) that you can simply add to your project.
-It uses [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D): my *header only* 3D GIZMO screen manipulator tool (in *Immediate Mode* without pan and dolly functions) and [**glm** mathematics library](https://github.com/g-truc/glm) (0.9.9 or higher), also it an *header only* tool.
+**imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and `vGizmoMath.h` a small vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
 
-****imGuIZMO.quat** is widget/control for [**ImGui**](https://github.com/ocornut/imgui) Immediate Mode GUI library*
+You can use **vGizmoMath** also externally, for your purposes, both as ***simple* float classes** (*Default*) or as **template classes** for both `float` and `double` data types, or as alternative to it is also possible to interface **imGuIZMO.quat** with [**glm** mathematics library](https://github.com/g-truc/glm) (*all by simply adding a* `#define`)
+
+==>&nbsp; **Please, read **Configure ImGuIZMO.quad** section, below.*
 
 ### Live WebGL2 demo
 
@@ -18,7 +19,7 @@ You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
 <img src="https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/imGuIZMO.gif"></a>
 </p>
 
-It works only on browsers with **WebGl 2** and *webassembly* support (FireFox/Opera/Chrome and Chromium based): test if your browser supports **WebGL2**, here: [WebGL2 Report](http://webglreport.com/?v=2)
+It works only on browsers with **WebGl 2** and *webAssembly* support (FireFox/Opera/Chrome and Chromium based). Test if your browser supports **WebGL2**, here: [WebGL2 Report](http://webglreport.com/?v=2)
 
 ****imGuIZMO.quat** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject: consult the source code for more examples.*
 
@@ -35,9 +36,9 @@ These are all mouse and keyModifiers controls internally used:
 
 ## How to use [imGuIZMO.quat](https://brutpitt.github.io/imGuIZMO.quat) to manipulate an object with 4 code lines 
 
-To use **imGuIZMO.quat** need to include `imGuIZMO.h` file in your code.
+To use **imGuIZMO.quat** need to include `imGuIZMOquat.h` file in your code.
 ```cpp
-#include "imGuIZMO.h"
+#include "imGuIZMOquat.h"
 ```
 You can think of declaring declare an object of type `glm::quat` (quaternion), global or static or as member of your class, to mantain track of rotations:
 
@@ -143,7 +144,7 @@ IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec3&, float=IMGUIZMO_DEF_S
 
 <p> &nbsp; </p>
 
-For for more details, more personalizations, or how to change sizes, color, thickness, etc... examine the attached example source code (`uiMainDlg.cpp` file), or again `imGuIZMO.h`, `imGuIZMO.cpp` files: they are well commented.
+For for more details, more personalizations, or how to change sizes, color, thickness, etc... examine the attached example source code (`uiMainDlg.cpp` file), or again `imGuIZMOquat.h`, `imGuIZMOquat.cpp` files: they are well commented.
 The widget are also used in **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject.
 
 **If you want use (also) full-screen manipulator, outside **ImGui** widget, look at [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (is its feature)... also in attached example, enabling `#define GLAPP_USE_VIRTUALGIZMO` define in `glWindow.cpp` file*
@@ -169,8 +170,61 @@ It's like the push/pop mechanism used in **ImGui**, but only that I don't have a
 
 
 
-<p>&nbsp;<br>&nbsp;<br></p>
+<p>&nbsp;<br></p>
 
+## Configure ImGuIZMO.quat - vGizmoConfig.h
+**virtalGizmo3D** and **ImGuIZMOquat** use **vGizmoMath** tool, it contains a group of vector/matrices/quaternion classes, operators, and principal functions. It uses the "glsl" convention for types and function names so is compatible with **glm** types and function calls: **vGizmoMath** is a subset of [**glm** mathematics library](https://github.com/g-truc/glm) and so you can use one or the other via simple `#define`.
+
+
+The file `vGizmoConfig.h` allows to configure internal math used form **ImGuIZMO.quat** and **virtalGizmo3D**. In particular is possible select between:
+ - simple **float** classes (*Default*) / temlpate classes 
+ - internal **vGizmoMath** tool (*Default*) / **glm** mathematics library
+ - **Right** (*Default*) / **Left** handed coordinate system (*lookAt, perspective, ortho, frustrum - functions*)
+
+You can do this simply by commenting / uncommenting the line in `vGizmoConfig.h` or adding related "define" to your project, as you can see below:
+
+```cpp
+// uncomment to use TEMPLATE internal vGizmoMath classes/types
+//
+// This is if you need to extend the use of different math types in your code
+//      or for your purposes:
+//          float  ==>  vec2 /  vec3 /  vec4 /  quat /  mat3 /  mat4
+//          double ==> dvec2 / dvec3 / dvec4 / dquat / dmat3 / dmat4
+// If you select TEMPLATE classes the widget too will use internally them 
+//      with single precision (float)
+//
+// Default ==> NO template
+//------------------------------------------------------------------------------
+//#define VGIZMO_USES_TEMPLATE
+```
+```cpp
+// uncomment to use "glm" (0.9.9 or higher) library instead of vGizmoMath
+//      Need to have "glm" installed and in your INCLUDE research compiler path
+//
+// vGizmoMath is a subset of "glm" and is compatible with glm types and calls
+//      change only namespace from "vgm" to "glm". It's automatically set by
+//      including vGizmo.h or vGizmoMath.h or imGuIZMOquat.h
+//
+// Default ==> use vGizmoMath
+//      If you enable GLM use, automatically is enabled also VGIZMO_USES_TEMPLATE
+//          if you can, I recommend to use GLM
+//------------------------------------------------------------------------------
+//#define VGIZMO_USES_GLM
+```
+```cpp
+// uncomment to use LeftHanded 
+//
+// This is used only in: lookAt / perspective / ortho / frustrum - functions
+//      DX is LeftHanded, OpenGL is RightHanded
+//
+// Default ==> RightHanded
+//------------------------------------------------------------------------------
+//#define VGIZMO_USES_LEFT_HAND_AXES
+```
+It does not want replicate **glm**, is only intended to make **virtalGizmo3D** / **ImGuIZMOquat** standalone, and avoid **template classes** use in the cases of low resources.
+
+**If your project is not limited from low resources, I recommend to use **glm***
+<p>&nbsp;<br></p>
 
 ## All widgets visualization
 
