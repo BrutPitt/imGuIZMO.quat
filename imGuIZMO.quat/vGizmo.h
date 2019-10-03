@@ -12,16 +12,16 @@
 //------------------------------------------------------------------------------
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/gtx/vector_angle.hpp>
-#include <glm/gtx/exterior_product.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "vGizmoConfig.h"
+
+#if !defined(VGIZMO_USES_TEMPLATE)
+    #define T VG_T_TYPE
+#endif
 
 typedef int vgButtons;
 typedef int vgModifiers;
 
+namespace vg {
 //  Default values for button and modifiers.
 //      This values are aligned with GLFW defines (for my comfort),
 //      but they are loose from any platform library: simply initialize
@@ -49,7 +49,7 @@ typedef int vgModifiers;
 //
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-template <class T> class virtualGizmoBaseClass {
+TEMPLATE_TYPENAME_T class virtualGizmoBaseClass {
 
 public:
     virtualGizmoBaseClass() : tbActive(false), pos(0), delta(0),
@@ -63,10 +63,11 @@ public:
 
     //    Call to initialize and on reshape
     ////////////////////////////////////////////////////////////////////////////
+    void viewportSize(int w, int h) { viewportSize(T(w), T(h)); }
     void viewportSize(T w, T h) { 
         width = w; height = h; 
         minVal = T(width < height ? width*T(0.5) : height*T(0.5));
-        offset = glm::tvec3<T>(T(.5 * width), T(.5 * height), 0.0);
+        offset = tVec3(T(.5 * width), T(.5 * height), T(0));
     }
 
     void inline activateMouse(T x, T y) {
@@ -98,11 +99,11 @@ public:
         }
 
         if((button == tbRotationButton) && pressed) {
-            if      (xRotationModifier & mod) { tbActive = true; rotationVector = glm::tvec3<T>(1.0, 0.0, 0.0); activateMouse(x,y); }
-            else if (yRotationModifier & mod) { tbActive = true; rotationVector = glm::tvec3<T>(0.0, 1.0, 0.0); activateMouse(x,y); }
-            else if (zRotationModifier & mod) { tbActive = true; rotationVector = glm::tvec3<T>(0.0, 0.0, 1.0); activateMouse(x,y); }
+            if      (xRotationModifier & mod) { tbActive = true; rotationVector = tVec3(T(1), T(0), T(0)); activateMouse(x,y); }
+            else if (yRotationModifier & mod) { tbActive = true; rotationVector = tVec3(T(0), T(1), T(0)); activateMouse(x,y); }
+            else if (zRotationModifier & mod) { tbActive = true; rotationVector = tVec3(T(0), T(0), T(1)); activateMouse(x,y); }
         } else if((button == tbRotationButton) && !pressed) { 
-            deactivateMouse(); rotationVector = glm::tvec3<T>(1.0); tbActive = false; 
+            deactivateMouse(); rotationVector = tVec3(T(1)); tbActive = false; 
         }
     
     }
@@ -132,31 +133,31 @@ public:
     {
 
         if(!delta.x && !delta.y) {
-            qtStep = glm::tquat<T>(1.0, 0.0, 0.0, 0.0); //no rotation
+            qtStep = tQuat(T(1), T(0), T(0), T(0)); //no rotation
             return;
         }
 
-        glm::tvec3<T> a(T(pos.x-delta.x), T(height - (pos.y+delta.y)), 0.0);
-        glm::tvec3<T> b(T(pos.x    ),     T(height -  pos.y         ), 0.0);
+        tVec3 a(T(pos.x-delta.x), T(height - (pos.y+delta.y)), T(0));
+        tVec3 b(T(pos.x    ),     T(height -  pos.y         ), T(0));
 
-        auto vecFromPos = [&] (glm::tvec3<T> &v) {
+        auto vecFromPos = [&] (tVec3 &v) {
             v -= offset;
             v /= minVal;
             const T len = length(v);
-            v.z = len>T(0.0) ? pow(T(2.0), -T(.5) * len) : T(1.0);
+            v.z = len>T(0) ? pow(T(2), -T(.5) * len) : T(1);
             v = normalize(v);
         };
 
         vecFromPos(a);
         vecFromPos(b);
 
-        glm::tvec3<T> axis = cross(a, b);
+        tVec3 axis = cross(a, b);
         axis = normalize(axis);
 
         T AdotB = dot(a, b); 
-        T angle = acos( AdotB>T(1.0) ? T(1.0) : (AdotB<-T(1.0) ? -T(1.0) : AdotB)); // clamp need!!! corss float is approximate to FLT_EPSILON
+        T angle = acos( AdotB>T(1) ? T(1) : (AdotB<-T(1) ? -T(1) : AdotB)); // clamp need!!! corss float is approximate to FLT_EPSILON
 
-        qtStep = normalize(glm::angleAxis(angle * tbScale * fpsRatio, axis * rotationVector));
+        qtStep = normalize(angleAxis(angle * tbScale * fpsRatio, axis * rotationVector));
         qtV = qtStep*qtV;
 
     }
@@ -170,12 +171,12 @@ public:
 
     //  Apply rotation
     //////////////////////////////////////////////////////////////////
-    inline void applyRotation(glm::tmat4x4<T> &m) { m = m * glm::mat4_cast(qtV); }                                     
+    inline void applyRotation(tMat4 &m) { m = m * mat4_cast(qtV); }                                     
 
     //  Set the point around which the virtualGizmo will rotate.
     //////////////////////////////////////////////////////////////////
-    void setRotationCenter( const glm::tvec3<T>& c) { rotationCenter = c; }
-    glm::tvec3<T>& getRotationCenter() { return rotationCenter; }
+    void setRotationCenter( const tVec3& c) { rotationCenter = c; }
+    tVec3& getRotationCenter() { return rotationCenter; }
 
     //  Set the mouse button and modifier for rotation 
     //////////////////////////////////////////////////////////////////
@@ -204,19 +205,19 @@ public:
 
 	//  get the rotation quaternion
     //////////////////////////////////////////////////////////////////
-	glm::tquat<T> &getRotation() { return qtV; }
+	tQuat &getRotation() { return qtV; }
 
 	//  get the rotation increment
     //////////////////////////////////////////////////////////////////
-    glm::tquat<T> &getStepRotation() { return qtStep; }
+    tQuat &getStepRotation() { return qtStep; }
 
 	//  get the rotation quaternion
     //////////////////////////////////////////////////////////////////
-	void setRotation(const glm::tquat<T> &q) { qtV = q; }
+	void setRotation(const tQuat &q) { qtV = q; }
 
 	//  get the rotation increment
     //////////////////////////////////////////////////////////////////
-	void setStepRotation(const glm::tquat<T> &q) { qtStep = q; }
+	void setStepRotation(const tQuat &q) { qtStep = q; }
 
 // Immediate mode helpers
 //////////////////////////////////////////////////////////////////////
@@ -235,40 +236,40 @@ public:
         tbActive = true;
         delta.x = dx; delta.y = -dy;
         pos.x = x;   pos.y = y;
-        if      (xRotationModifier & mod) { rotationVector = glm::tvec3<T>(1.0, 0.0, 0.0); }
-        else if (yRotationModifier & mod) { rotationVector = glm::tvec3<T>(0.0, 1.0, 0.0); }
-        else if (zRotationModifier & mod) { rotationVector = glm::tvec3<T>(0.0, 0.0, 1.0); }
+        if      (xRotationModifier & mod) { rotationVector = tVec3(T(1), T(0), T(0)); }
+        else if (yRotationModifier & mod) { rotationVector = tVec3(T(0), T(1), T(0)); }
+        else if (zRotationModifier & mod) { rotationVector = tVec3(T(0), T(0), T(1)); }
         update();
     }
 
     //  return current transformatin as 4x4 matrix.
     ////////////////////////////////////////////////////////////////////////////
-    virtual glm::tmat4x4<T> getTransform() = 0;
+    virtual tMat4 getTransform() = 0;
     ////////////////////////////////////////////////////////////////////////////
-    virtual void applyTransform(glm::tmat4x4<T> &model) = 0;
+    virtual void applyTransform(tMat4 &model) = 0;
 
 protected:
 
-    glm::tvec2<T> pos, delta;
+    tVec2 pos, delta;
 
     // UI commands that this virtualGizmo responds to (defaults to left mouse button with no modifier key)
     vgButtons   tbControlButton, tbRotationButton;   
     vgModifiers tbControlModifiers, xRotationModifier, yRotationModifier, zRotationModifier;
 
-    glm::tvec3<T> rotationVector = glm::tvec3<T>(1.0);
+    tVec3 rotationVector = tVec3(T(1));
 
-    glm::tquat<T> qtV    = glm::tquat<T>(1.0, 0.0, 0.0, 0.0);
-    glm::tquat<T> qtStep = glm::tquat<T>(1.0, 0.0, 0.0, 0.0);
+    tQuat qtV    = tQuat(T(1), T(0), T(0), T(0));
+    tQuat qtStep = tQuat(T(1), T(0), T(0), T(0));
 
-    glm::tvec3<T> rotationCenter = glm::tvec3<T>(0.0);
+    tVec3 rotationCenter = tVec3(T(0));
 
     //  settings for the sensitivity
     //////////////////////////////////////////////////////////////////
-    T tbScale = T(1.0);   //base scale sensibility
-    T fpsRatio = T(1.0);  //auto adjust by FPS (call idle with current FPS)
+    T tbScale = T(1);   //base scale sensibility
+    T fpsRatio = T(1);  //auto adjust by FPS (call idle with current FPS)
     
     T minVal;
-    glm::tvec3<T> offset;
+    tVec3 offset;
 
     bool tbActive;  // trackbal activated via mouse
 
@@ -283,32 +284,32 @@ protected:
 //
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-template <class T> class virtualGizmoClass : public virtualGizmoBaseClass<T> {
+TEMPLATE_TYPENAME_T class virtualGizmoClass : public VGIZMO_BASE_CLASS {
 
 public:
 
     virtualGizmoClass()  { }
 
     //////////////////////////////////////////////////////////////////
-    void motion( T x, T y) { if(this->tbActive) virtualGizmoBaseClass<T>::motion(x,y); }
+    void motion( T x, T y) { if(this->tbActive) VGIZMO_BASE_CLASS::motion(x,y); }
 
     //////////////////////////////////////////////////////////////////
     void update() { this->updateGizmo(); }
 
     //////////////////////////////////////////////////////////////////
-    void applyTransform(glm::tmat4x4<T> &model) {
-        model = glm::translate(model, -this->rotationCenter);
-        virtualGizmoBaseClass<T>::applyRotation(model);
-        model = glm::translate(model, this->rotationCenter);
+    void applyTransform(tMat4 &model) {
+        model = translate(model, -this->rotationCenter);
+        VGIZMO_BASE_CLASS::applyRotation(model);
+        model = translate(model, this->rotationCenter);
     }
 
     //////////////////////////////////////////////////////////////////
-    glm::tmat4x4<T> getTransform() {
-        glm::tmat4x4<T> trans, invTrans, rotation;
-        rotation = glm::mat4_cast(this->qtV);
+    tMat4 getTransform() {
+        tMat4 trans, invTrans, rotation;
+        rotation = mat4_cast(this->qtV);
 
-        trans = glm::translate(glm::tmat4x4<T>(T(1.0)),this->rotationCenter);
-        invTrans = glm::translate(glm::tmat4x4<T>(T(1.0)),-this->rotationCenter);
+        trans = translate(tMat4(T(1)),this->rotationCenter);
+        invTrans = translate(tMat4(T(1)),-this->rotationCenter);
         
         return invTrans * rotation * trans;
     }
@@ -318,7 +319,7 @@ public:
     void setGizmoScale( T scale) { scale = scale; }
 
 	// get the rotation quaternion
-	glm::tquat<T> &getRotation() { return this->qtV; }
+	tQuat &getRotation() { return this->qtV; }
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -329,10 +330,10 @@ public:
 //
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-template <class T> class virtualGizmo3DClass : public virtualGizmoBaseClass<T> {
+TEMPLATE_TYPENAME_T class virtualGizmo3DClass : public VGIZMO_BASE_CLASS {
 
-using virtualGizmoBaseClass<T>::delta;
-using virtualGizmoBaseClass<T>::qtV; 
+using VGIZMO_BASE_CLASS::delta;
+using VGIZMO_BASE_CLASS::qtV; 
 
 public:
     //////////////////////////////////////////////////////////////////
@@ -340,9 +341,10 @@ public:
                          dollyControlModifiers(evNoModifier), panControlModifiers(evNoModifier), panActive(false) { }
 
     //////////////////////////////////////////////////////////////////
+    void mouse( vgButtons button, vgModifiers mod, bool pressed, int x, int y) { mouse(button, mod, pressed, T(x), T(y)); }
     void mouse( vgButtons button, vgModifiers mod, bool pressed, T x, T y) 
     {
-        virtualGizmoBaseClass<T>::mouse(button, mod, pressed,  x,  y);
+        VGIZMO_BASE_CLASS::mouse(button, mod, pressed,  x,  y);
         if ( button == dollyControlButton && pressed && (dollyControlModifiers ? dollyControlModifiers & mod : dollyControlModifiers == mod) ) {
             dollyActive = true;
             this->activateMouse(x,y);
@@ -365,57 +367,58 @@ public:
     //    Call on wheel (only for Dolly/Zoom)
     ////////////////////////////////////////////////////////////////////////////
     void wheel( T x, T y) {
-        dolly.z += y * dollyScale * 5.;
+        dolly.z += y * dollyScale * T(5);
     }
 
     //////////////////////////////////////////////////////////////////
+    void motion( int x, int y) { motion( T(x), T(y)); }
     void motion( T x, T y) {
-        if( this->tbActive || dollyActive || panActive) virtualGizmoBaseClass<T>::motion(x,y);
+        if( this->tbActive || dollyActive || panActive) VGIZMO_BASE_CLASS::motion(x,y);
     }
 
     //////////////////////////////////////////////////////////////////
     void updatePan() {
-        glm::tvec3<T> v(delta.x, delta.y, 0.0);	  
+        tVec3 v(delta.x, delta.y, T(0));	  
         pan += v * panScale;
 	}
 
     //////////////////////////////////////////////////////////////////
     void updateDolly() {
-        glm::tvec3<T> v(0.0, 0.0, delta.y);
+        tVec3 v(T(0), T(0), delta.y);
         dolly -= v * dollyScale;
 	}
 
     //////////////////////////////////////////////////////////////////
     void update() {
-        if (this->tbActive) virtualGizmoBaseClass<T>::updateGizmo();
+        if (this->tbActive) VGIZMO_BASE_CLASS::updateGizmo();
         if (dollyActive) updateDolly();
         if (panActive)   updatePan();
     }
 
     //////////////////////////////////////////////////////////////////
-    void applyTransform(glm::tmat4x4<T> &m) {
-        m = glm::translate(m, pan);
-        m = glm::translate(m, dolly);
-        m = glm::translate(m, -this->rotationCenter);
-        virtualGizmoBaseClass<T>::applyRotation(m);
-        m = glm::translate(m, this->rotationCenter);
+    void applyTransform(tMat4 &m) {
+        m = translate(m, pan);
+        m = translate(m, dolly);
+        m = translate(m, -this->rotationCenter);
+        VGIZMO_BASE_CLASS::applyRotation(m);
+        m = translate(m, this->rotationCenter);
     }
 
     //////////////////////////////////////////////////////////////////
-    glm::tmat4x4<T> getTransform() {
-        glm::tmat4x4<T> trans, invTrans, rotation;
-        glm::tmat4x4<T> panMat, dollyMat;
+    tMat4 getTransform() {
+        tMat4 trans, invTrans, rotation;
+        tMat4 panMat, dollyMat;
 
         //create pan and dolly translations
-        panMat   = glm::translate(glm::tmat4x4<T>(T(1.0)),pan  );
-        dollyMat = glm::translate(glm::tmat4x4<T>(T(1.0)),dolly);
+        panMat   = translate(tMat4(T(1)),pan  );
+        dollyMat = translate(tMat4(T(1)),dolly);
 
         //create the virtualGizmo rotation
-        rotation = glm::mat4_cast(qtV);
+        rotation = mat4_cast(qtV);
 
         //create the translations to move the center of rotation to the origin and back
-        trans    = glm::translate(glm::tmat4x4<T>(T(1.0)), this->rotationCenter);
-        invTrans = glm::translate(glm::tmat4x4<T>(T(1.0)),-this->rotationCenter);
+        trans    = translate(tMat4(T(1)), this->rotationCenter);
+        invTrans = translate(tMat4(T(1)),-this->rotationCenter);
 
         //concatenate all the tranforms
         return panMat * dollyMat * invTrans * rotation * trans;
@@ -452,23 +455,23 @@ public:
     //  Set the Dolly to a specified distance.
     //////////////////////////////////////////////////////////////////
     void setDollyPosition(T pos)             { dolly.z = pos; }
-    void setDollyPosition(const glm::tvec3<T> &pos) { dolly.z = pos.z; }
+    void setDollyPosition(const tVec3 &pos) { dolly.z = pos.z; }
 
     //  Set the Dolly to a specified distance.
     //////////////////////////////////////////////////////////////////
-    void setPanPosition(const glm::tvec3<T> &pos) { pan.x = pos.x; pan.y = pos.y;}
+    void setPanPosition(const tVec3 &pos) { pan.x = pos.x; pan.y = pos.y;}
 
     //  Get dolly pos... use as Zoom factor
     //////////////////////////////////////////////////////////////////
-    glm::tvec3<T> &getDollyPosition() { return dolly; }
+    tVec3 &getDollyPosition() { return dolly; }
 
     //  Get Pan pos... use as Zoom factor
     //////////////////////////////////////////////////////////////////
-    glm::tvec3<T> &getPanPosition() { return pan; }
+    tVec3 &getPanPosition() { return pan; }
 
     //  Get pos... use as Zoom factor
     //////////////////////////////////////////////////////////////////
-    glm::tvec3<T> getPosition() const { return glm::tvec3<T>(pan.x, pan.y, dolly.z); }
+    tVec3 getPosition() const { return tVec3(pan.x, pan.y, dolly.z); }
 private:
     // UI commands that this virtualGizmo responds to (defaults to left mouse button with no modifier key)
     vgButtons   dollyControlButton,    panControlButton;
@@ -478,16 +481,30 @@ private:
     bool dollyActive;
     bool panActive;      
 
-    glm::tvec3<T> pan   = glm::tvec3<T>(0.0);
-    glm::tvec3<T> dolly = glm::tvec3<T>(0.0);
+    tVec3 pan   = tVec3(T(0));
+    tVec3 dolly = tVec3(T(0));
     
-    T dollyScale = T(0.01);  //dolly scale
-    T panScale   = T(0.01);  //pan scale
-    T wheelScale = T(5.0);   //dolly multiply for wheel
+    T dollyScale = T(.01);  //dolly scale
+    T panScale   = T(.01);  //pan scale
+    T wheelScale = T(5);   //dolly multiply for wheel
 };
 
-typedef virtualGizmoClass<float> vfGizmoClass;
-typedef virtualGizmo3DClass<float> vfGizmo3DClass;
+#ifdef VGIZMO_USES_TEMPLATE
+    #ifdef VGIZMO_USES_DOUBLE_PRECISION
+        using vGizmo   = virtualGizmoClass<double>;
+        using vGizmo3D = virtualGizmo3DClass<double>;
+    #else
+        using vGizmo   = virtualGizmoClass<float>;
+        using vGizmo3D = virtualGizmo3DClass<float>;
+    #endif
+    using vImGuIZMO = virtualGizmoClass<float>;
+#else
+    using vImGuIZMO = virtualGizmoClass;
 
-typedef virtualGizmoClass<double> vdGizmoClass;
-typedef virtualGizmo3DClass<double> vdGizmo3DClass;
+    using vGizmo    = virtualGizmoClass;
+    using vGizmo3D  = virtualGizmo3DClass;
+#endif
+
+} // end namespace vg::
+
+#undef T  // if used T as #define, undef it
