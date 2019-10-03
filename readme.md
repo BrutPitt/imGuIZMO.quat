@@ -9,7 +9,7 @@ With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** 
 
 You can use **vGizmoMath** also externally, for your purposes, both as *simple* `float` **classes** (*Default*) or as **template classes** for both `float` and `double` data types, or as alternative to **vGizmoMath** is also possible to interface **imGuIZMO.quat** with [**glm**](https://github.com/g-truc/glm) (*all by simply adding a* `#define`)
 
-==>&nbsp; **Please, read [**Configure ImGuIZMO.quad**](#Configure\ ImGuIZMO.quat\ -\ vGizmoConfig.h) section.*
+==>&nbsp; **Please, read [**Configure ImGuIZMO.quad**](#Configure-ImGuIZMOquat) section.*
 
 ### Live WebGL2 demo
 
@@ -204,7 +204,7 @@ Full configurable: Lenght, thickness, dimensions, number of polygon slices, colo
 <p>&nbsp;<br>&nbsp;<br></p>
 
 
-## Configure ImGuIZMO.quat - vGizmoConfig.h
+## Configure ImGuIZMOquat
 
 **virtalGizmo3D** and **ImGuIZMOquat** use **vGizmoMath** tool, it contains a group of vector/matrices/quaternion classes, operators, and principal functions. It uses the "glsl" convention for types and function names so is compatible with **glm** types and function calls: **vGizmoMath** is a subset of [**glm** mathematics library](https://github.com/g-truc/glm) and so you can use one or the other via simple `#define`.
 
