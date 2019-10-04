@@ -7,7 +7,9 @@ With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** 
 
 **No other files or external libraries are required**, except [**ImGui**](https://github.com/ocornut/imgui) (of course).
 
-You can use **vGizmoMath** also externally, for your purposes, both as *simple* `float` **classes** (*Default*) or as **template classes** for both `float` and `double` data types, or as alternative to **vGizmoMath** is also possible to interface **imGuIZMO.quat** with [**glm**](https://github.com/g-truc/glm) (*all by simply adding a* `#define`)
+You can use **vGizmoMath** also externally, for your purposes, both as *simple* single precision `float` **classes** (*Default*) or, enabling **template classes** (*simply adding a* `#define`), as both `float` and `double` data types. 
+
+As alternative to **vGizmoMath** is also possible to interface **imGuIZMO.quat** with [**glm**](https://github.com/g-truc/glm) (*simply adding a* `#define`)
 
 ==>&nbsp; **Please, read [**Configure ImGuIZMO.quad**](#Configure-ImGuIZMOquat) section.*
 
