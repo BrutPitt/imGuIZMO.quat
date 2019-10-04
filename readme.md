@@ -168,7 +168,45 @@ Instead to change the color of a single widget:
 ```
 It's like the push/pop mechanism used in **ImGui**, but only that I don't have a stak (for now I don't see the reason): just a single variable where to save the value. The other functions work in the same way.
 
+<p>&nbsp;<br></p>
 
+
+## All widgets visualization
+
+**FOUR** widget types are prvided, (six function calls with different parameters: *quaternion, vec4, vec3* for different uses) each of them personalizable with several graphics options:
+
+### Axes mode
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A004.jpg) |
+| :---: | :---: | :---: | :---: |
+
+
+### Directional arrow
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0009.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B003.jpg) |
+| :---: | :---: | :---: | :---: | 
+
+### Plane direction 
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0006.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0008.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0010.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0011.jpg) | 
+| :---: | :---: | :---: | :---: |
+
+### Axes + spot
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/C004.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/C003.jpg) |
+| :---: | :---: | :---: | :---: |
+
+
+### And much more...
+Full configurable: Lenght, thickness, dimensions, number of polygon slices, colors and sphere tesselation:
+
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0005.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0007.jpg)| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D003.jpg) |
+| :---: | :---: | :---: | :---: | :---: |
+
+<p>&nbsp;<br>&nbsp;<br></p>
+
+## Changes from v. 1.1
+
+Users of the previous version need:
+ - change `#include <imGuIZMO.h>` &nbsp; ==> &nbsp; `#include <imGuIZMOquat.h>` 
+ - in file `vGizmoConfig.h` uncomment `#define VGIZMO_USES_GLM` to continue to use **glm**, or add `VGIZMO_USES_GLM` to compiler preprocessor defines. 
+ - Read [**virtualGizmo3D Changes**](https://github.com/BrutPitt/virtualGizmo3D) if you use it outside **imGuIZMO.quat** widget
 
 <p>&nbsp;<br></p>
 
@@ -225,38 +263,6 @@ It does not want replicate **glm**, is only intended to make **virtalGizmo3D** /
 
 **If your project is not limited from low resources, I recommend to use **glm***
 <p>&nbsp;<br></p>
-
-## All widgets visualization
-
-**FOUR** widget types are prvided, (six function calls with different parameters: *quaternion, vec4, vec3* for different uses) each of them personalizable with several graphics options:
-
-### Axes mode
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A004.jpg) |
-| :---: | :---: | :---: | :---: |
-
-
-### Directional arrow
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0009.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/B003.jpg) |
-| :---: | :---: | :---: | :---: | 
-
-### Plane direction 
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0006.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0008.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0010.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0011.jpg) | 
-| :---: | :---: | :---: | :---: |
-
-### Axes + spot
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/C004.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/C003.jpg) |
-| :---: | :---: | :---: | :---: |
-
-
-### And much more...
-Full configurable: Lenght, thickness, dimensions, number of polygon slices, colors and sphere tesselation:
-
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0005.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0007.jpg)| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D003.jpg) |
-| :---: | :---: | :---: | :---: | :---: |
-
-
-
-<p>&nbsp;<br>&nbsp;<br></p>
 
 ### Building Example
 
