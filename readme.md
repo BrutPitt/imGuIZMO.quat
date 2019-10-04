@@ -1,13 +1,15 @@
-# imGuIZMO.quat
+# imGuIZMO.quat 2.0
 **imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse, and graphically visualize their position in space, also around any single axis (*Shift/Ctrl/Alt/Super*). It uses **quaternions** algebra, internally, to manage rotations, but offers the possibility also to interfacing with **vec3**, **vec4** or **mat4x4** (rotation)
 
 With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** &nbsp; &nbsp; *(read below)*
 
 **imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and `vGizmoMath.h` a small vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
 
-You can use **vGizmoMath** also externally, for your purposes, both as ***simple* float classes** (*Default*) or as **template classes** for both `float` and `double` data types, or as alternative to it is also possible to interface **imGuIZMO.quat** with [**glm** mathematics library](https://github.com/g-truc/glm) (*all by simply adding a* `#define`)
+**No other files or external libraries are required**, except [**ImGui**](https://github.com/ocornut/imgui) (of course).
 
-==>&nbsp; **Please, read **Configure ImGuIZMO.quad** section, below.*
+You can use **vGizmoMath** also externally, for your purposes, both as *simple* `float` **classes** (*Default*) or as **template classes** for both `float` and `double` data types, or as alternative to **vGizmoMath** is also possible to interface **imGuIZMO.quat** with [**glm**](https://github.com/g-truc/glm) (*all by simply adding a* `#define`)
+
+==>&nbsp; **Please, read [**Configure ImGuIZMO.quad**](#Configure\ ImGuIZMO.quat\ -\ vGizmoConfig.h) section.*
 
 ### Live WebGL2 demo
 
@@ -152,7 +154,7 @@ The widget are also used in **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)
 
 **Sizes and colors**
 
-To change size and color of one or all widgets, **imGuIZMO.quat** have some [helper funcs](https://github.com/BrutPitt/imGuIZMO.quat/blob/master/imGuIZMO.quat/imGuIZMO.h#L115#L145)
+To change size and color of one or all widgets, **imGuIZMO.quat** have some [helper funcs](https://github.com/BrutPitt/imGuIZMO.quat/blob/master/imGuIZMO.quat/imGuIZMOquat.h#L115#L145)
 
 Just an example...
 
@@ -201,16 +203,9 @@ Full configurable: Lenght, thickness, dimensions, number of polygon slices, colo
 
 <p>&nbsp;<br>&nbsp;<br></p>
 
-## Changes from v. 1.1
-
-Users of the previous version need:
- - change `#include <imGuIZMO.h>` &nbsp; ==> &nbsp; `#include <imGuIZMOquat.h>` 
- - in file `vGizmoConfig.h` uncomment `#define VGIZMO_USES_GLM` to continue to use **glm**, or add `VGIZMO_USES_GLM` to compiler preprocessor defines. 
- - Read [**virtualGizmo3D Changes**](https://github.com/BrutPitt/virtualGizmo3D) if you use it outside **imGuIZMO.quat** widget
-
-<p>&nbsp;<br></p>
 
 ## Configure ImGuIZMO.quat - vGizmoConfig.h
+
 **virtalGizmo3D** and **ImGuIZMOquat** use **vGizmoMath** tool, it contains a group of vector/matrices/quaternion classes, operators, and principal functions. It uses the "glsl" convention for types and function names so is compatible with **glm** types and function calls: **vGizmoMath** is a subset of [**glm** mathematics library](https://github.com/g-truc/glm) and so you can use one or the other via simple `#define`.
 
 
@@ -262,6 +257,15 @@ You can do this simply by commenting / uncommenting the line in `vGizmoConfig.h`
 It does not want replicate **glm**, is only intended to make **virtalGizmo3D** / **ImGuIZMOquat** standalone, and avoid **template classes** use in the cases of low resources.
 
 **If your project is not limited from low resources, I recommend to use **glm***
+<p>&nbsp;<br></p>
+
+## Changes from v. 1.1
+
+Users of the previous versions need:
+ - change `#include <imGuIZMO.h>` &nbsp; ==> &nbsp; `#include <imGuIZMOquat.h>` 
+ - in file `vGizmoConfig.h` uncomment `#define VGIZMO_USES_GLM` to continue to use **glm**, or add `VGIZMO_USES_GLM` to compiler preprocessor defines. 
+ - Read [**virtualGizmo3D Changes**](https://github.com/BrutPitt/virtualGizmo3D) if you use it outside **imGuIZMO.quat** widget
+
 <p>&nbsp;<br></p>
 
 ### Building Example
