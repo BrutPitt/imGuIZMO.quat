@@ -1,4 +1,4 @@
-# imGuIZMO.quat 2.0
+# imGuIZMO.quat &nbsp;2.0
 **imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse, and graphically visualize their position in space, also around any single axis (*Shift/Ctrl/Alt/Super*). It uses **quaternions** algebra, internally, to manage rotations, but offers the possibility also to interfacing with **vec3**, **vec4** or **mat4x4** (rotation)
 
 With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** &nbsp; &nbsp; *(read below)*
@@ -7,9 +7,10 @@ With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** 
 
 **No other files or external libraries are required**, except [**ImGui**](https://github.com/ocornut/imgui) (of course).
 
-You can use **vGizmoMath** also externally, for your purposes, both as *simple* single precision `float` **classes** (*Default*) or, enabling **template classes** (*simply adding a* `#define`), as both `float` and `double` data types. 
+You can use **vGizmoMath** also externally, for your purposes: it contains classes to manipulate **vec**tors (with 2/3/4 components), **quat**ernions, square **mat**ricies (3x3 and 4x4), both as *simple* single precision `float` **classes** (*Default*) or, enabling **template classes** (*simply adding a* `#define`), as both `float` and `double` data types. It contains also 4 helper functions to define Model/View matrix: **perspective**, **frustrum**, **lookAt**, **ortho**
 
-As alternative to **vGizmoMath** is also possible to interface **imGuIZMO.quat** with [**glm**](https://github.com/g-truc/glm) (*simply adding a* `#define`)
+If need a larger/complete library, as alternative to **vGizmoMath**, is also possible to interface **imGuIZMO.quat** with [**glm** mathematics library](https://github.com/g-truc/glm) (*simply adding a* `#define`)
+
 
 ==>&nbsp; **Please, read [**Configure ImGuIZMO.quad**](#Configure-ImGuIZMOquat) section.*
 
@@ -208,15 +209,14 @@ Full configurable: Lenght, thickness, dimensions, number of polygon slices, colo
 
 ## Configure ImGuIZMOquat
 
-**virtalGizmo3D** and **ImGuIZMOquat** use **vGizmoMath** tool, it contains a group of vector/matrices/quaternion classes, operators, and principal functions. It uses the "glsl" convention for types and function names so is compatible with **glm** types and function calls: **vGizmoMath** is a subset of [**glm** mathematics library](https://github.com/g-truc/glm) and so you can use one or the other via simple `#define`.
-
+**virtalGizmo3D** and **ImGuIZMOquat** use **vGizmoMath** tool, it contains a group of vector/matrices/quaternion classes, operators, and principal functions. It uses the "glsl" convention for types and function names so is compatible with **glm** types and function calls: **vGizmoMath** is a subset of [**glm** mathematics library](https://github.com/g-truc/glm) and so you can use first or upgrade to second via a simple `#define`. However **vGizmoMath** does not want replicate **glm**, is only intended to make **virtalGizmo3D** / **ImGuIZMOquat** standalone, and avoid **template classes** use in the cases of low resources or embedded systems.
 
 The file `vGizmoConfig.h` allows to configure internal math used form **ImGuIZMO.quat** and **virtalGizmo3D**. In particular is possible select between:
  - simple **float** classes (*Default*) / temlpate classes 
  - internal **vGizmoMath** tool (*Default*) / **glm** mathematics library
  - **Right** (*Default*) / **Left** handed coordinate system (*lookAt, perspective, ortho, frustrum - functions*)
 
-You can do this simply by commenting / uncommenting the line in `vGizmoConfig.h` or adding related "define" to your project, as you can see below:
+You can do this simply by commenting / uncommenting a line in `vGizmoConfig.h` or adding related "define" to your project, as you can see below:
 
 ```cpp
 // uncomment to use TEMPLATE internal vGizmoMath classes/types
@@ -256,9 +256,8 @@ You can do this simply by commenting / uncommenting the line in `vGizmoConfig.h`
 //------------------------------------------------------------------------------
 //#define VGIZMO_USES_LEFT_HAND_AXES
 ```
-It does not want replicate **glm**, is only intended to make **virtalGizmo3D** / **ImGuIZMOquat** standalone, and avoid **template classes** use in the cases of low resources.
 
-**If your project is not limited from low resources, I recommend to use **glm***
+**If your project grows you can upgrade/pass to **glm***, in any moment
 <p>&nbsp;<br></p>
 
 ## Changes from v. 1.1
