@@ -22,10 +22,11 @@
 //
 // This is if you need to extend the use of different math types in your code
 //      or for your purposes:
-//          float  ==>  vec2 /  vec3 /  vec4 /  quat /  mat3 /  mat4
-//          double ==> dvec2 / dvec3 / dvec4 / dquat / dmat3 / dmat4
+//          float  ==>  vec2 /  vec3 /  vec4 /  quat /  mat3|mat3x3  /  mat4|mat4x4
+//          double ==> dvec2 / dvec3 / dvec4 / dquat / dmat3|dmat3x3 / dmat4|dmat4x4
 // If you select TEMPLATE classes the widget too will use internally them 
 //      with single precision (float)
+//
 // Default ==> NO template
 //------------------------------------------------------------------------------
 //#define VGIZMO_USES_TEMPLATE
@@ -33,9 +34,10 @@
 // uncomment to use "glm" (0.9.9 or higher) library instead of vGizmoMath
 //      Need to have "glm" installed and in your INCLUDE research compiler path
 //
-// vGizmoMath is a subset of GLM: it is only intended to make vGizmo / ImGuIZMOquat
-//      standalone and/or to avoid TEMPLATES uses.
-//      All vGizmoMath sub-set is compatible with GLM types and calls
+// vGizmoMath is a subset of "glm" and is compatible with glm types and calls
+//      change only namespace from "vgm" to "glm". It's automatically set by
+//      including vGizmo.h or vGizmoMath.h or imGuIZMOquat.h
+//
 // Default ==> use vGizmoMath
 //      If you enable GLM use, automatically is enabled also VGIZMO_USES_TEMPLATE
 //          if you can, I recommend to use GLM
@@ -46,6 +48,7 @@
 //
 // This is used only in: lookAt / perspective / ortho / frustrum - functions
 //      DX is LeftHanded, OpenGL is RightHanded
+//
 // Default ==> RightHanded
 //------------------------------------------------------------------------------
 //#define VGIZMO_USES_LEFT_HAND_AXES
@@ -114,6 +117,8 @@
         using quat = Quat<float>;
         using mat3 = Mat3<float>;
         using mat4 = Mat4<float>;
+        using mat3x3 = Mat3<float>;
+        using mat4x4 = Mat4<float>;
 
         using dvec2 = Vec2<double>;;
         using dvec3 = Vec3<double>;;
@@ -121,6 +126,8 @@
         using dquat = Quat<double>;;
         using dmat3 = Mat3<double>;;
         using dmat4 = Mat4<double>;;
+        using dmat3x3 = Mat3<float>;
+        using dmat4x4 = Mat4<float>;
     #else
         #define TEMPLATE_TYPENAME_T
 
@@ -153,6 +160,8 @@
         using quat = Quat;
         using mat3 = Mat3;
         using mat4 = Mat4;
+        using mat3x3 = Mat3;
+        using mat4x4 = Mat4;
     #endif
 
     using tVec2 = VEC2_PRECISION ;

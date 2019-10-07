@@ -223,8 +223,8 @@ You can do this simply by commenting / uncommenting a line in `vGizmoConfig.h` o
 //
 // This is if you need to extend the use of different math types in your code
 //      or for your purposes:
-//          float  ==>  vec2 /  vec3 /  vec4 /  quat /  mat3 /  mat4
-//          double ==> dvec2 / dvec3 / dvec4 / dquat / dmat3 / dmat4
+//          float  ==>  vec2 /  vec3 /  vec4 /  quat /  mat3|mat3x3  /  mat4|mat4x4
+//          double ==> dvec2 / dvec3 / dvec4 / dquat / dmat3|dmat3x3 / dmat4|dmat4x4
 // If you select TEMPLATE classes the widget too will use internally them 
 //      with single precision (float)
 //
