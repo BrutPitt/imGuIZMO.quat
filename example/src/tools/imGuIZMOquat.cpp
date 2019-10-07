@@ -343,9 +343,9 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
     ImVec2 controlPos = ImGui::GetCursorScreenPos();
 
-    const float innerSquareSize = size; //std::min(ImGui::CalcItemWidth(), size);
-    const float halfSquareSize = innerSquareSize*.5;
-    const ImVec2 innerSize(innerSquareSize,innerSquareSize);
+    const float squareSize = size; //std::min(ImGui::CalcItemWidth(), size);
+    const float halfSquareSize = squareSize*.5;
+    const ImVec2 innerSize(squareSize,squareSize);
 
     bool highlighted = false;
     ImGui::InvisibleButton("imguiGizmo", innerSize);
@@ -353,13 +353,13 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     ////////////////////////////////////////////////////////////////////////////
     //  trackball control (virtualGizmo.h)
     //      Only this 2 lamdas
-    //      can be replaced facilly with an personal 3d manipulator which 
+    //      can be replaced easly with an personal 3d manipulator which 
     //      returns rotations in a quaternion
     ////////////////////////////////////////////////////////////////////////////
     auto setTrackball = [&] (vg::vImGuIZMO &track, quat &q) {
-        track.viewportSize(size, size);
+        track.viewportSize(innerSize.x, innerSize.y);
         track.setRotation(q);
-        track.setGizmoScale(size/std::max(io.DisplaySize.x,io.DisplaySize.y));
+        track.setGizmoScale(squareSize/std::max(io.DisplaySize.x,io.DisplaySize.y));
     };
 
     //  getTrackball
@@ -381,7 +381,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
             value_changed = true;
     };
 
-    //LeftClick
+    // LeftClick
     if (ImGui::IsItemActive()) {
         highlighted = true;
         if(ImGui::IsMouseDragging(0))                       getTrackball(qtV);        
@@ -591,7 +591,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     //  ... and now..  draw the widget!!!
     ///////////////////////////////////////
     if(drawMode & (modeDirection | modeDirPlane)) dirArrow(_q, drawMode);
-    else { // draw arrows & sphere
+    else { // draw arrows & solid
         if(drawMode == modeDual) {
             vec3 spot(qtV2 * vec3(-1.0f, 0.0f, .0f)); // versus opposite
             if(spot.z>0) { draw3DSystem(); spotArrow(normalize(qtV2),spot.z); }
@@ -607,9 +607,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     return value_changed;
 }
 
-//
 //  Polygon
-//
 ////////////////////////////////////////////////////////////////////////////
 void imguiGizmo::buildPolygon(const vec3 &size, ImVector<vec3> &vtx, ImVector<vec3> &norm)
 {
@@ -630,9 +628,7 @@ void imguiGizmo::buildPolygon(const vec3 &size, ImVector<vec3> &vtx, ImVector<ve
 #undef V
 #undef N
 }
-//
 //  Sphere
-//
 ////////////////////////////////////////////////////////////////////////////
 void imguiGizmo::buildSphere(const float radius, const int tessFactor)
 {
@@ -656,8 +652,7 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
     float x1 = -1.0f;
     float y1 =  0.0f;
 
-    // The first parallel is covered with triangles
-
+    // The first pole==>parallel is covered with triangles
     for (int j=0; j<meridians; j++, angle+=incAngle)
     {
         const float x0 = x1; x1 = cosf(T_PI-angle);
@@ -696,7 +691,7 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
             }
     }
 
-    // The last parallel is covered with triangls
+    // The last parallel==>pole is covered with triangls
     z0 = z1; 
     r0 = r1;
     x1 = -1.0f; y1 = 0.f;
@@ -708,7 +703,6 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
         const float y0 = y1; y1 = sinf(angle+T_PI);
 
         const int tType = ((parallels-1)>>div)&1 ? ((j>>div)&1) : !((j>>div)&1); 
-        //color = 0xff0000ff;
 
         V( 0.0f,   0.0f,-radius); T(tType);
         V(x0*r0, -y0*r0,     z0); T(tType);
@@ -717,9 +711,7 @@ void imguiGizmo::buildSphere(const float radius, const int tessFactor)
 #   undef V
 #   undef C
 }
-//
-//  Cone
-//
+//  Cone / Pyramid
 ////////////////////////////////////////////////////////////////////////////
 void imguiGizmo::buildCone(const float x0, const float x1, const float radius, const int slices)
 {
@@ -737,8 +729,8 @@ void imguiGizmo::buildCone(const float x0, const float x1, const float radius, c
     const float incAngle = 2.0f*T_PI/(float)( slices );
     float angle = incAngle;
 
-    float yt1 = sinn,  y1 = radius;// cos(0) * sinn ... cos(0) * radius 
-    float zt1 = 0.0f,  z1 = 0.0f;  // sin(0) * sinn ... sin(0) * radius 
+    float yt1 = sinn,  y1 = radius;// ==> yt1 = cos(0) * sinn, y1 = cos(0) * radius 
+    float zt1 = 0.0f,  z1 = 0.0f;  // ==> zt1 = sin(0) * sinn, z1 = sin(0) * radius 
 
     const float xt0 = x0 * cosn, xt1 = x1 * cosn; 
 
@@ -779,9 +771,7 @@ void imguiGizmo::buildCone(const float x0, const float x1, const float radius, c
 #undef V
 #undef N
 }
-//
 //  Cylinder
-//
 ////////////////////////////////////////////////////////////////////////////
 void imguiGizmo::buildCylinder(const float x0, const float x1, const float radius, const int slices)
 {

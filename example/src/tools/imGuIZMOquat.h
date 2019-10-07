@@ -269,7 +269,7 @@ struct imguiGizmo
 
 
 
-#define IMGUIZMO_DEF_SIZE (ImGui::GetFrameHeightWithSpacing()*4 - ImGui::GetStyle().ItemSpacing.y*2)
+#define IMGUIZMO_DEF_SIZE (ImGui::GetFrameHeightWithSpacing()*4 - (ImGui::GetStyle().ItemSpacing.y*2))
 
 namespace ImGui
 {
