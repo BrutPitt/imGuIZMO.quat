@@ -1,4 +1,4 @@
-# imGuIZMO.quat &nbsp;2.0
+# imGuIZMO.quat &nbsp;v2.01
 **imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse, and graphically visualize their position in space, also around any single axis (*Shift/Ctrl/Alt/Super*). It uses **quaternions** algebra, internally, to manage rotations, but offers the possibility also to interfacing with **vec3**, **vec4** or **mat4x4** (rotation)
 
 With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** &nbsp; &nbsp; *(read below)*
@@ -225,6 +225,8 @@ You can do this simply by commenting / uncommenting a line in `vGizmoConfig.h` o
 //      or for your purposes:
 //          float  ==>  vec2 /  vec3 /  vec4 /  quat /  mat3|mat3x3  /  mat4|mat4x4
 //          double ==> dvec2 / dvec3 / dvec4 / dquat / dmat3|dmat3x3 / dmat4|dmat4x4
+//          int    ==> ivec2 / ivec3 / ivec4
+//          uint   ==> uvec2 / uvec3 / uvec4
 // If you select TEMPLATE classes the widget too will use internally them 
 //      with single precision (float)
 //
