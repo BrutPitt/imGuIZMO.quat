@@ -16,14 +16,6 @@
 #include <cassert>
 using namespace std;
 
-/**
- * A class for the Program Object for using shaders.
- *
- * This class encapsulates all the GLSL shading functionality.
- *
- * \author Michele Morrone
- * \version 1.0
- */
 class ProgramObject
 {
 public:
@@ -33,7 +25,8 @@ public:
     void deleteProgram();
 
     void addShader(ShaderObject* shader);
-    void removeShader(ShaderObject* shader);
+    void removeShader(ShaderObject* shader, bool wantDelete = false);
+    void deleteShader(ShaderObject* shader);
 
     void link();
 
@@ -44,43 +37,8 @@ public:
     GLuint  getHandle() { return program; }
     GLuint  getProgram() { return program; }
 
-#ifdef GLAPP_REQUIRE_OGL45
-  void setUniform1f(GLuint loc, GLfloat v0)                                     { glProgramUniform1f(program, loc, v0); }  
-  void setUniform2f(GLuint loc, GLfloat v0, GLfloat v1)                         { glProgramUniform2f(program, loc, v0, v1); }    
-  void setUniform3f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2)             { glProgramUniform3f(program, loc, v0, v1, v2); }    
-  void setUniform4f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) { glProgramUniform4f(program, loc, v0, v1, v2, v3); } 
-
-  void setUniform1i(GLuint loc, GLint v0)                                       { glProgramUniform1i(program, loc, v0); }  
-  void setUniform2i(GLuint loc, GLint v0, GLint v1)                             { glProgramUniform2i(program, loc, v0, v1); }    
-  void setUniform3i(GLuint loc, GLint v0, GLint v1, GLint v2)                   { glProgramUniform3i(program, loc, v0, v1, v2); }    
-  void setUniform4i(GLuint loc, GLint v0, GLint v1, GLint v2, GLint v3)         { glProgramUniform4i(program, loc, v0, v1, v2, v3); }
-
-  void setUniform1ui(GLuint loc, GLuint v0)                                     { glProgramUniform1ui(program, loc, v0); }  
-  void setUniform2ui(GLuint loc, GLuint v0, GLuint v1)                          { glProgramUniform2ui(program, loc, v0, v1); }    
-  void setUniform3ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2)               { glProgramUniform3ui(program, loc, v0, v1, v2); }    
-  void setUniform4ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2, GLuint v3)    { glProgramUniform4ui(program, loc, v0, v1, v2, v3); }
-
-  // Arrays
-  void setUniform1fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform1fv(program, loc, count, v); }  
-  void setUniform2fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform2fv(program, loc, count, v); }  
-  void setUniform3fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform3fv(program, loc, count, v); }  
-  void setUniform4fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform4fv(program, loc, count, v); }  
-  
-  void setUniform1iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform1iv(program, loc, count, v); }  
-  void setUniform2iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform2iv(program, loc, count, v); }  
-  void setUniform3iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform3iv(program, loc, count, v); }  
-  void setUniform4iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform4iv(program, loc, count, v); }  
-  
-  void setUniform1uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform1uiv(program, loc, count, v); }  
-  void setUniform2uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform2uiv(program, loc, count, v); }  
-  void setUniform3uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform3uiv(program, loc, count, v); }  
-  void setUniform4uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform4uiv(program, loc, count, v); }  
-  
-  // Matrix
-  void setUniformMatrix2fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix2fv(program, loc, count, transpose, v); }  
-  void setUniformMatrix3fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix3fv(program, loc, count, transpose, v); }  
-  void setUniformMatrix4fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix4fv(program, loc, count, transpose, v); }  
-#else
+#ifdef GLAPP_NO_GLSL_PIPELINE
+#define USE_PROGRAM useProgram();
   void setUniform1f(GLuint loc, GLfloat v0)                                     { glUniform1f(loc, v0); }  
   void setUniform2f(GLuint loc, GLfloat v0, GLfloat v1)                         { glUniform2f(loc, v0, v1); }    
   void setUniform3f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2)             { glUniform3f(loc, v0, v1, v2); }    
@@ -116,6 +74,43 @@ public:
   void setUniformMatrix2fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glUniformMatrix2fv(loc, count, transpose, v); }  
   void setUniformMatrix3fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glUniformMatrix3fv(loc, count, transpose, v); }  
   void setUniformMatrix4fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glUniformMatrix4fv(loc, count, transpose, v); }  
+#else
+#define USE_PROGRAM
+  void setUniform1f(GLuint loc, GLfloat v0)                                     { glProgramUniform1f(program, loc, v0); }  
+  void setUniform2f(GLuint loc, GLfloat v0, GLfloat v1)                         { glProgramUniform2f(program, loc, v0, v1); }    
+  void setUniform3f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2)             { glProgramUniform3f(program, loc, v0, v1, v2); }    
+  void setUniform4f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) { glProgramUniform4f(program, loc, v0, v1, v2, v3); } 
+
+  void setUniform1i(GLuint loc, GLint v0)                                       { glProgramUniform1i(program, loc, v0); }  
+  void setUniform2i(GLuint loc, GLint v0, GLint v1)                             { glProgramUniform2i(program, loc, v0, v1); }    
+  void setUniform3i(GLuint loc, GLint v0, GLint v1, GLint v2)                   { glProgramUniform3i(program, loc, v0, v1, v2); }    
+  void setUniform4i(GLuint loc, GLint v0, GLint v1, GLint v2, GLint v3)         { glProgramUniform4i(program, loc, v0, v1, v2, v3); }
+
+  void setUniform1ui(GLuint loc, GLuint v0)                                     { glProgramUniform1ui(program, loc, v0); }  
+  void setUniform2ui(GLuint loc, GLuint v0, GLuint v1)                          { glProgramUniform2ui(program, loc, v0, v1); }    
+  void setUniform3ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2)               { glProgramUniform3ui(program, loc, v0, v1, v2); }    
+  void setUniform4ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2, GLuint v3)    { glProgramUniform4ui(program, loc, v0, v1, v2, v3); }
+
+  // Arrays
+  void setUniform1fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform1fv(program, loc, count, v); }  
+  void setUniform2fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform2fv(program, loc, count, v); }  
+  void setUniform3fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform3fv(program, loc, count, v); }  
+  void setUniform4fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform4fv(program, loc, count, v); }  
+  
+  void setUniform1iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform1iv(program, loc, count, v); }  
+  void setUniform2iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform2iv(program, loc, count, v); }  
+  void setUniform3iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform3iv(program, loc, count, v); }  
+  void setUniform4iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform4iv(program, loc, count, v); }  
+  
+  void setUniform1uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform1uiv(program, loc, count, v); }  
+  void setUniform2uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform2uiv(program, loc, count, v); }  
+  void setUniform3uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform3uiv(program, loc, count, v); }  
+  void setUniform4uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform4uiv(program, loc, count, v); }  
+  
+  // Matrix
+  void setUniformMatrix2fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix2fv(program, loc, count, transpose, v); }  
+  void setUniformMatrix3fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix3fv(program, loc, count, transpose, v); }  
+  void setUniformMatrix4fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix4fv(program, loc, count, transpose, v); }  
 #endif                       
   // Receive Uniform variables:
   void getUniformfv(GLuint loc, GLfloat* v)  { glGetUniformfv(program,  loc, v); }
@@ -161,8 +156,7 @@ public:
   void setVertexAttrib4ui(GLuint index, GLuint v0, GLuint v1, GLuint v2, GLuint v3) { glVertexAttribI4ui(index, v0, v1, v2, v3); }
 
 #endif
-
-
+ 
   //void ActiveVarying(GLchar* name) { glActiveVarying(program,name); }
 
   GLint getUniformLocation(const GLchar* name);
@@ -191,11 +185,11 @@ public:
     void useFragment() { fragObj = new FragmentShader; }
     void useAll()      { useVertex(); useGeometry(); useFragment(); }
 
-    void removeVertex()     { removeShader(vertObj); }
-    void removeFragment()   { removeShader(fragObj); }
-    void removeAllShaders() { removeVertex(); removeFragment(); removeGeometry(); }
+    void removeVertex(bool wantDelete = false)     { removeShader(vertObj, vsCloned ? false : wantDelete); }
+    void removeFragment(bool wantDelete = false)   { removeShader(fragObj, wantDelete); }
+    void removeAllShaders(bool wantDelete = false) { removeVertex(wantDelete); removeFragment(wantDelete); removeGeometry(wantDelete); }
 
-    void deleteVertex()     { delete vertObj; vertObj = nullptr; }
+    void deleteVertex()     { if(!vsCloned) { delete vertObj; vertObj = nullptr; } }
     void deleteFragment()   { delete fragObj; fragObj = nullptr; }
     void deleteAllShaders() { deleteVertex(); deleteFragment(); deleteGeometry(); }
 
@@ -209,7 +203,7 @@ public:
 
 #if !defined(__EMSCRIPTEN__)
     void useGeometry()       { geomObj = new GeometryShader; }
-    void removeGeometry()    { if(!gsCloned) removeShader(geomObj); }
+    void removeGeometry(bool wantDelete = false)    { removeShader(geomObj, wantDelete); }
     void deleteGeometry() { delete geomObj; geomObj = nullptr; }
 
     void addGeometry()       { addShader(geomObj); }
@@ -219,7 +213,7 @@ public:
     bool gsCloned = false;
 #else
     void useGeometry() {}
-    void removeGeometry() {}
+    void removeGeometry(bool wantDelete = false) {}
     void deleteGeometry() {}
 #endif
 

@@ -1,14 +1,15 @@
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//------------------------------------------------------------------------------
 //  Copyright (c) 2018-2019 Michele Morrone
 //  All rights reserved.
 //
 //  https://michelemorrone.eu - https://BrutPitt.com
 //
-//  me@michelemorrone.eu - brutpitt@gmail.com
-//  twitter: @BrutPitt - github: BrutPitt
+//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//
+//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
 //  
 //  This software is distributed under the terms of the BSD 2-Clause license
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//------------------------------------------------------------------------------
 #pragma once
 
 #ifdef __EMSCRIPTEN__
@@ -30,7 +31,7 @@ class ShaderObject
         ShaderObject() {}
 
     public:
-        virtual ~ShaderObject() { glDeleteShader(shaderID); } 
+        virtual ~ShaderObject() { if(shaderID) glDeleteShader(shaderID); } 
 
         void Load(const char *name);
         //void Load(int numShaders, ...) { Load(NULL, numShaders, ...); }

@@ -16,12 +16,7 @@
 #endif
 
 #include "vGizmo.h"
-
-#ifdef VGIZMO_USES_GLM
-    using namespace glm;
-#else
-    using namespace vg;
-#endif
+#include "vGizmoMath.h"
 
 
 #define GLAPP_USE_MATRIX_BUFFERS
@@ -29,7 +24,7 @@
 struct transfMatrix {
     mat4 vMatrix   = mat4(1.0f);
     mat4 mMatrix   = mat4(1.0f);
-    mat4 pMatrix   = mat4(1.0f);      // Uniforms starts HERE!
+    mat4 pMatrix   = mat4(1.0f);  // Uniforms block starts HERE!!!
     mat4 mvMatrix  = mat4(1.0f);
     mat4 mvpMatrix = mat4(1.0f);
     mat4 mvLightM  = mat4(1.0f);
@@ -80,21 +75,19 @@ public:
         return blockIndex;
     }
 
-    void updatePmatrix(GLuint loc) {
-        glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.pMatrix));
-    }
-    void updateMmatrix(GLuint loc) {
-        glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.mMatrix));
-    }
-    void updateVmatrix(GLuint loc) {
-        glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.vMatrix));
-    }
-    void updateMVmatrix(GLuint loc) {
-        glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.mvMatrix));
-    }
-    void updateMVPmatrix(GLuint loc) {
-        glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.mvpMatrix));
-    }
+    void updatePmatrix  (GLuint loc) { glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.pMatrix)  ); }
+    void updateMmatrix  (GLuint loc) { glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.mMatrix)  ); }
+    void updateVmatrix  (GLuint loc) { glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.vMatrix)  ); }
+    void updateMVmatrix (GLuint loc) { glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.mvMatrix) ); }
+    void updateMVPmatrix(GLuint loc) { glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.mvpMatrix)); }
+
+#if !defined(GLAPP_NO_GLSL_PIPELINE)
+    void updatePmatrix  (GLuint prog, GLuint loc) { glProgramUniformMatrix4fv(prog, loc, 1, GL_FALSE, value_ptr(tM.pMatrix)  ); }
+    void updateMmatrix  (GLuint prog, GLuint loc) { glProgramUniformMatrix4fv(prog, loc, 1, GL_FALSE, value_ptr(tM.mMatrix)  ); }
+    void updateVmatrix  (GLuint prog, GLuint loc) { glProgramUniformMatrix4fv(prog, loc, 1, GL_FALSE, value_ptr(tM.vMatrix)  ); }
+    void updateMVmatrix (GLuint prog, GLuint loc) { glProgramUniformMatrix4fv(prog, loc, 1, GL_FALSE, value_ptr(tM.mvMatrix) ); }
+    void updateMVPmatrix(GLuint prog, GLuint loc) { glProgramUniformMatrix4fv(prog, loc, 1, GL_FALSE, value_ptr(tM.mvpMatrix)); }
+#endif
 
     void applyTransforms(const mat4& m = mat4(1.0f)) { 
         applyTransforms(trackball, m);
@@ -109,7 +102,6 @@ public:
     void setModelMatrix(const mat4& m) { tM.mMatrix = m; }
     void setViewMatrix (const mat4& m) { tM.vMatrix = m; }
     void setProjMatrix (const mat4& m) { tM.pMatrix = m; }
-
 
     void build_MV_MVP()
     {
