@@ -352,8 +352,8 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
     ////////////////////////////////////////////////////////////////////////////
     //  trackball control (virtualGizmo.h)
-    //      Only this 2 lamdas
-    //      can be replaced easly with an personal 3d manipulator which 
+    //      Only this 2 lambdas
+    //      can be replaced easly with a personal 3d manipulator which 
     //      returns rotations in a quaternion
     ////////////////////////////////////////////////////////////////////////////
     auto setTrackball = [&] (vg::vImGuIZMO &track, quat &q) {

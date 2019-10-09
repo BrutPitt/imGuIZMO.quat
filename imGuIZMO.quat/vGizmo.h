@@ -13,8 +13,12 @@
 #pragma once
 
 #include "vGizmoConfig.h"
+#include "vGizmoMath.h"
 
-#if !defined(VGIZMO_USES_TEMPLATE)
+#ifdef VGIZMO_USES_TEMPLATE
+    #define VGIZMO_BASE_CLASS virtualGizmoBaseClass<T>
+#else
+    #define VGIZMO_BASE_CLASS virtualGizmoBaseClass
     #define T VG_T_TYPE
 #endif
 

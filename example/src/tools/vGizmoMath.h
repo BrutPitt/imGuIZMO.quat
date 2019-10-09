@@ -13,7 +13,81 @@
 #pragma once
 
 #include "vGizmoConfig.h"
-#include <cmath>
+
+#ifdef VGIZMO_USES_GLM
+    #ifndef VGIZMO_USES_TEMPLATE
+        #define VGIZMO_USES_TEMPLATE
+    #endif
+
+    #define VGIZMO_NAMESPACE glm
+
+    #include <glm/glm.hpp>
+    #include <glm/gtx/vector_angle.hpp>
+    #include <glm/gtx/exterior_product.hpp>
+    #include <glm/gtc/type_ptr.hpp>
+    #include <glm/gtc/quaternion.hpp>
+    #include <glm/gtc/matrix_transform.hpp>
+
+    using tVec2 = glm::tvec2<VG_T_TYPE>;
+    using tVec3 = glm::tvec3<VG_T_TYPE>;
+    using tVec4 = glm::tvec4<VG_T_TYPE>;
+    using tQuat = glm::tquat<VG_T_TYPE>;
+    using tMat3 = glm::tmat3x3<VG_T_TYPE>;
+    using tMat4 = glm::tmat4x4<VG_T_TYPE>;
+
+    #define T_PI glm::pi<VG_T_TYPE>()
+    #define T_INV_PI glm::one_over_pi<VG_T_TYPE>()
+
+    #define VGIZMO_BASE_CLASS virtualGizmoBaseClass<T>
+    #define TEMPLATE_TYPENAME_T  template<typename T>
+
+#else // use vGizmoMath
+
+    #include <math.h>
+    #include <cmath>
+    #include <stdint.h>
+    #define VGIZMO_NAMESPACE vgm
+
+    #ifdef VGIZMO_USES_TEMPLATE
+        #define TEMPLATE_TYPENAME_T  template<typename T>
+
+        #define VEC2_T Vec2<T>
+        #define VEC3_T Vec3<T>
+        #define VEC4_T Vec4<T>
+        #define QUAT_T Quat<T>
+        #define MAT3_T Mat3<T>
+        #define MAT4_T Mat4<T>
+
+        #define VEC2_PRECISION Vec2<VG_T_TYPE>
+        #define VEC3_PRECISION Vec3<VG_T_TYPE>
+        #define VEC4_PRECISION Vec4<VG_T_TYPE>
+        #define QUAT_PRECISION Quat<VG_T_TYPE>
+        #define MAT3_PRECISION Mat3<VG_T_TYPE>
+        #define MAT4_PRECISION Mat4<VG_T_TYPE>
+        
+        #define T_PI vgm::pi<VG_T_TYPE>()
+        #define T_INV_PI vgm::one_over_pi<VG_T_TYPE>()
+    
+    #else
+        #define TEMPLATE_TYPENAME_T
+
+        #define VEC2_T Vec2
+        #define VEC3_T Vec3
+        #define VEC4_T Vec4
+        #define QUAT_T Quat
+        #define MAT3_T Mat3
+        #define MAT4_T Mat4
+
+        #define VEC2_PRECISION Vec2
+        #define VEC3_PRECISION Vec3
+        #define VEC4_PRECISION Vec4
+        #define QUAT_PRECISION Quat
+        #define MAT3_PRECISION Mat3
+        #define MAT4_PRECISION Mat4
+
+        #define T_PI vgm::pi()
+        #define T_INV_PI vgm::one_over_pi()
+    #endif
 
 namespace vgm {
 
@@ -295,6 +369,8 @@ TEMPLATE_TYPENAME_T inline MAT3_T mat3_cast(QUAT_T const& q) {
                           T(2) * (xy - wz),  T(1) - T(2) * (xx + zz),         T(2) * (yz + wx),
                           T(2) * (xz + wy),         T(2) * (yz - wx),  T(1) - T(2) * (xx + yy)); }
 TEMPLATE_TYPENAME_T inline MAT4_T mat4_cast(QUAT_T const& q) { return MAT4_T(mat3_cast(q)); }
+inline float uintBitsToFloat(uint32_t const& v) { return *((float *)(&v)); }
+inline uint32_t floatBitsToUint(float const& v) { return *((uint32_t *)(&v)); }
 // dot
 //////////////////////////
 TEMPLATE_TYPENAME_T inline T dot(const VEC2_T& v0, const VEC2_T& v1) { return v0.x * v1.x + v0.y * v1.y; }
@@ -311,19 +387,38 @@ TEMPLATE_TYPENAME_T inline T length(const VEC2_T& v) { return sqrt(dot(v, v)); }
 TEMPLATE_TYPENAME_T inline T length(const VEC3_T& v) { return sqrt(dot(v, v)); }
 TEMPLATE_TYPENAME_T inline T length(const VEC4_T& v) { return sqrt(dot(v, v)); }
 TEMPLATE_TYPENAME_T inline T length(const QUAT_T& q) { return sqrt(dot(q, q)); }
-//abs
+// distance
+//////////////////////////
+TEMPLATE_TYPENAME_T inline T distance(const VEC2_T& v0, const VEC2_T& v1) { return length(v1 - v0); }
+TEMPLATE_TYPENAME_T inline T distance(const VEC3_T& v0, const VEC3_T& v1) { return length(v1 - v0); }
+TEMPLATE_TYPENAME_T inline T distance(const VEC4_T& v0, const VEC4_T& v1) { return length(v1 - v0); }
+// abs
 //////////////////////////
 TEMPLATE_TYPENAME_T inline const T tAbs(T x) { return x>=T(0) ? x : -x; }
 TEMPLATE_TYPENAME_T inline const VEC2_T abs(const VEC2_T& v) { return VEC2_T(tAbs(v.x), tAbs(v.y)); }
 TEMPLATE_TYPENAME_T inline const VEC3_T abs(const VEC3_T& v) { return VEC3_T(tAbs(v.x), tAbs(v.y), tAbs(v.z)); }
 TEMPLATE_TYPENAME_T inline const VEC4_T abs(const VEC4_T& v) { return VEC4_T(tAbs(v.x), tAbs(v.y), tAbs(v.z), tAbs(v.w)); }
 TEMPLATE_TYPENAME_T inline const QUAT_T abs(const QUAT_T& q) { return QUAT_T(tAbs(q.w), tAbs(q.x), tAbs(q.y), tAbs(q.z)); }
+// sign
+//////////////////////////
+TEMPLATE_TYPENAME_T inline T sign(const T v) { return v>T(0) ? T(1) : ( v<T(0) ? T(-1) : T(0)); }
 // normalize
 //////////////////////////
 TEMPLATE_TYPENAME_T inline const VEC2_T normalize(const VEC2_T& v) { return v / length(v); }
 TEMPLATE_TYPENAME_T inline const VEC3_T normalize(const VEC3_T& v) { return v / length(v); }
 TEMPLATE_TYPENAME_T inline const VEC4_T normalize(const VEC4_T& v) { return v / length(v); }
 TEMPLATE_TYPENAME_T inline const QUAT_T normalize(const QUAT_T& q) { return q / length(q); }
+// mix
+//////////////////////////
+TEMPLATE_TYPENAME_T inline const      T mix(const      T  x, const      T  y, const T a)   { return x + (y-x) * a; }
+TEMPLATE_TYPENAME_T inline const VEC2_T mix(const VEC2_T& x, const VEC2_T& y, const T a)   { return x + (y-x) * a; }
+TEMPLATE_TYPENAME_T inline const VEC3_T mix(const VEC3_T& x, const VEC3_T& y, const T a)   { return x + (y-x) * a; }
+TEMPLATE_TYPENAME_T inline const VEC4_T mix(const VEC4_T& x, const VEC4_T& y, const T a)   { return x + (y-x) * a; }
+// pow
+//////////////////////////
+TEMPLATE_TYPENAME_T inline VEC2_T pow(const VEC2_T& b, const VEC2_T& e) { return VEC2_T(::pow(b.x,e.x), ::pow(b.y,e.y)); }
+TEMPLATE_TYPENAME_T inline VEC3_T pow(const VEC3_T& b, const VEC3_T& e) { return VEC3_T(::pow(b.x,e.x), ::pow(b.y,e.y), ::pow(b.z,e.z)); }
+TEMPLATE_TYPENAME_T inline VEC4_T pow(const VEC4_T& b, const VEC4_T& e) { return VEC4_T(::pow(b.x,e.x), ::pow(b.y,e.y), ::pow(b.z,e.z), ::pow(b.w,e.w)); }
 // value_ptr
 //////////////////////////
 TEMPLATE_TYPENAME_T inline T *value_ptr(const VEC2_T &v) { return const_cast<T *>(&v.x); }
@@ -356,6 +451,16 @@ TEMPLATE_TYPENAME_T inline const MAT3_T inverse(MAT3_T m) {
                     (m.m10 * m.m21 - m.m20 * m.m11), - (m.m00 * m.m21 - m.m20 * m.m01),   (m.m00 * m.m11 - m.m10 * m.m01)) * invDet; }
 // external operators
 //////////////////////////
+TEMPLATE_TYPENAME_T inline VEC2_T operator*(const T s, const VEC2_T& v) {  return v * s; }
+TEMPLATE_TYPENAME_T inline VEC3_T operator*(const T s, const VEC3_T& v) {  return v * s; }
+TEMPLATE_TYPENAME_T inline VEC4_T operator*(const T s, const VEC4_T& v) {  return v * s; }
+TEMPLATE_TYPENAME_T inline QUAT_T operator*(const T s, const QUAT_T& q) {  return q * s; }
+
+TEMPLATE_TYPENAME_T inline VEC2_T operator/(const T s, const VEC2_T& v) {  return VEC2_T(s/v.x, s/v.y); }
+TEMPLATE_TYPENAME_T inline VEC3_T operator/(const T s, const VEC3_T& v) {  return VEC3_T(s/v.x, s/v.y, s/v.z); }
+TEMPLATE_TYPENAME_T inline VEC4_T operator/(const T s, const VEC4_T& v) {  return VEC4_T(s/v.x, s/v.y, s/v.z, s/v.w); }
+TEMPLATE_TYPENAME_T inline QUAT_T operator/(const T s, const QUAT_T& q) {  return QUAT_T(s/q.x, s/q.y, s/q.z, s/q.w); }
+
 TEMPLATE_TYPENAME_T inline VEC3_T operator*(const QUAT_T& q, const VEC3_T& v) {
     const VEC3_T qV(q.x, q.y, q.z), uv(cross(qV, v));
     return v + ((uv * q.w) + cross(qV, uv)) * T(2); }
@@ -374,9 +479,11 @@ TEMPLATE_TYPENAME_T inline VEC3_T axis(QUAT_T const& q) {
     const T t2 = T(1) / sqrt(t1);  return VEC3_T(q.x * t2, q.y * t2, q.z * t2); }
 // trigonometric
 //////////////////////////
-TEMPLATE_TYPENAME_T inline T pi() { return T(3.1415926535897932384626433832795029); }
 TEMPLATE_TYPENAME_T inline T radians(T d) { return d * T(0.0174532925199432957692369076849); }
 TEMPLATE_TYPENAME_T inline T degrees(T r) { return r * T(57.295779513082320876798154814105); }
+TEMPLATE_TYPENAME_T inline T pi() { return T(3.1415926535897932384626433832795029); }
+TEMPLATE_TYPENAME_T inline T one_over_pi() { return T(0.318309886183790671537767526745028724); }
+
 // lookAt
 //////////////////////////
 TEMPLATE_TYPENAME_T inline const MAT4_T lookAt(const VEC3_T& pov, const VEC3_T& tgt, const VEC3_T& up)
@@ -435,5 +542,76 @@ TEMPLATE_TYPENAME_T inline const MAT4_T frustrum(T l, T r, T b, T t, T n, T f)
                         T(0),           T(0),    -(T(2)*f*n)/(f-n), T(0)); }
 
 } // end namespace vg::
+
+#ifdef VGIZMO_USES_TEMPLATE
+    using vec2 = vgm::Vec2<float>;
+    using vec3 = vgm::Vec3<float>;
+    using vec4 = vgm::Vec4<float>;
+    using quat = vgm::Quat<float>;
+    using mat3 = vgm::Mat3<float>;
+    using mat4 = vgm::Mat4<float>;
+    using mat3x3 = mat3;
+    using mat4x4 = mat4;
+
+    using dvec2 = vgm::Vec2<double>;
+    using dvec3 = vgm::Vec3<double>;
+    using dvec4 = vgm::Vec4<double>;
+    using dquat = vgm::Quat<double>;
+    using dmat3 = vgm::Mat3<double>;
+    using dmat4 = vgm::Mat4<double>;
+    using dmat3x3 = dmat3;
+    using dmat4x4 = dmat4;
+
+    using ivec2 = vgm::Vec2<int32_t>;
+    using ivec3 = vgm::Vec3<int32_t>;
+    using ivec4 = vgm::Vec4<int32_t>;
+
+    using uvec2 = vgm::Vec2<uint32_t>;
+    using uvec3 = vgm::Vec3<uint32_t>;
+    using uvec4 = vgm::Vec4<uint32_t>;
+#else
+    using vec2 = vgm::Vec2;
+    using vec3 = vgm::Vec3;
+    using vec4 = vgm::Vec4;
+    using quat = vgm::Quat;
+    using mat3 = vgm::Mat3;
+    using mat4 = vgm::Mat4;
+    using mat3x3 = mat3;
+    using mat4x4 = mat4;
+#endif
+
+    using tVec2 = vgm::VEC2_PRECISION;
+    using tVec3 = vgm::VEC3_PRECISION;
+    using tVec4 = vgm::VEC4_PRECISION;
+    using tQuat = vgm::QUAT_PRECISION;
+    using tMat3 = vgm::MAT3_PRECISION;
+    using tMat4 = vgm::MAT4_PRECISION;
+
+    using uint8 = uint8_t;
+    using  int8 =  int8_t;
+    using uint   = uint32_t;
+    using  int32 =  int32_t;
+    using uint32 = uint32_t;
+    using  int64 =  int64_t;
+    using uint64 = uint64_t;
+
+    #undef VEC2_T
+    #undef VEC3_T
+    #undef VEC4_T
+    #undef QUAT_T
+    #undef MAT3_T
+    #undef MAT4_T
+
+    #undef VEC2_PRECISION
+    #undef VEC3_PRECISION
+    #undef VEC4_PRECISION
+    #undef QUAT_PRECISION
+    #undef MAT3_PRECISION
+    #undef MAT4_PRECISION
+
+
+#endif // use vGizmoMath
+
+using namespace VGIZMO_NAMESPACE;
 
 #undef T // if used T as #define, undef it

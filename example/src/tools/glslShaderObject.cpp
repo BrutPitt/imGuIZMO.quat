@@ -13,9 +13,9 @@
 #include "glslShaderObject.h"
 
 #define ANSI
-#ifdef ANSI             /* ANSI compatible version          */
+#ifdef ANSI             // ANSI compatible version
 #include <stdarg.h>
-#else                   /* UNIX compatible version          */
+#else                   // UNIX compatible version
 #include <varargs.h>
 #endif
 
