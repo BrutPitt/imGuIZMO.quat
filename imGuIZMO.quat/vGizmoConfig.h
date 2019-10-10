@@ -12,6 +12,8 @@
 //------------------------------------------------------------------------------
 #pragma once
 
+// EXPERIMENTAL ==> NOT FULL TESTED (YET)
+//
 // uncomment to use DOUBLE precision
 //      It automatically enable also VGIZMO_USES_TEMPLATE (read below)
 // Default ==> SINGLE precision: float
@@ -23,6 +25,7 @@
 // This is if you need to extend the use of different math types in your code
 //      or for your purposes, there are predefined alias:
 //          float  ==>  vec2 /  vec3 /  vec4 /  quat /  mat3|mat3x3  /  mat4|mat4x4
+//      and more TEMPLATE (only!) alias:
 //          double ==> dvec2 / dvec3 / dvec4 / dquat / dmat3|dmat3x3 / dmat4|dmat4x4
 //          int    ==> ivec2 / ivec3 / ivec4
 //          uint   ==> uvec2 / uvec3 / uvec4
