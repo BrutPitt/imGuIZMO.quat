@@ -7,7 +7,7 @@ With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** 
 
 **No other files or external libraries are required**, except [**ImGui**](https://github.com/ocornut/imgui) (of course).
 
-You can use **vGizmoMath** also externally, for your purposes: it contains classes to manipulate **vec**tors (with 2/3/4 components), **quat**ernions, square **mat**ricies (3x3 and 4x4), both as *simple* single precision `float` **classes** (*Default*) or, enabling **template classes** (*simply adding a* `#define`), as both `float` and `double` data types. It contains also 4 helper functions to define Model/View matrix: **perspective**, **frustrum**, **lookAt**, **ortho**
+You can use **vGizmoMath** also externally, for your purposes: it contains classes to manipulate **vec**tors (with 2/3/4 components), **quat**ernions, square **mat**ricies (3x3 and 4x4), both as *simple* single precision `float` **classes** (*Default*) or, enabling **template classes** (*simply adding a* `#define`), both as `float` and `double` data types (also `int` and `uint` vec*). It contains also 4 helper functions to define Model/View matrix: **perspective**, **frustrum**, **lookAt**, **ortho**
 
 If need a larger/complete library, as alternative to **vGizmoMath**, is also possible to interface **imGuIZMO.quat** with [**glm** mathematics library](https://github.com/g-truc/glm) (*simply adding a* `#define`)
 
@@ -222,8 +222,9 @@ You can do this simply by commenting / uncommenting a line in `vGizmoConfig.h` o
 // uncomment to use TEMPLATE internal vGizmoMath classes/types
 //
 // This is if you need to extend the use of different math types in your code
-//      or for your purposes:
+//      or for your purposes, there are predefined alias:
 //          float  ==>  vec2 /  vec3 /  vec4 /  quat /  mat3|mat3x3  /  mat4|mat4x4
+//      and more TEMPLATE (only!) alias:
 //          double ==> dvec2 / dvec3 / dvec4 / dquat / dmat3|dmat3x3 / dmat4|dmat4x4
 //          int    ==> ivec2 / ivec3 / ivec4
 //          uint   ==> uvec2 / uvec3 / uvec4
@@ -259,7 +260,9 @@ You can do this simply by commenting / uncommenting a line in `vGizmoConfig.h` o
 //#define VGIZMO_USES_LEFT_HAND_AXES
 ```
 
-**If your project grows you can upgrade/pass to **glm***, in any moment
+- *If your project grows you can upgrade/pass to **glm**, in any moment*
+- *My [**glChAoS.P**](https://github.com/BrutPitt/glChAoS.P) project can switch from internal **vGizmoMath** (`VGIZMO_USES_TEMPLATE`) to **glm** (`VGIZMO_USES_GLM`), and vice versa, only changing defines: you can examine it as example*
+
 <p>&nbsp;<br></p>
 
 ## Changes from v. 1.1

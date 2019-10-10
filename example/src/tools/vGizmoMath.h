@@ -16,7 +16,7 @@
 
 #ifdef VGIZMO_USES_GLM
     #ifndef VGIZMO_USES_TEMPLATE
-        #define VGIZMO_USES_TEMPLATE
+        #define VGIZMO_USES_TEMPLATE    // glm uses template ==> vGizmo needs to know
     #endif
 
     #define VGIZMO_NAMESPACE glm
@@ -369,8 +369,8 @@ TEMPLATE_TYPENAME_T inline MAT3_T mat3_cast(QUAT_T const& q) {
                           T(2) * (xy - wz),  T(1) - T(2) * (xx + zz),         T(2) * (yz + wx),
                           T(2) * (xz + wy),         T(2) * (yz - wx),  T(1) - T(2) * (xx + yy)); }
 TEMPLATE_TYPENAME_T inline MAT4_T mat4_cast(QUAT_T const& q) { return MAT4_T(mat3_cast(q)); }
-inline float uintBitsToFloat(uint32_t const& v) { return *((float *)(&v)); }
-inline uint32_t floatBitsToUint(float const& v) { return *((uint32_t *)(&v)); }
+inline float uintBitsToFloat(uint32_t const v) { return *((float *)(&v)); }
+inline uint32_t floatBitsToUint(float const v) { return *((uint32_t *)(&v)); }
 // dot
 //////////////////////////
 TEMPLATE_TYPENAME_T inline T dot(const VEC2_T& v0, const VEC2_T& v1) { return v0.x * v1.x + v0.y * v1.y; }
@@ -541,7 +541,7 @@ TEMPLATE_TYPENAME_T inline const MAT4_T frustrum(T l, T r, T b, T t, T n, T f)
                      (r+l)/(r-l),    (t+b)/(t-b),      f_n,           v ,
                         T(0),           T(0),    -(T(2)*f*n)/(f-n), T(0)); }
 
-} // end namespace vg::
+} // end namespace vgm
 
 #ifdef VGIZMO_USES_TEMPLATE
     using vec2 = vgm::Vec2<float>;
