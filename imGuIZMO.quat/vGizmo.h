@@ -473,7 +473,7 @@ public:
     //////////////////////////////////////////////////////////////////
     tVec3 &getPanPosition() { return pan; }
 
-    //  Get pos... use as Zoom factor
+    //  Get Pan (xy) & Dolly (z) position
     //////////////////////////////////////////////////////////////////
     tVec3 getPosition() const { return tVec3(pan.x, pan.y, dolly.z); }
 private:

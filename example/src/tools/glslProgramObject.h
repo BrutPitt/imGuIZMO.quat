@@ -36,6 +36,7 @@ public:
 
     GLuint  getHandle() { return program; }
     GLuint  getProgram() { return program; }
+    GLuint  getPipeline() { return pipeline; }
 
 #ifdef GLAPP_NO_GLSL_PIPELINE
 #define USE_PROGRAM useProgram();
@@ -177,8 +178,8 @@ protected:
 class mainProgramObj : public ProgramObject
 {
 public:
-    mainProgramObj() { } 
-    virtual ~mainProgramObj() { removeAllShaders(); deleteAllShaders(); }
+    mainProgramObj() { createProgram(); } 
+    virtual ~mainProgramObj() { removeAllShaders(true); deleteAllShaders(); }
 
     void useVertex(VertexShader *VS) { vertObj = VS; vsCloned = true; }
     void useVertex()   { vertObj = new VertexShader; }
@@ -189,8 +190,8 @@ public:
     void removeFragment(bool wantDelete = false)   { removeShader(fragObj, wantDelete); }
     void removeAllShaders(bool wantDelete = false) { removeVertex(wantDelete); removeFragment(wantDelete); removeGeometry(wantDelete); }
 
-    void deleteVertex()     { if(!vsCloned) { delete vertObj; vertObj = nullptr; } }
-    void deleteFragment()   { delete fragObj; fragObj = nullptr; }
+    void deleteVertex()     { if(!vsCloned) { deleteShader(vertObj); delete vertObj; vertObj = nullptr; } }
+    void deleteFragment()   { deleteShader(fragObj); delete fragObj; fragObj = nullptr; }
     void deleteAllShaders() { deleteVertex(); deleteFragment(); deleteGeometry(); }
 
     void addVertex()      { addShader(vertObj); }
@@ -204,7 +205,7 @@ public:
 #if !defined(__EMSCRIPTEN__)
     void useGeometry()       { geomObj = new GeometryShader; }
     void removeGeometry(bool wantDelete = false)    { removeShader(geomObj, wantDelete); }
-    void deleteGeometry() { delete geomObj; geomObj = nullptr; }
+    void deleteGeometry() { deleteShader(geomObj); delete geomObj; geomObj = nullptr; }
 
     void addGeometry()       { addShader(geomObj); }
 
