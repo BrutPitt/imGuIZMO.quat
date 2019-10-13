@@ -121,11 +121,11 @@ public:
                              tgtVec,
                              vec3(0.0f, 1.0f, 0.0f));
     }
-    void setLightView(vec3 &lightPos) {
+    void setLightView(const vec3 &lightPos) {
         //mat4 m(1.f);
         //m = translate(m,getPOV());
         //m = translate(m,getTrackball().getPosition());
-        tM.mvLightM = lookAt(lightPos * .25f +povVec,
+        tM.mvLightM = lookAt(lightPos + povVec,
                              tgtVec, //getTrackball().getRotationCenter(),
                              vec3(0.0f, 1.0f, 0.0f));
         //tM.mvLightM = tM.mvLightM * m;

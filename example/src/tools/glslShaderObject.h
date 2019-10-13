@@ -27,11 +27,11 @@ using namespace std;
 /////////////////////////////////////////////////
 class ShaderObject
 {
-    protected:
-        ShaderObject() {}
-
     public:
-        virtual ~ShaderObject() { if(shaderID) glDeleteShader(shaderID); } 
+        ShaderObject() {}
+        enum { unassigned, attached, wantDetach, wantDelete };
+
+        virtual ~ShaderObject() {  glDeleteShader(shaderID); } 
 
         void Load(const char *name);
         //void Load(int numShaders, ...) { Load(NULL, numShaders, ...); }
@@ -39,12 +39,17 @@ class ShaderObject
         void Compile(const GLchar *code);
 
         GLuint& getShader();
-        void resetShader() { shaderID=0; }
 
+        void statusAttached()   { status = attached; }
+        void statusWantDetach() { status = wantDetach; }
+        void statusWantDelete() { status = wantDelete; }
+        int getStatus() { return status; }
+  
     protected:
-        void getFileContents(const char* fileName, string &s);
 
         GLuint  shaderID=0;
+        int status = unassigned;
+
 };
 
 //  Fragment 
@@ -105,8 +110,9 @@ inline void CheckErrorsGL( const char* location = NULL,
 #define CHECK_SHADER_ERROR(hProg) 
 #endif
 
+void getFileContents(const char* fileName, string &str);
 
-
+void checkDeletedShader(GLuint shader);
 void getCompilerLog(GLuint handle, GLint blen, bool isShader);
 
 int CheckGLError(const char *file, int line);
