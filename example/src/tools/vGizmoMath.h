@@ -440,8 +440,8 @@ TEMPLATE_TYPENAME_T inline const MAT4_T transpose(MAT4_T m) {
                    m.m03, m.m13, m.m23, m.m33); }
 // inverse
 //////////////////////////
-TEMPLATE_TYPENAME_T inline const QUAT_T inverse(QUAT_T q) { return QUAT_T(q.w, -q.x, -q.y, -q.z) / dot(q, q); }
-TEMPLATE_TYPENAME_T inline const MAT3_T inverse(MAT3_T m) {
+TEMPLATE_TYPENAME_T inline const QUAT_T inverse(QUAT_T const &q) { return QUAT_T(q.w, -q.x, -q.y, -q.z) / dot(q, q); }
+TEMPLATE_TYPENAME_T inline const MAT3_T inverse(MAT3_T const &m) {
     T invDet = T(1) / (   m.m00 * (m.m11 * m.m22 - m.m21 * m.m12)
                         - m.m10 * (m.m01 * m.m22 - m.m21 * m.m02)
                         + m.m20 * (m.m01 * m.m12 - m.m11 * m.m02));
@@ -449,6 +449,29 @@ TEMPLATE_TYPENAME_T inline const MAT3_T inverse(MAT3_T m) {
     return MAT3_T(  (m.m11 * m.m22 - m.m21 * m.m12), - (m.m01 * m.m22 - m.m21 * m.m02),   (m.m01 * m.m12 - m.m11 * m.m02),
                   - (m.m10 * m.m22 - m.m20 * m.m12),   (m.m00 * m.m22 - m.m20 * m.m02), - (m.m00 * m.m12 - m.m10 * m.m02),
                     (m.m10 * m.m21 - m.m20 * m.m11), - (m.m00 * m.m21 - m.m20 * m.m01),   (m.m00 * m.m11 - m.m10 * m.m01)) * invDet; }
+TEMPLATE_TYPENAME_T inline const MAT4_T inverse(MAT4_T const &m) {
+    const T c0 = m.m22 * m.m33 - m.m32 * m.m23; VEC4_T f0(c0, c0, m.m12 * m.m33 - m.m32 * m.m13, m.m12 * m.m23 - m.m22 * m.m13);
+    const T c1 = m.m21 * m.m33 - m.m31 * m.m23; VEC4_T f1(c1, c1, m.m11 * m.m33 - m.m31 * m.m13, m.m11 * m.m23 - m.m21 * m.m13);
+    const T c2 = m.m21 * m.m32 - m.m31 * m.m22; VEC4_T f2(c2, c2, m.m11 * m.m32 - m.m31 * m.m12, m.m11 * m.m22 - m.m21 * m.m12);
+    const T c3 = m.m20 * m.m33 - m.m30 * m.m23; VEC4_T f3(c3, c3, m.m10 * m.m33 - m.m30 * m.m13, m.m10 * m.m23 - m.m20 * m.m13);
+    const T c4 = m.m20 * m.m32 - m.m30 * m.m22; VEC4_T f4(c4, c4, m.m10 * m.m32 - m.m30 * m.m12, m.m10 * m.m22 - m.m20 * m.m12);
+    const T c5 = m.m20 * m.m31 - m.m30 * m.m21; VEC4_T f5(c5, c5, m.m10 * m.m31 - m.m30 * m.m11, m.m10 * m.m21 - m.m20 * m.m11);
+
+    VEC4_T v0(m.m10, m.m00, m.m00, m.m00);
+    VEC4_T v1(m.m11, m.m01, m.m01, m.m01);
+    VEC4_T v2(m.m12, m.m02, m.m02, m.m02);
+    VEC4_T v3(m.m13, m.m03, m.m03, m.m03);
+
+    VEC4_T i0(v1 * f0 - v2 * f1 + v3 * f2);
+    VEC4_T i1(v0 * f0 - v2 * f3 + v3 * f4);
+    VEC4_T i2(v0 * f1 - v1 * f3 + v3 * f5);
+    VEC4_T i3(v0 * f2 - v1 * f4 + v2 * f5);
+            
+    VEC4_T signA( 1, -1,  1, -1), signB(-1,  1, -1,  1);
+    MAT4_T inv(i0 * signA, i1 * signB, i2 * signA, i3 * signB);
+
+    VEC4_T v0r0(m.v0 * VEC4_T(inv.m00, inv.m10, inv.m20, inv.m30));
+    return inv * (T(1) / (v0r0.x + v0r0.y + v0r0.z + v0r0.w)); }// 1/determinant 
 // external operators
 //////////////////////////
 TEMPLATE_TYPENAME_T inline VEC2_T operator*(const T s, const VEC2_T& v) {  return v * s; }
