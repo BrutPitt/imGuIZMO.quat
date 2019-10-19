@@ -45,11 +45,11 @@ To use **imGuIZMO.quat** need to include `imGuIZMOquat.h` file in your code.
 ```cpp
 #include "imGuIZMOquat.h"
 ```
-You can think of declaring declare an object of type `glm::quat` (quaternion), global or static or as member of your class, to mantain track of rotations:
+You can think of declaring declare an object of type `quat` (quaternion), global or static or as member of your class, to mantain track of rotations:
 
 ```cpp
 // For imGuIZMO, declare static or global variable or member class quaternion
-    glm::quat qRot = glm::quat(1.f, 0.f, 0.f, 0.f);
+    quat qRot = quat(1.f, 0.f, 0.f, 0.f);
 ```
 In your **ImGui** window you call/declare a widget...
 
@@ -59,7 +59,7 @@ In your **ImGui** window you call/declare a widget...
 Finally in your render function (or where you prefer) you can get back the transformations matrix
 
 ```cpp
-    glm::mat4 modelMatrix = glm::mat4_cast(qRot);
+    mat4 modelMatrix = mat4_cast(qRot);
     // now you have modelMatrix with rotation then can build MV and MVP matrix
 ```
 now you have modelMatrix with rotation then can build MV and MVP matrix
@@ -69,13 +69,13 @@ now you have modelMatrix with rotation then can build MV and MVP matrix
 Maybe can be more elegant to add two helper functions
 ```cpp
 // two helper functions, not really necessary (but comfortable)
-    void setRotation(const glm::quat &q) { qRot = q; }
-    glm::quat& getRotation() { return qRot; }
+    void setRotation(const quat &q) { qRot = q; }
+    quat& getRotation() { return qRot; }
  ```
 And to change the widget call
 
 ```cpp
-    glm::quat qt = getRotation();
+    quat qt = getRotation();
     if(ImGui::gizmo3D("##gizmo1", qt /*, size,  mode */)) {  setRotation(qt); }
 ```
 but the essence of the code does not change
@@ -87,7 +87,7 @@ but the essence of the code does not change
 
 **Axes mode:**
 ```cpp
-    glm::quat qt = getRotation();
+    quat qt = getRotation();
 // get/setRotation are helper funcs that you have ideally defined to manage your global/member objs
     if(ImGui::gizmo3D("##gizmo1", qt /*, size,  mode */)) {  setRotation(qt); }
     // or explicitly
@@ -102,7 +102,7 @@ but the essence of the code does not change
 ```cpp
 // I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify 
 // a light spot toward origin need to change direction
-    glm::vec3 light(-getLight()));
+    vec3 light(-getLight()));
 // get/setLigth are helper funcs that you have ideally defined to manage your global/member objs
     if(ImGui::gizmo3D("##Dir1", light /*, size,  mode */)  setLight(-light);
     // or explicitly
@@ -112,7 +112,7 @@ but the essence of the code does not change
 ```
 **Directional plane:**
 ```cpp
-    static glm::vec3 dir(1.0, 0.0, 0.0);
+    static vec3 dir(1.0, 0.0, 0.0);
     if(ImGui::gizmo3D("##Dir1", dir, 100,  imguiGizmo::modeDirPlane)  { }
 
     // Default direction color is same of default arrow color: YELLOW -> ImVec4(1.0, 1.0, 0.0, 1.0);
@@ -123,8 +123,8 @@ but the essence of the code does not change
 ```cpp
 // I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify 
 // a light spot toward origin need to change direction, it's maintained for uniformity even in spot
-    glm::vec3 light(-getLight()));
-    glm::quat qt = getRotation();
+    vec3 light(-getLight()));
+    quat qt = getRotation();
 // get/setLigth get/setRotation are helper funcs that you have ideally defined to manage your global/member objs
     if(ImGui::gizmo3D("##gizmo1", qt, light /*, size,  mode */))  { 
         setLight(-light); 
@@ -137,13 +137,13 @@ but the essence of the code does not change
 
 **Prototypes** - all possible widget calls:
 ```cpp
-IMGUI_API bool gizmo3D(const char*, glm::quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, glm::vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, glm::vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDirection);
+IMGUI_API bool gizmo3D(const char*, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDirection);
 
-IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, glm::quat&, glm::vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, quat&, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, quat&, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, quat&, vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 ```
 
 
