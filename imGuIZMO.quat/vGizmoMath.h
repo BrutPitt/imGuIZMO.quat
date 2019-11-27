@@ -181,10 +181,12 @@ public:
     };
 
     Vec4() {}
-    Vec4(T s)                          : x(s),   y(s),   z(s),   w(s) {}
-    Vec4(T x, T y, T z, T w)           : x(x),   y(y),   z(z),   w(w) {}
-    Vec4(const VEC3_T& v, T s = T(0))  : x(v.x), y(v.y), z(v.z), w(s) {}
+    Vec4(T s)                          : x(s),   y(s),   z(s),   w(s)   {}
+    Vec4(T x, T y, T z, T w)           : x(x),   y(y),   z(z),   w(w)   {}
+    Vec4(const VEC3_T& v, T s = T(0))  : x(v.x), y(v.y), z(v.z), w(s)   {}
+    Vec4(T s, const VEC3_T& v)         : x(s),   y(v.x), z(v.y), w(v.z) {}
 
+    //operator VEC3_T() const { return *((VEC3_T *) &x); }
     const Vec4 operator-() const { return Vec4(-x, -y, -z, -w); }
     
     Vec4& operator+=(const Vec4& v) { x += v.x; y += v.y; z += v.z; w += v.w; return *this; }
@@ -461,14 +463,12 @@ TEMPLATE_TYPENAME_T inline const MAT4_T inverse(MAT4_T const &m) {
     VEC4_T v2(m.m12, m.m02, m.m02, m.m02);
     VEC4_T v3(m.m13, m.m03, m.m03, m.m03);
 
-    VEC4_T i0(v1 * f0 - v2 * f1 + v3 * f2);
-    VEC4_T i1(v0 * f0 - v2 * f3 + v3 * f4);
-    VEC4_T i2(v0 * f1 - v1 * f3 + v3 * f5);
-    VEC4_T i3(v0 * f2 - v1 * f4 + v2 * f5);
+    VEC4_T signV(T(1), T(-1),  T(1), T(-1));
+    MAT4_T inv((v1 * f0 - v2 * f1 + v3 * f2) *  signV,
+               (v0 * f0 - v2 * f3 + v3 * f4) * -signV,
+               (v0 * f1 - v1 * f3 + v3 * f5) *  signV,
+               (v0 * f2 - v1 * f4 + v2 * f5) * -signV);
             
-    VEC4_T signA( 1, -1,  1, -1), signB(-1,  1, -1,  1);
-    MAT4_T inv(i0 * signA, i1 * signB, i2 * signA, i3 * signB);
-
     VEC4_T v0r0(m.v0 * VEC4_T(inv.m00, inv.m10, inv.m20, inv.m30));
     return inv * (T(1) / (v0r0.x + v0r0.y + v0r0.z + v0r0.w)); }// 1/determinant ==> "operator *" is faster
 // external operators
@@ -591,6 +591,30 @@ TEMPLATE_TYPENAME_T inline const MAT4_T frustrum(T l, T r, T b, T t, T n, T f)
     using uvec2 = vgm::Vec2<uint32_t>;
     using uvec3 = vgm::Vec3<uint32_t>;
     using uvec4 = vgm::Vec4<uint32_t>;
+
+#ifdef VGIZMO_USES_HLSL_TYPES // testing phase
+    using float2   = vgm::Vec2<float>;
+    using float3   = vgm::Vec3<float>;
+    using float4   = vgm::Vec4<float>;
+    using quat     = vgm::Quat<float>;
+    using float3x3 = vgm::Mat3<float>;
+    using float4x4 = vgm::Mat4<float>;
+
+    using double2   = vgm::Vec2<double>;
+    using double3   = vgm::Vec3<double>;
+    using double4   = vgm::Vec4<double>;
+    using dquat     = vgm::Quat<double>;
+    using double3x3 = vgm::Mat3<double>;
+    using double4x4 = vgm::Mat4<double>;
+
+    using int2 = vgm::Vec2<int32_t>;
+    using int3 = vgm::Vec3<int32_t>;
+    using int4 = vgm::Vec4<int32_t>;
+
+    using uint2 = vgm::Vec2<uint32_t>;
+    using uint3 = vgm::Vec3<uint32_t>;
+    using uint4 = vgm::Vec4<uint32_t>;
+#endif
 #else
     using vec2 = vgm::Vec2;
     using vec3 = vgm::Vec3;
@@ -600,8 +624,18 @@ TEMPLATE_TYPENAME_T inline const MAT4_T frustrum(T l, T r, T b, T t, T n, T f)
     using mat4 = vgm::Mat4;
     using mat3x3 = mat3;
     using mat4x4 = mat4;
+
+#ifdef VGIZMO_USES_HLSL_TYPES
+    using float2   = vgm::Vec2;
+    using float3   = vgm::Vec3;
+    using float4   = vgm::Vec4;
+    using quat     = vgm::Quat;
+    using float3x3 = vgm::Mat3;
+    using float4x4 = vgm::Mat4;
 #endif
 
+#endif
+// Internal vGizmo USES ONLY
     using tVec2 = vgm::VEC2_PRECISION;
     using tVec3 = vgm::VEC3_PRECISION;
     using tVec4 = vgm::VEC4_PRECISION;
@@ -609,8 +643,8 @@ TEMPLATE_TYPENAME_T inline const MAT4_T frustrum(T l, T r, T b, T t, T n, T f)
     using tMat3 = vgm::MAT3_PRECISION;
     using tMat4 = vgm::MAT4_PRECISION;
 
-    using uint8 = uint8_t;
-    using  int8 =  int8_t;
+    using uint8  = uint8_t;
+    using  int8  =  int8_t;
     using uint   = uint32_t;
     using  int32 =  int32_t;
     using uint32 = uint32_t;
