@@ -49,6 +49,9 @@
 //      change only namespace from "vgm" to "glm". It's automatically set by
 //      including vGizmo.h or vgMath.h or imGuIZMOquat.h
 //
+// note: affects only virtualGizmo3D / imGuIZMO.quat on which library to use
+//      internally: vgMath | glm
+//
 // Default ==> use vgMath
 //      If you enable GLM use, automatically is enabled also VGM_USES_TEMPLATE
 //          if you can, I recommend to use GLM

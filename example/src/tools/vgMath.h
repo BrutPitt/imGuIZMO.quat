@@ -494,11 +494,13 @@ TEMPLATE_TYPENAME_T inline VEC3_T operator*(const QUAT_T& q, const VEC3_T& v) {
     const VEC3_T qV(q.x, q.y, q.z), uv(cross(qV, v));
     return v + ((uv * q.w) + cross(qV, uv)) * T(2); }
 TEMPLATE_TYPENAME_T inline  VEC3_T operator*(const VEC3_T& v, const QUAT_T& q) {  return inverse(q) * v; }
-// translate
+// translate / scale
 //////////////////////////
 TEMPLATE_TYPENAME_T inline const MAT4_T translate(MAT4_T const& m, VEC3_T const& v) {
     MAT4_T r(m); r[3] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3]; 
     return r; }
+TEMPLATE_TYPENAME_T inline const MAT4_T scale(MAT4_T const& m, VEC3_T const& v) {
+    return MAT4_T(m[0] * v[0], m[1] * v[1], m[2] * v[2], m[3]); }
 // quat angle/axis
 //////////////////////////
 TEMPLATE_TYPENAME_T inline QUAT_T angleAxis(T const &a, VEC3_T const &v) {	return QUAT_T(cos(a * T(0.5)), v * sin(a * T(0.5))); }
@@ -558,7 +560,7 @@ TEMPLATE_TYPENAME_T inline const MAT4_T perspective(T fovy, T a, T n, T f)
 TEMPLATE_TYPENAME_T inline const MAT4_T perspectiveFov(T fovy, T w, T h, T n, T f) { return perspective(fovy, w/h, n, f); }
 // frustrum
 //////////////////////////
-TEMPLATE_TYPENAME_T inline const MAT4_T frustrum(T l, T r, T b, T t, T n, T f)
+TEMPLATE_TYPENAME_T inline const MAT4_T frustum(T l, T r, T b, T t, T n, T f)
 {
 #ifdef VGM_USES_LEFT_HAND_AXES
     const T v = T(1),  f_n =  (f+n)/(f-n);
