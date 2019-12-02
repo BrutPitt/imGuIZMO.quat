@@ -3,11 +3,11 @@
 
 With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** &nbsp; &nbsp; *(read below)*
 
-**imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and `vgMath.h` a small vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
+**imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and [**vgMath**](https://github.com/BrutPitt/vgMath) a compact (my *single file header only*) vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
 
 **No other files or external libraries are required**, except [**ImGui**](https://github.com/ocornut/imgui) (of course).
 
-You can use **vgMath** also externally, for your purposes: it contains classes to manipulate **vec**tors (with 2/3/4 components), **quat**ernions, square **mat**ricies (3x3 and 4x4), both as *simple* single precision `float` **classes** (*Default*) or, enabling **template classes** (*simply adding a* `#define`), both as `float` and `double` data types (also `int` and `uint` vec*). It contains also 4 helper functions to define Model/View matrix: **perspective**, **frustrum**, **lookAt**, **ortho**
+You can use [**vgMath**](https://github.com/BrutPitt/vgMath) also externally, for your purposes: it contains classes to manipulate **vec**tors (with 2/3/4 components), **quat**ernions, square **mat**ricies (3x3 and 4x4), both as *simple* single precision `float` **classes** (*Default*) or, enabling **template classes** (*simply adding a* `#define`), both as `float` and `double` data types (also `int` and `uint` vec*). It contains also 4 helper functions to define Model/View matrix: **perspective**, **frustum**, **lookAt**, **ortho**
 
 If need a larger/complete library, as alternative to **vgMath**, is also possible to interface **imGuIZMO.quat** with [**glm** mathematics library](https://github.com/g-truc/glm) (*simply adding a* `#define`)
 
@@ -26,7 +26,7 @@ You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
 
 It works only on browsers with **WebGl 2** and *webAssembly* support (FireFox/Opera/Chrome and Chromium based). Test if your browser supports **WebGL2**, here: [WebGL2 Report](http://webglreport.com/?v=2)
 
-****imGuIZMO.quat** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject: consult the source code for more examples.*
+****imGuIZMO.quat** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** project: consult the source code for more examples.*
 
 ### Mouse buttons and key modifiers
 These are all mouse and keyModifiers controls internally used:
@@ -45,7 +45,7 @@ To use **imGuIZMO.quat** need to include `imGuIZMOquat.h` file in your code.
 ```cpp
 #include "imGuIZMOquat.h"
 ```
-You can think of declaring declare an object of type `quat` (quaternion), global or static or as member of your class, to mantain track of rotations:
+You can think of declaring declare an object of type `quat` (quaternion), global or static or as member of your class, to maintain track of rotations:
 
 ```cpp
 // For imGuIZMO, declare static or global variable or member class quaternion
@@ -149,8 +149,8 @@ IMGUI_API bool gizmo3D(const char*, quat&, vec3&, float=IMGUIZMO_DEF_SIZE, const
 
 <p> &nbsp; </p>
 
-For for more details, more personalizations, or how to change sizes, color, thickness, etc... examine the attached example source code (`uiMainDlg.cpp` file), or again `imGuIZMOquat.h`, `imGuIZMOquat.cpp` files: they are well commented.
-The widget are also used in **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** poroject.
+For for more details, more customizations, or how to change sizes, color, thickness, etc... examine the attached example source code (`uiMainDlg.cpp` file), or again `imGuIZMOquat.h`, `imGuIZMOquat.cpp` files: they are well commented.
+The widget are also used in **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** project.
 
 **If you want use (also) full-screen manipulator, outside **ImGui** widget, look at [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (is its feature)... also in attached example, enabling `#define GLAPP_USE_VIRTUALGIZMO` define in `glWindow.cpp` file*
 
@@ -171,14 +171,14 @@ Instead to change the color of a single widget:
     ImGui::gizmo3D("##Dir1", dir);                             // display widget with changed color
     imguiGizmo::restoreDirectionColor();                       // restore old ArrowDirection color
 ```
-It's like the push/pop mechanism used in **ImGui**, but only that I don't have a stak (for now I don't see the reason): just a single variable where to save the value. The other functions work in the same way.
+It's like the push/pop mechanism used in **ImGui**, but only that I don't have a stack (for now I don't see the reason): just a single variable where to save the value. The other functions work in the same way.
 
 <p>&nbsp;<br></p>
 
 
 ## All widgets visualization
 
-**FOUR** widget types are prvided, (six function calls with different parameters: *quaternion, vec4, vec3* for different uses) each of them personalizable with several graphics options:
+**FOUR** widget types are provided, (six function calls with different parameters: *quaternion, vec4, vec3* for different uses) each of them customizable with several graphics options:
 
 ### Axes mode
 | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/A004.jpg) |
@@ -199,7 +199,7 @@ It's like the push/pop mechanism used in **ImGui**, but only that I don't have a
 
 
 ### And much more...
-Full configurable: Lenght, thickness, dimensions, number of polygon slices, colors and sphere tesselation:
+Full configurable: length, thickness, dimensions, number of polygon slices, colors and sphere tessellation:
 
 | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0005.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/U0007.jpg)| ![alt text](https://raw.githubusercontent.com/BrutPitt/imGuIZMO/master/screenshots/D003.jpg) |
 | :---: | :---: | :---: | :---: | :---: |
@@ -209,12 +209,12 @@ Full configurable: Lenght, thickness, dimensions, number of polygon slices, colo
 
 ## Configure ImGuIZMOquat
 
-**virtalGizmo3D** and **ImGuIZMOquat** use **vgMath** tool, it contains a group of vector/matrices/quaternion classes, operators, and principal functions. It uses the "glsl" convention for types and function names so is compatible with **glm** types and function calls: **vgMath** is a subset of [**glm** mathematics library](https://github.com/g-truc/glm) and so you can use first or upgrade to second via a simple `#define`. However **vgMath** does not want replicate **glm**, is only intended to make **virtalGizmo3D** / **ImGuIZMOquat** standalone, and avoid **template classes** use in the cases of low resources or embedded systems.
+**ImGuIZMOquat** and [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) use [**vgMath**](https://github.com/BrutPitt/vgMath) tool, it contains a group of vector/matrices/quaternion classes, operators, and principal functions. It uses the "glsl" convention for types and function names so is compatible with **glm** types and function calls: [**vgMath**](https://github.com/BrutPitt/vgMath) is a subset of [**glm** mathematics library](https://github.com/g-truc/glm) and so you can use first or upgrade to second via a simple `#define`. However [**vgMath**](https://github.com/BrutPitt/vgMath) does not want replicate **glm**, is only intended to make **virtalGizmo3D** / **ImGuIZMOquat** standalone, and avoid **template classes** use in the cases of low resources or embedded systems.
 
 The file `vgConfig.h` allows to configure internal math used form **ImGuIZMO.quat** and **virtalGizmo3D**. In particular is possible select between:
- - simple **float** classes (*Default*) / temlpate classes 
+ - simple **float** classes (*Default*) / template classes 
  - internal **vgMath** tool (*Default*) / **glm** mathematics library
- - **Right** (*Default*) / **Left** handed coordinate system (*lookAt, perspective, ortho, frustrum - functions*)
+ - **Right** (*Default*) / **Left** handed coordinate system (*lookAt, perspective, ortho, frustum - functions*)
  - Add additional HLSL types name convention
  - **enable** (*Default*) / **disable** the automatic entry of `using namespace vgm;` at end of `vgMath.h` (it influences only your external use of `vgMath.h`)
 
@@ -311,10 +311,10 @@ You need to have [**GLFW**](https://www.glfw.org/) (or [**SDL**](https://libsdl.
 **CMake**
 
 Use the following command-line defines to enable different options:  
-  - `-DUSE_SDL:BOOL=TRUE` to enable **SDL** framwork instead of **GLFW**
+  - `-DUSE_SDL:BOOL=TRUE` to enable **SDL** framework instead of **GLFW**
   - `-DUSE_VIRTUALGIZMO:BOOL=TRUE` to use also (together) [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) to manipulate objects
 
-**this flags are aviables also in CMakeGUI*
+**this flags are available also in CMakeGUI*
 
 To build [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html) example, use batch/script files:
 
@@ -325,7 +325,7 @@ where:
 - `%EMSCRIPTEN%` is your emscripten installation path (e.g. `C:\emsdk\emscripten\1.38.10`)
 - `%BUILD_TYPE%` is build type: `Debug | Release | RelWithDebInfo | MinSizeRel` 
 
-They are located in root example directory, or examine their content to pass appropriate defines/patameters to CMake command line.
+They are located in root example directory, or examine their content to pass appropriate defines/parameters to CMake command line.
 
 **To build with [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html), obviously you need to have installed EMSCRIPTEN SDK on your computer (1.38.10 or higher)*
 

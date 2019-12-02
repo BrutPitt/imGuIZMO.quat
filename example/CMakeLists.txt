@@ -39,8 +39,8 @@ set(SOURCE_FILES
     ${SRC}/tools/imGuIZMOquat.cpp
     ${SRC}/tools/imGuIZMOquat.h
     ${SRC}/tools/vGizmo.h
-    ${SRC}/tools/vGizmoMath.h
-    ${SRC}/tools/vGizmoConfig.h
+    ${SRC}/tools/vgMath.h
+    ${SRC}/tools/vgConfig.h
     ${SRC}/libs/ImGui/imconfig.h
     ${SRC}/libs/ImGui/imgui.h
     ${SRC}/libs/ImGui/imgui.cpp
