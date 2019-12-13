@@ -179,7 +179,7 @@ class mainProgramObj : public ProgramObject
 {
 public:
     mainProgramObj() { createProgram(); } 
-    virtual ~mainProgramObj() { removeAllShaders(true); deleteAllShaders(); }
+    virtual ~mainProgramObj() { removeAllShaders(false); deleteAllShaders(); }
 
     void useVertex(VertexShader *VS) { vertObj = VS; vsCloned = true; }
     void useVertex()   { vertObj = new VertexShader; }
@@ -237,20 +237,21 @@ public:
         if(realDataSize%uBufferMinSize) uBlockSize += uBufferMinSize;
     }
 
-    static GLuint bindIndex(GLuint prog, const char *nameUBlock)
+    static GLuint bindIndex(GLuint prog, const char *nameUBlock, GLuint idx)
     {
         GLuint blockIndex = glGetUniformBlockIndex(prog, nameUBlock);
-        glUniformBlockBinding(prog, blockIndex, bind::bindIdx);
+        glUniformBlockBinding(prog, blockIndex, idx);
 
         return blockIndex;
     }
 
 #ifdef GLAPP_REQUIRE_OGL45
-    void create(GLuint size, void *pData)
+    void create(GLuint size, void *pData, GLuint idx = GLuint(bind::bindIdx)) 
 #else
-    void create(GLuint size, void *pData, GLuint prog, const char *nameUBlock)
+    void create(GLuint size, void *pData, GLuint prog, const char *nameUBlock, GLuint idx = GLuint(bind::bindIdx))
 #endif
     {
+        bindingLocation = idx;
         realDataSize = size;
         ptrData = pData;
 
@@ -262,7 +263,7 @@ public:
         glNamedBufferSubData(uBuffer, 0, realDataSize, ptrData);
 #else
         glGenBuffers(1,    &uBuffer);
-        GLuint blockIndex = bindIndex(prog, nameUBlock);
+        GLuint blockIndex = bindIndex(prog, nameUBlock, bindingLocation);
 //get min size block sending
         GLint minBlockSize;
         glGetActiveUniformBlockiv(prog, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &minBlockSize);
@@ -281,12 +282,13 @@ public:
         glBindBuffer(GL_UNIFORM_BUFFER,uBuffer);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, realDataSize, ptrData); 
 #endif
-        glBindBufferBase(GL_UNIFORM_BUFFER, bind::bindIdx, uBuffer);
+        glBindBufferBase(GL_UNIFORM_BUFFER, bindingLocation, uBuffer);
     }
 
+    enum bind { bindIdx=2 };  //internal binding indel location
 private:
     void *ptrData;
-    enum bind { bindIdx=2 };
+    GLuint bindingLocation;
     GLuint uBuffer;
     GLuint realDataSize, uBlockSize; 
 };
