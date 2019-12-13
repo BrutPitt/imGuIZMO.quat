@@ -31,14 +31,29 @@ class ShaderObject
         ShaderObject() {}
         enum { unassigned, attached, wantDetach, wantDelete };
 
-        virtual ~ShaderObject() {  glDeleteShader(shaderID); } 
+        virtual ~ShaderObject() {  deleteShader(); } 
 
         void Load(const char *name);
         //void Load(int numShaders, ...) { Load(NULL, numShaders, ...); }
         void Load(const char *defines, int numShaders, ...);
         void Compile(const GLchar *code);
 
-        GLuint& getShader();
+        GLuint& getShader() { return(shaderID); }
+
+        void detachShader(GLuint prog, bool wntDelete) {
+            if(getStatus() == ShaderObject::attached) {
+                glDetachShader(prog, getShader());
+                statusWantDetach();
+                if(wntDelete) deleteShader(); 
+            }
+        }
+
+        void deleteShader() {
+            if(getStatus() == ShaderObject::attached || getStatus() == ShaderObject::wantDetach) {
+                glDeleteShader(getShader()); 
+                statusWantDelete();
+            }
+        }
 
         void statusAttached()   { status = attached; }
         void statusWantDetach() { status = wantDetach; }
@@ -89,12 +104,24 @@ inline void CheckErrorsGL( const char* location = NULL,
 
 #if !defined(NDEBUG)
 #define CHECK_GL_ERROR() {\
-    CheckGLError(__FILE__, __LINE__);\
-    GLenum err = glGetError();\
-    if(err!=GL_NO_ERROR) cout << "OpenGL Error:" << err << endl;\
+    static int count=0;\
+    if(count++<5) {\
+        CheckGLError(__FILE__, __LINE__);\
+        GLenum err = glGetError();\
+        if(err!=GL_NO_ERROR) cout << "OpenGL Error:" << err << endl;\
+    }\
+}
+#define CHECK_GL_ERROR_MSG(X) {\
+    static int count=0;\
+    if(count++<5) {\
+        CheckGLError(__FILE__, __LINE__);\
+        GLenum err = glGetError();\
+        if(err!=GL_NO_ERROR) cout << X << " - OpenGL Error:" << err << endl;\
+    }\
 }
 #else
 #define CHECK_GL_ERROR()
+#define CHECK_GL_ERROR_MSG(X)
 #endif
 
 #define FORCE_CHECK_GL_ERROR() {\
