@@ -325,8 +325,8 @@
     <ClInclude Include="..\src\tools\glslProgramObject.h" />
     <ClInclude Include="..\src\tools\glslShaderObject.h" />
     <ClInclude Include="..\src\tools\imGuIZMOquat.h" />
+    <ClInclude Include="..\src\tools\vgConfig.h" />
     <ClInclude Include="..\src\tools\vGizmo.h" />
-    <ClInclude Include="..\src\tools\vGizmoConfig.h" />
     <ClInclude Include="..\src\tools\vGizmoMath.h" />
     <ClInclude Include="..\src\glApp.h" />
     <ClInclude Include="..\src\glWindow.h" />
@@ -337,6 +337,7 @@
     <ClInclude Include="..\src\libs\ImGui\imgui_impl_opengl3.h" />
     <ClInclude Include="..\src\libs\imgui\imgui_internal.h" />
     <ClInclude Include="..\src\qJulia.h" />
+    <ClInclude Include="..\src\tools\vgMath.h" />
     <ClInclude Include="..\src\ui\uiMainDlg.h" />
   </ItemGroup>
   <ItemGroup>

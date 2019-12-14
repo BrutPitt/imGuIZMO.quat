@@ -125,10 +125,13 @@
     <ClInclude Include="..\src\tools\imGuIZMOquat.h">
       <Filter>Tools\imguiTools</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\tools\vGizmoConfig.h">
+    <ClInclude Include="..\src\tools\vGizmoMath.h">
       <Filter>Tools</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\tools\vGizmoMath.h">
+    <ClInclude Include="..\src\tools\vgConfig.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tools\vgMath.h">
       <Filter>Tools</Filter>
     </ClInclude>
   </ItemGroup>
