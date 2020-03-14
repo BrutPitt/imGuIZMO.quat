@@ -148,7 +148,6 @@ else()
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${M_GLOBAL_FLAGS} ${M_CXX_FLAGS}")
 
-#   find_package(glfw3 REQUIRED)
 
 
     if(USE_SDL)
@@ -158,6 +157,13 @@ else()
             target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} SDL2 dl)
         endif()
     else()
-        target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} glfw dl)
+        if(WIN32)
+            find_package(glfw3 REQUIRED)
+            target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} glfw)
+        else()            
+            #find_package(glfw3 REQUIRED)
+            target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} glfw dl)
+        endif()
     endif()
+
 endif ()
