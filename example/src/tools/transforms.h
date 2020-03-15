@@ -112,12 +112,12 @@ public:
         tM.invMV = inverse(tM.mvMatrix);
     }
     void buid_invP() {
-        tM.invP = inverse(tM.pMatrix);  //BUGLIGHT
+        tM.invP = inverse(tM.pMatrix);
     }
 
     void setModelMatrix(const mat4& m) { tM.mMatrix = m; }
     void setViewMatrix (const mat4& m) { tM.vMatrix = m; }
-    void setProjMatrix (const mat4& m) { tM.pMatrix = m; buid_invP(); }
+    void setProjMatrix (const mat4& m) { tM.pMatrix = m; }
 
     mat4& getModelMatrix() { return tM.mMatrix; }
     mat4& getViewMatrix () { return tM.vMatrix; }

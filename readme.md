@@ -1,4 +1,4 @@
-# imGuIZMO.quat &nbsp;v2.1
+# imGuIZMO.quat &nbsp;v2.1.3
 **imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse, and graphically visualize their position in space, also around any single axis (*Shift/Ctrl/Alt/Super*). It uses **quaternions** algebra, internally, to manage rotations, but offers the possibility also to interfacing with **vec3**, **vec4** or **mat4x4** (rotation)
 
 With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** &nbsp; &nbsp; *(read below)*
@@ -314,7 +314,7 @@ Use the following command-line defines to enable different options:
   - `-DUSE_SDL:BOOL=TRUE` to enable **SDL** framework instead of **GLFW**
   - `-DUSE_VIRTUALGIZMO:BOOL=TRUE` to use also (together) [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) to manipulate objects
 
-**this flags are available also in CMakeGUI*
+**these flags are available also in CMakeGUI*
 
 To build [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html) example, use batch/script files:
 
