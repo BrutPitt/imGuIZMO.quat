@@ -298,7 +298,6 @@ You can do this simply by commenting / uncommenting a line in `vgConfig.h` or ad
 
 <p>&nbsp;<br></p>
 
-
 ### Building Example
 
 The source code example shown in the animated gif screenshot, is provided.
