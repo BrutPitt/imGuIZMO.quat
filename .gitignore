@@ -12,6 +12,7 @@
 /example/Shaders/QJset_frag2.glsl
 /example/src/libs/gl3w/
 /example/src/libs/glfw/
+/example/src/libs/glm/
 /example/src/tools/fastRandom.cpp
 /example/src/tools/fastRandom.h
 /example/src/tools/imguiControls.cpp
