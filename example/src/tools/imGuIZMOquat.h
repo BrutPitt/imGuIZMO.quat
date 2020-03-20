@@ -13,10 +13,15 @@
 #pragma once
 #include <algorithm>
 
-
-#include <ImGui/imgui.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
-#include <ImGui/imgui_internal.h>
+
+#ifdef IMGUIZMO_USE_ImGui_FOLDER
+    #include <ImGui/imgui.h>
+    #include <ImGui/imgui_internal.h>
+#else
+    #include <imgui/imgui.h>
+    #include <imgui/imgui_internal.h>
+#endif
 
 #include <vGizmo.h>
 

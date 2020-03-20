@@ -8,10 +8,11 @@ set(BUILD_EMSCRIPTEN FALSE CACHE BOOL FALSE)
 set(USE_SDL FALSE CACHE BOOL FALSE)
 set(USE_VIRTUALGIZMO FALSE CACHE BOOL FALSE)
 
+set(IMGUI_DIR imgui)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(M_GLOBAL_FLAGS "-DGLM_ENABLE_EXPERIMENTAL -fpermissive")
+set(M_GLOBAL_FLAGS "-DIMGUI_DIR -DGLM_ENABLE_EXPERIMENTAL -fpermissive")
 
 if(USE_VIRTUALGIZMO)
     set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DGLAPP_USE_VIRTUALGIZMO")
@@ -39,18 +40,18 @@ set(SOURCE_FILES
     ${SRC}/tools/vGizmo.h
     ${SRC}/tools/vgMath.h
     ${SRC}/tools/vgConfig.h
-    ${SRC}/libs/ImGui/imconfig.h
-    ${SRC}/libs/ImGui/imgui.h
-    ${SRC}/libs/ImGui/imgui.cpp
-    ${SRC}/libs/ImGui/imgui_widgets.cpp
-    ${SRC}/libs/ImGui/imgui_draw.cpp
-    ${SRC}/libs/ImGui/imgui_demo.cpp
-    ${SRC}/libs/ImGui/imgui_impl_opengl3.cpp
-    ${SRC}/libs/ImGui/imgui_impl_opengl3.h
-    ${SRC}/libs/ImGui/imgui_internal.h
-    ${SRC}/libs/ImGui/imstb_rectpack.h
-    ${SRC}/libs/ImGui/imstb_textedit.h
-    ${SRC}/libs/ImGui/imstb_truetype.h)
+    ${SRC}/libs/${IMGUI_DIR}/imconfig.h
+    ${SRC}/libs/${IMGUI_DIR}/imgui.h
+    ${SRC}/libs/${IMGUI_DIR}/imgui.cpp
+    ${SRC}/libs/${IMGUI_DIR}/imgui_widgets.cpp
+    ${SRC}/libs/${IMGUI_DIR}/imgui_draw.cpp
+    ${SRC}/libs/${IMGUI_DIR}/imgui_demo.cpp
+    ${SRC}/libs/${IMGUI_DIR}/imgui_impl_opengl3.cpp
+    ${SRC}/libs/${IMGUI_DIR}/imgui_impl_opengl3.h
+    ${SRC}/libs/${IMGUI_DIR}/imgui_internal.h
+    ${SRC}/libs/${IMGUI_DIR}/imstb_rectpack.h
+    ${SRC}/libs/${IMGUI_DIR}/imstb_textedit.h
+    ${SRC}/libs/${IMGUI_DIR}/imstb_truetype.h)
 
 # additional INCLUDE directories
 include_directories(${SRC})
@@ -65,8 +66,8 @@ if (${BUILD_EMSCRIPTEN})
     project(wgl_qjSet)
 
     add_executable(${PROJECT_NAME} ${SOURCE_FILES}
-        ${SRC}/libs/ImGui/imgui_impl_glfw.cpp
-        ${SRC}/libs/ImGui/imgui_impl_glfw.h)
+        ${SRC}/libs/${IMGUI_DIR}/imgui_impl_glfw.cpp
+        ${SRC}/libs/${IMGUI_DIR}/imgui_impl_glfw.h)
 
     set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DIMGUI_IMPL_OPENGL_ES3 -DGLFW_INCLUDE_NONE -DGLAPP_NO_OGL_DSA -DGLFW_INCLUDE_ES3")
 #    set(CMAKE_C_COMPILER "emcc")
@@ -132,14 +133,14 @@ else()
     if(USE_SDL)
         add_executable(${PROJECT_NAME} ${SOURCE_FILES} 
             ${SRC}/libs/glad/glad.cpp
-            ${SRC}/libs/ImGui/imgui_impl_sdl.cpp
-            ${SRC}/libs/ImGui/imgui_impl_sdl.h)
+            ${SRC}/libs/${IMGUI_DIR}/imgui_impl_sdl.cpp
+            ${SRC}/libs/${IMGUI_DIR}/imgui_impl_sdl.h)
         set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DGLAPP_USE_SDL")
     else()    
         add_executable(${PROJECT_NAME} ${SOURCE_FILES} 
             ${SRC}/libs/glad/glad.cpp
-            ${SRC}/libs/ImGui/imgui_impl_glfw.cpp
-            ${SRC}/libs/ImGui/imgui_impl_glfw.h)
+            ${SRC}/libs/${IMGUI_DIR}/imgui_impl_glfw.cpp
+            ${SRC}/libs/${IMGUI_DIR}/imgui_impl_glfw.h)
     endif(USE_SDL)    
     
     set(M_CXX_FLAGS "-DAPP_REQUIRE_OGL45")
