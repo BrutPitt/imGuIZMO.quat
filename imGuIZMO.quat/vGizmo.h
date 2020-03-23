@@ -246,7 +246,7 @@ public:
         update();
     }
 
-    //  return current transformatin as 4x4 matrix.
+    //  return current transformations as 4x4 matrix.
     ////////////////////////////////////////////////////////////////////////////
     virtual tMat4 getTransform() = 0;
     ////////////////////////////////////////////////////////////////////////////
@@ -320,7 +320,7 @@ public:
 
     //  Set the speed for the virtualGizmo.
     //////////////////////////////////////////////////////////////////
-    void setGizmoScale( T scale) { scale = scale; }
+    //void setGizmoScale( T scale) { scale = scale; }
 
     // get the rotation quaternion
     tQuat &getRotation() { return this->qtV; }
@@ -504,8 +504,10 @@ private:
         using vGizmo3D = virtualGizmo3DClass<float>;
     #endif
     using vImGuIZMO = virtualGizmoClass<float>;
+    using vImGuIZMO3D = virtualGizmo3DClass<float>;
 #else
     using vImGuIZMO = virtualGizmoClass;
+    using vImGuIZMO3D = virtualGizmo3DClass;
 
     using vGizmo    = virtualGizmoClass;
     using vGizmo3D  = virtualGizmo3DClass;

@@ -376,7 +376,10 @@ void mainImGuiDlgClass::renderImGui()
             static quat qv1(1.0f,0,0,0);
             static quat qv2(1.0f,0,0,0);
 
-            ImGui::SetCursorPos(ImVec2(0,dimY-ImGui::GetFrameHeightWithSpacing()));
+            ImGui::SetCursorPos(ImVec2(0,dimY-ImGui::GetFrameHeightWithSpacing()*2));
+
+            static float mouseFeeling = imguiGizmo::getGizmoFeelingRot(); // default 1.0
+            if(ImGui::SliderFloat("##MouseFeeling", &mouseFeeling, .25, 2.0, "mouse feelRot %.2f")) imguiGizmo::setGizmoFeelingRot(mouseFeeling);
 
             if(ImGui::Button(" -= Change solids attributes =- ")) vertexChange ^=1;
 

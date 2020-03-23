@@ -72,19 +72,20 @@ struct imguiGizmo
     quat qtV  = quat(1.0f, vec3(0.0f)); // Quaternion value
     quat qtV2 = quat(1.0f, vec3(0.0f)); // Quaternion value
 
-    enum      {                            //0b0000'0000, //C++14 notation
-                mode3Axes          = 0x01, //0b0000'0001, 
-                modeDirection      = 0x02, //0b0000'0010,
-                modeDirPlane       = 0x04, //0b0000'0010,
-                modeDual           = 0x08, //0b0000'1000,
-                modeMask           = 0x0f, //0b0000'1111,
+    enum      {                              //0b0000'0000, //C++14 notation
+                mode3Axes          = 0x0001, //0b0000'0001, 
+                modeDirection      = 0x0002, //0b0000'0010,
+                modeDirPlane       = 0x0004, //0b0000'0100,
+                modeDual           = 0x0008, //0b0000'1000,
+                modePanDolly       = 0x0010, //0b0001'0000,
+                modeMask           = 0x00ff, 
                 
 
-                cubeAtOrigin       = 0x10, //0b0000'0000, 
-                sphereAtOrigin     = 0x20, //0b0001'0000,
-                noSolidAtOrigin    = 0x40, //0b0010'0000,
-                modeFullAxes       = 0x80,
-                axesModeMask       = 0xf0  //0b1111'0000
+                cubeAtOrigin       = 0x0100, //0b0000'0000, 
+                sphereAtOrigin     = 0x0200, //0b0001'0000,
+                noSolidAtOrigin    = 0x0400, //0b0010'0000,
+                modeFullAxes       = 0x0800,
+                axesModeMask       = 0xff00  
     };
 
     enum { sphereTess16, sphereTess8, sphereTess4, sphereTess2 };
@@ -145,6 +146,9 @@ struct imguiGizmo
         sphereColors[0] = a; sphereColors[1] = b; }
     static void restoreSphereColors() {
         sphereColors[0] = savedSphereColors[0]; sphereColors[1] = savedSphereColors[1]; }
+
+    static void setGizmoFeelingRot(float f) { gizmoFeelingRot = f; }
+    static float getGizmoFeelingRot() { return gizmoFeelingRot; }
 
 
     //
@@ -270,6 +274,11 @@ struct imguiGizmo
 
     static ImVec4 planeColor;
     static ImVec4 savedPlaneColor;
+
+    // Gizmo mouse settings
+    ///////////////////////////////////////
+    static float gizmoFeelingRot; // >1 more mouse sensibility, <1 less mouse sensibility
+
 
     static const int imguiGizmoDefaultSize;
 };

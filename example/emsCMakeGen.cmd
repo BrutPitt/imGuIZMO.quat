@@ -70,7 +70,7 @@ echo.
 echo.
 echo. Start mingw32-make... 
 echo.
-mingw32-make -j 8 wgl_qjSet
+mingw32-make -j wgl_qjSet
 echo.
 echo.
 

@@ -91,6 +91,12 @@ ImU32 imguiGizmo::sphereColors[2] = { 0xff401010, 0xffc0a0a0 }; // Tessellation 
 ImU32 imguiGizmo::savedSphereColors[2]  = { 0xff401010, 0xffc0a0a0 }; 
 //ImU32 spherecolorA=0xff005cc0, spherecolorB=0xffc05c00;
 
+// Gizmo mouse settings
+///////////////////////////////////////
+float imguiGizmo::gizmoFeelingRot = 1.f; // >1 more mouse sensibility, <1 less mouse sensibility
+
+
+
 //
 //  for all gizmo3D
 //
@@ -350,6 +356,14 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     bool highlighted = false;
     ImGui::InvisibleButton("imguiGizmo", innerSize);
 
+    bool vgModsActive = false;
+    vgModifiers vgMods = vg::evNoModifier;
+
+    if(io.KeyCtrl)  { vgMods |= vg::evControlModifier; vgModsActive = true; }
+    if(io.KeyAlt)   { vgMods |= vg::evAltModifier;     vgModsActive = true; }
+    if(io.KeyShift) { vgMods |= vg::evShiftModifier;   vgModsActive = true; }
+    if(io.KeySuper) { vgMods |= vg::evSuperModifier;   vgModsActive = true; }
+
     ////////////////////////////////////////////////////////////////////////////
     //  trackball control (virtualGizmo.h)
     //      Only this 2 lambdas
@@ -359,7 +373,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     auto setTrackball = [&] (vg::vImGuIZMO &track, quat &q) {
         track.viewportSize(innerSize.x, innerSize.y);
         track.setRotation(q);
-        track.setGizmoScale(squareSize/std::max(io.DisplaySize.x,io.DisplaySize.y));
+        track.setGizmoFeeling(gizmoFeelingRot);
     };
 
     //  getTrackball
@@ -371,12 +385,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
             setTrackball(track, q);    
             
             ImVec2 mouse = ImGui::GetMousePos() - controlPos;
-            vgModifiers mod  = (io.KeyCtrl) ?  vg::evControlModifier : vg::evNoModifier;
-                        if(io.KeyAlt)   mod |= vg::evAltModifier;
-                        if(io.KeyShift) mod |= vg::evShiftModifier;
-                        if(io.KeySuper) mod |= vg::evSuperModifier;
-
-            track.motionImmediateMode(mouse.x, mouse.y, io.MouseDelta.x, io.MouseDelta.y, mod);
+            track.motionImmediateMode(mouse.x, mouse.y, io.MouseDelta.x, io.MouseDelta.y, vgMods);
             q = track.getRotation();
             value_changed = true;
     };
@@ -407,13 +416,13 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
     quat _q(normalize(qtV)); 
 
-    ////////////////////////////////////////////////////////////////////////////
     //  Just a "few" lambdas... 
-
     //////////////////////////////////////////////////////////////////
     auto normalizeToControlSize = [&] (float x, float y) {
         return controlPos + ImVec2(x,-y) * halfSquareSize + ImVec2(halfSquareSize,halfSquareSize); //drawing from 0,0 .. no borders
     };
+
+    auto returnSizeFromRatio = [&] (float ratio) { return squareSize * ratio; };
 
     //////////////////////////////////////////////////////////////////
     auto addTriangle = [&] ()
@@ -588,18 +597,61 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         drawAxes(frontSide);  
     };
 
+    //////////////////////////////////////////////////////////////////
+    auto drawRotationHelper = [&] ()
+    {
+        if(vgModsActive && (ImGui::IsItemHovered() && (!ImGui::IsMouseDown(0) && !ImGui::IsMouseDown(1)) )) {
+            const ImVec2 center(normalizeToControlSize(-.85, -.85));
+            const float radius = returnSizeFromRatio(.05);
+            const int nSegments = 12;
+            const ImU32 color = (vgMods & vg::evShiftModifier)   ? 0xff0000ff : 
+                                (vgMods & vg::evControlModifier) ? 0xff00ff00 : 0xffff0000;
+
+            if(squareSize<100) { // if too small filled circle
+                draw_list->AddCircleFilled(center, radius, color, nSegments);
+            } else { // draw arc
+                const float thickness = squareSize/100.f;  
+                const float a_max = (IM_PI * 1.5f) * ((float)nSegments) / (float)nSegments;
+                draw_list->PathClear();
+                draw_list->PathArcTo(center, radius - 0.5f, 0.0f, a_max, nSegments);
+                draw_list->PathStroke(color, false, thickness);
+                if(squareSize>150) { // if big enough draw also arrowhead
+                    const float lenLine = radius*.33f;
+                    const float thickRadius = radius - thickness*.5;
+                    draw_list->AddTriangleFilled(ImVec2(center.x-lenLine, center.y-(thickRadius+lenLine)),
+                                                 ImVec2(center.x+lenLine, center.y- thickRadius),
+                                                 ImVec2(center.x-lenLine, center.y-(thickRadius-lenLine)),
+                                            color);
+
+                    draw_list->AddTriangleFilled(ImVec2(center.x+(thickRadius-lenLine), center.y+lenLine),
+                                                 ImVec2(center.x+ thickRadius         , center.y-lenLine),
+                                                 ImVec2(center.x+(thickRadius+lenLine), center.y+lenLine),
+                                            color);
+                }
+
+            }
+        }
+    };
+
+
     //  ... and now..  draw the widget!!!
     ///////////////////////////////////////
-    if(drawMode & (modeDirection | modeDirPlane)) dirArrow(_q, drawMode);
-    else { // draw arrows & solid
-        if(drawMode == modeDual) {
-            vec3 spot(qtV2 * vec3(-1.0f, 0.0f, .0f)); // versus opposite
-            if(spot.z>0) { draw3DSystem(); spotArrow(normalize(qtV2),spot.z); }
-            else         { spotArrow(normalize(qtV2),spot.z); draw3DSystem(); }
-        } else draw3DSystem();
-    }
+    if((drawMode & modePanDolly) && (ImGui::IsItemHovered() || ImGui::IsMouseDragging(0))) {
 
-    draw_list->PopClipRect();
+    } else {
+        if(drawMode & (modeDirection | modeDirPlane)) dirArrow(_q, drawMode);
+        else { // draw arrows & solid
+            if(drawMode == modeDual) {
+                vec3 spot(qtV2 * vec3(-1.0f, 0.0f, .0f)); // versus opposite
+                if(spot.z>0) { draw3DSystem(); spotArrow(normalize(qtV2),spot.z); }
+                else         { spotArrow(normalize(qtV2),spot.z); draw3DSystem(); }
+            } else draw3DSystem();
+        }
+
+        drawRotationHelper();
+
+        draw_list->PopClipRect();
+    }
 
     ImGui::EndGroup();
     ImGui::PopID();

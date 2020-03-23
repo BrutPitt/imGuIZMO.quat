@@ -69,7 +69,7 @@ if (${BUILD_EMSCRIPTEN})
         ${SRC}/libs/${IMGUI_DIR}/imgui_impl_glfw.cpp
         ${SRC}/libs/${IMGUI_DIR}/imgui_impl_glfw.h)
 
-    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DIMGUI_IMPL_OPENGL_ES3 -DGLFW_INCLUDE_NONE -DGLAPP_NO_OGL_DSA -DGLFW_INCLUDE_ES3")
+    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DGLAPP_NO_GLSL_PIPELINE -DIMGUI_IMPL_OPENGL_ES3 -DGLFW_INCLUDE_NONE -DGLAPP_NO_OGL_DSA -DGLFW_INCLUDE_ES3")
 #    set(CMAKE_C_COMPILER "emcc")
 #    set(CMAKE_CXX_COMPILER "emcc")
 
@@ -97,7 +97,7 @@ if (${BUILD_EMSCRIPTEN})
         else()
             if(${CMAKE_BUILD_TYPE} MATCHES "MinSizeRel")
                 # one file no memory option: -s SINGLE_FILE=1 --memory-init-file 0 
-                set(M_EMCC_BINARYEN "-s WASM=1 -s SINGLE_FILE=1 --memory-init-file 0 -s \"BINARYEN_METHOD='native-wasm'\" ")
+                set(M_EMCC_BINARYEN "-s WASM=1 -s SINGLE_FILE=1 --memory-init-file 0")
                 set(M_EMCC_SHELL_FILE "--shell-file \"${SRC}/mVeryMinimal.html\"")
             else() # Release 
                 # -s SINGLE_FILE=1 --memory-init-file 0 -s \"BINARYEN_METHOD='interpret-asm2wasm'\"
@@ -115,7 +115,7 @@ if (${BUILD_EMSCRIPTEN})
 
 # merge all EMCC_OPTIONS
 #    set(M_EMCC_OPTIONS "-s \"BINARYEN_TRAP_MODE='clamp'\" ${M_EMCC_SHELL_FILE} ${M_EMCC_OGL_OPTIONS} ${M_EMCC_BINARYEN} ${M_EMCC_EMBED_FILES}")
-    set(M_EMCC_OPTIONS "-s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 -s ALLOW_MEMORY_GROWTH=1 -s BINARYEN_TRAP_MODE=clamp -s PRECISE_F32=1 ${M_EMCC_SHELL_FILE} ${M_EMCC_OGL_OPTIONS} ${M_EMCC_BINARYEN} ${M_EMCC_EMBED_FILES}")
+    set(M_EMCC_OPTIONS "-s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 -s ALLOW_MEMORY_GROWTH=1 -s PRECISE_F32=1 ${M_EMCC_SHELL_FILE} ${M_EMCC_OGL_OPTIONS} ${M_EMCC_BINARYEN} ${M_EMCC_EMBED_FILES}")
 
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/${EMSOUT}")
     set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}/${EMSOUT}")
