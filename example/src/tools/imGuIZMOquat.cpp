@@ -345,9 +345,8 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
     bool value_changed = false;
 
-    if(label[0]!='#' && label[1]!='#') ImGui::Text("%s", label);
-
     ImVec2 controlPos = ImGui::GetCursorScreenPos();
+    if(label[0]!='#' && label[1]!='#') ImGui::Text("%s", label);
 
     const float squareSize = size; //std::min(ImGui::CalcItemWidth(), size);
     const float halfSquareSize = squareSize*.5;
