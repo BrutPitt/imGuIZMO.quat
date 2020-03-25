@@ -346,7 +346,6 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     bool value_changed = false;
 
     ImVec2 controlPos = ImGui::GetCursorScreenPos();
-    if(label[0]!='#' && label[1]!='#') ImGui::Text("%s", label);
 
     const float squareSize = size; //std::min(ImGui::CalcItemWidth(), size);
     const float halfSquareSize = squareSize*.5;
@@ -635,22 +634,21 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
     //  ... and now..  draw the widget!!!
     ///////////////////////////////////////
-    if((drawMode & modePanDolly) && (ImGui::IsItemHovered() || ImGui::IsMouseDragging(0))) {
-
-    } else {
-        if(drawMode & (modeDirection | modeDirPlane)) dirArrow(_q, drawMode);
-        else { // draw arrows & solid
-            if(drawMode == modeDual) {
-                vec3 spot(qtV2 * vec3(-1.0f, 0.0f, .0f)); // versus opposite
-                if(spot.z>0) { draw3DSystem(); spotArrow(normalize(qtV2),spot.z); }
-                else         { spotArrow(normalize(qtV2),spot.z); draw3DSystem(); }
-            } else draw3DSystem();
-        }
-
-        drawRotationHelper();
-
-        draw_list->PopClipRect();
+    if(drawMode & (modeDirection | modeDirPlane)) dirArrow(_q, drawMode);
+    else { // draw arrows & solid
+        if(drawMode == modeDual) {
+            vec3 spot(qtV2 * vec3(-1.0f, 0.0f, .0f)); // versus opposite
+            if(spot.z>0) { draw3DSystem(); spotArrow(normalize(qtV2),spot.z); }
+            else         { spotArrow(normalize(qtV2),spot.z); draw3DSystem(); }
+        } else draw3DSystem();
     }
+
+    drawRotationHelper();
+
+    ImGui::SetCursorScreenPos(controlPos);
+    if(label[0]!='#' && label[1]!='#') ImGui::Text("%s", label);
+
+    draw_list->PopClipRect();
 
     ImGui::EndGroup();
     ImGui::PopID();
