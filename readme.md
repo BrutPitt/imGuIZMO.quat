@@ -28,7 +28,7 @@ You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
 
 It works only on browsers with **WebGl 2** and *webAssembly* support (FireFox/Opera/Chrome and Chromium based). Test if your browser supports **WebGL2**, here: [WebGL2 Report](http://webglreport.com/?v=2)
 
-****imGuIZMO.quat** was originally developed (still used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** project: consult the source code for more examples.*
+****imGuIZMO.quat** was originally developed (currently used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** project: consult the source code for more examples.*
 
 ### Mouse buttons and key modifiers
 These are all mouse and keyModifiers controls internally used:
@@ -204,7 +204,7 @@ IMGUI_API bool gizmo3D(const char*, quat&, vec4&, float=IMGUIZMO_DEF_SIZE, const
 IMGUI_API bool gizmo3D(const char*, quat&, vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 ```
 
-from v.3.0 have been added other calls that pass/return Pan-Dolly (x,y,z) position: same as above, but with vec3 (Pan/Dolly position) as second parameter:
+from v.3.0 have been added other calls that pass/return **Pan/Dolly** (x,y,z) position: same as above, but with `vec3` (Pan/Dolly position) as second parameter:
 ```cpp
 //with Pan & Dolly feature
 IMGUI_API bool gizmo3D(const char*, vec3&, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);

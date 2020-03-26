@@ -484,9 +484,9 @@ public:
     bool isPanActive() { return panActive; }
 
     void motionImmediateMode( T x, T y, T dx, T dy,  vgModifiers mod) {
-        tbActive = true;
-        delta.x = dx; delta.y = -dy;
-        pos.x = x;   pos.y = y;
+        this->tbActive = true;
+        this->delta.x = dx; this->delta.y = -dy;
+        this->pos.x = x;   this->pos.y = y;
         if (dollyControlModifiers & mod) dollyActive = true;
         else if (panControlModifiers & mod) panActive = true;
 
