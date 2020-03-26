@@ -99,7 +99,7 @@
 //#define VGM_USES_HLSL_TYPES 
 
 //------------------------------------------------------------------------------
-// imGuiZmo.quat - v2.5 and later - (used only inside it)
+// imGuiZmo.quat - v3.0 and later - (used only inside it)
 //
 //      Used to add Pan & Dolly feature to imGuIZMO.quat widget
 //          It uses virtualGizmo3DClass just a little bit complex of

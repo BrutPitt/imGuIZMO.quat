@@ -1,6 +1,8 @@
 # imGuIZMO.quat &nbsp;v3.0
 **imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse, and graphically visualize their position in space, also around any single axis (*Shift/Ctrl/Alt/Super*). It uses **quaternions** algebra, internally, to manage rotations, but offers the possibility also to interfacing with **vec3**, **vec4** or **mat4x4** (rotation)
 
+- Since v3.0 you can also **move/zoom** objects via new **Pan** & **Dolly** features
+
 With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** &nbsp; &nbsp; *(read below)*
 
 **imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and [**vgMath**](https://github.com/BrutPitt/vgMath) a compact (my *single file header only*) vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
@@ -17,8 +19,8 @@ If need a larger/complete library, as alternative to **vgMath**, is also possibl
 ### Live WebGL2 demo
 
 You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
-- [**imGuIZMO.quat** ImGui widget + 3D (dolly/zoom) screen manipulator](https://brutpitt.github.io/myRepoImages/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
-- [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/myRepoImages/imGuIZMO/example/WebGL/wgl_qjSet.html)
+- [**imGuIZMO.quat** ImGui widget + 3D Pan/Dolly (move/zoom) screen manipulator](https://brutpitt.github.io/myRepoImages/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
+- [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/myRepoImages/imGuIZMO/example/WebGL/wgl_qjSet.html), now with 3D Pan/Dolly (move/zoom) features - **since v3.0*
 
 <p align="center"><a href="https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/wgl_qjSetVG.html"> 
 <img src="https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/imGuIZMO.gif"></a>
@@ -39,7 +41,7 @@ Based on the type of widget it can do
   - **leftButton**+**SHIFT** & drag -> rotation around X
   - **leftButton**+**CTRL** & drag -> rotation around Y
   - **leftButton**+**ALT**|**SUPER** & drag -> rotation around Z
-- **Pan & Dolly** (move / zoom)  
+- **Pan & Dolly** (move / zoom)  - **since v3.0*
   - **Shft+btn** -> Dolly/Zoom
   - **Wheel** -> Dolly/Zoom
   - **Ctrl+btn** -> Pan/Move
@@ -169,7 +171,7 @@ In your render function (or where you prefer) you can get back the transformatio
 ```
 ### Added since version 3.0
 
-To each of the functions listed above was added a vec3 parameter, as second parameter, to get the object movement (Pan/Dolly), so the **Axes mode** function becomes:
+To each of the functions listed above was added a `vec3` parameter, as second parameter, to get the object movement: **Pan/Dolly**, so the **Axes mode** function becomes:
 
 **Axes mode + Pan/Dolly:**
 ```cpp
@@ -191,7 +193,7 @@ To each of the functions listed above was added a vec3 parameter, as second para
 
 
 ### **Prototypes** 
-All possible widget calls:
+All possible widget calls (rotations only):
 ```cpp
 IMGUI_API bool gizmo3D(const char*, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
 IMGUI_API bool gizmo3D(const char*, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
@@ -306,6 +308,15 @@ Full configurable: length, thickness, dimensions, number of polygon slices, colo
 | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/D002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0005.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/D001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0007.jpg)| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/D003.jpg) |
 | :---: | :---: | :---: | :---: | :---: |
 
+### Helper on specific feature
+Now, when the mouse is hovered and the modifier key is pressed, a graphic helper is displayed to identify the relative functionality  currently set:
+
+| rotation around X | rotation around Y | rotation around Z | Pan / move | Dolly / zoom |
+| :---: | :---: | :---: | :---: | :---: |
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/rotX.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/rotY.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/rotZ.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/Pan.jpg)| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/Dolly.jpg) |
+
+
+
 <p>&nbsp;<br>&nbsp;<br></p>
 
 
@@ -364,7 +375,7 @@ You can do this simply by commenting / uncommenting a line in `vgConfig.h` or ad
 //------------------------------------------------------------------------------
 //#define VGM_USES_LEFT_HAND_AXES
 ```
-**From v.2.1**
+**Since v.2.1**
 ```cpp
 // uncomment to avoid vgMath.h add folow line code:
 //      using namespace vgm | glm; // if (!VGIZMO_USES_GLM | VGIZMO_USES_GLM)
@@ -395,6 +406,23 @@ You can do this simply by commenting / uncommenting a line in `vgConfig.h` or ad
 //------------------------------------------------------------------------------
 //#define VGM_USES_HLSL_TYPES 
 ```
+
+**Since v.3.0**
+```cpp
+//------------------------------------------------------------------------------
+// imGuiZmo.quat - v3.0 and later - (used only inside it)
+//
+//      Used to add Pan & Dolly feature to imGuIZMO.quat widget
+//          It uses virtualGizmo3DClass just a little bit complex of
+//          virtualGizmoClass. 
+//          Comment for very low resources ==> Pan & Dolly will be disabled
+//
+// Default (uncommented) ==> Pan & Dolly enabled 
+//------------------------------------------------------------------------------
+#define IGQ_USE_FULL_3D
+```
+
+
 - *If your project grows you can upgrade/pass to **glm**, in any moment*
 - *My [**glChAoS.P**](https://github.com/BrutPitt/glChAoS.P) project can switch from internal **vgMath** (`VGIZMO_USES_TEMPLATE`) to **glm** (`VGIZMO_USES_GLM`), and vice versa, only changing defines: you can examine it as example*
 
