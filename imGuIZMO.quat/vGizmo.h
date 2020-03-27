@@ -489,10 +489,8 @@ public:
         this->pos.x = x;   this->pos.y = y;
         if (dollyControlModifiers & mod) dollyActive = true;
         else if (panControlModifiers & mod) panActive = true;
-
         update();
     }
-
 
 private:
     // UI commands that this virtualGizmo responds to (defaults to left mouse button with no modifier key)

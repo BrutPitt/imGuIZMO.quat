@@ -46,7 +46,7 @@ Based on the type of widget it can do
   - **Wheel** -> Dolly/Zoom
   - **Ctrl+btn** -> Pan/Move
 
-**you can change default key modifier for Pan/Dolly movements*
+**you can change default key modifier for Pan/Dolly movements, read below*
 
 <p><br></p>
 
