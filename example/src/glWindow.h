@@ -15,6 +15,9 @@
 #include "glApp.h"
 #include <vGizmo.h>
 
+//#define GLAPP_USE_VIRTUALGIZMO
+
+
 /*
 ///////////////////////////////////////////
 //Data Init for 32/64 bit systems

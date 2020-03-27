@@ -100,6 +100,7 @@ public:
     bool useAO        = false;
 
     mat3 matOrientation = mat3(1.0f);
+    vec3 position = vec3(0.f);
 
     vaoClass vao;
 
@@ -115,6 +116,7 @@ GLuint  _Resolution         ,
         _useAO              ,
         _matOrientation     ,
         _Light              ,
+        _position           ,
         _epsilon            ;
 
 };

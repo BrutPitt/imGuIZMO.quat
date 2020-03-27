@@ -20,25 +20,30 @@
 ///////////////////////////////////////////////////////////////////////////////
 // if you want use also the virtualGizmo3D, screen manipulator, uncomment this:
 
-//#define GLAPP_USE_VIRTUALGIZMO
 
 // Global variable or member class
-#ifdef GLAPP_USE_VIRTUALGIZMO
+#ifdef GLAPP_USE_VIRTUALGIZMO // Enable it in glWindows.h or with compiler define
     
     vg::vGizmo3D gizmo; 
     vg::vGizmo3D &getGizmo() { return gizmo; }
 
     void setRotation(const quat &q) { getGizmo().setRotation(q); }
-    quat& getRotation() { return getGizmo().getRotation(); }
+    quat getRotation() { return getGizmo().getRotation(); }
+
+    void setPosition(const vec3 &p) { getGizmo().setPosition(p); }
+    vec3 getPosition() { return getGizmo().getPosition(); }
 #else
 /////////////////////////////////////////////////////////////////////////////
 // For imGuIZMO, declare global variable or member class quaternion
     quat qRot = quat(1.f, 0.f, 0.f, 0.f);
+    vec3 position = vec3(0.f);
 
 /////////////////////////////////////////////////////////////////////////////
 // two helper functions, not really necessary (but comfortable)
     void setRotation(const quat &q) { qRot = q; }
-    quat& getRotation() { return qRot; }
+    quat const &getRotation() { return qRot; }
+    void setPosition(const vec3 &p) { position = p; }
+    vec3 const &getPosition() { return position; }
 #endif
 
 //using namespace glm;
@@ -140,12 +145,15 @@ void glWindow::onInit()
     // If you need to more feeling with the mouse use:
     // getGizmo().setGizmoFeeling(1.0);
     // 1.0 default,  > 1.0 more sensible, < 1.0 less sensible
+    float scale = 1.f/(theApp->GetWidth() > theApp->GetHeight() ? theApp->GetHeight() : theApp->GetWidth());
+    getGizmo().setDollyScale(scale);
+    getGizmo().setPanScale(scale);
     
 
     // other settings if you need it
     /////////////////////////////////////////////
-    getGizmo().setDollyScale(.001f);
-    getGizmo().setDollyPosition(1.0f);
+
+    getGizmo().setDollyPosition(0.0f);
     //getGizmo().setRotationCenter(vec3(0.0));
 #endif
     qjSet = new qJulia;
@@ -170,15 +178,24 @@ void glWindow::onRender()
     glClear(GL_COLOR_BUFFER_BIT);
 
 #ifdef GLAPP_USE_VIRTUALGIZMO 
-    float zoom = getGizmo().getDollyPosition().z;
+    qjSet->matOrientation = getGizmo().getTransform();
+    qjSet->position = getGizmo().getPosition();
 
-    qjSet->matOrientation = getGizmo().getTransform() * zoom;
 #else
 ////////////////////////////////////////////////////////////////////
 // imGuIZMO: get quaternion in to orientation Matrix
 
+#ifdef IGQ_USE_FULL_3D
+    //qjSet->matOrientation = transfMat * (1.0+position.z);
+    //mat4 modelMatrix = mat4_cast(qRot);
+    //mat4 m(1.f); translate(m, vec3(position.x, position.y, position.z));
     mat4 modelMatrix = mat4_cast(qRot);
     qjSet->matOrientation = modelMatrix;
+    qjSet->position = position;
+#else
+    mat4 modelMatrix = mat4_cast(qRot);
+    qjSet->matOrientation = modelMatrix;
+#endif
 
 #endif
     qjSet->render(); 

@@ -1,4 +1,4 @@
-# imGuIZMO.quat &nbsp;v2.2
+# imGuIZMO.quat &nbsp;v3.0
 **imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse, and graphically visualize their position in space, also around any single axis (*Shift/Ctrl/Alt/Super*). It uses **quaternions** algebra, internally, to manage rotations, but offers the possibility also to interfacing with **vec3**, **vec4** or **mat4x4** (rotation)
 
 With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** &nbsp; &nbsp; *(read below)*
@@ -30,12 +30,21 @@ It works only on browsers with **WebGl 2** and *webAssembly* support (FireFox/Op
 
 ### Mouse buttons and key modifiers
 These are all mouse and keyModifiers controls internally used:
-- **leftButton** & drag -> move control in all direction
-- **rightButton** & drag -> used only in **Axes+Spot** widget: move spot in all direction
-- **Rotation around a single axis**
-  - **leftButton**+**SHIFT** & drag -> rotate around X
-  - **leftButton**+**CTRL** & drag -> rotate around Y
-  - **leftButton**+**ALT**|**SUPER** & drag -> rotate around Z
+- **leftButton** & drag -> free rotation axes
+- **rightButton** & drag -> free rotation spot &nbsp; &nbsp; **(used only in **Axes+Spot** widget)*
+- **middleButton** / **bothButtons** & drag -> move together axes & spot &nbsp; &nbsp; **(used only in **Axes+Spot** widget)*
+
+Based on the type of widget it can do
+- **Rotation around a fixed axis**
+  - **leftButton**+**SHIFT** & drag -> rotation around X
+  - **leftButton**+**CTRL** & drag -> rotation around Y
+  - **leftButton**+**ALT**|**SUPER** & drag -> rotation around Z
+- **Pan & Dolly** (move / zoom)  
+  - **Shft+btn** -> Dolly/Zoom
+  - **Wheel** -> Dolly/Zoom
+  - **Ctrl+btn** -> Pan/Move
+
+**you can change default key modifier for Pan/Dolly movements*
 
 <p><br></p>
 
@@ -79,6 +88,30 @@ And to change the widget call
     if(ImGui::gizmo3D("##gizmo1", qt /*, size,  mode */)) {  setRotation(qt); }
 ```
 but the essence of the code does not change
+
+### Pan & Dolly - v3.0
+From ver. 3.0 you can use all widgets also to "move" the objects, using Pan (x,y) & Dolly (z):
+```cpp
+    // declare static or global variable or member class (quat -> rotation)
+    quat qRot = quat(1.f, 0.f, 0.f, 0.f);
+    // declare static or global variable or member class (vec3 -> Pan/Dolly)
+    vec3 PanDolly(0.f);
+```    
+In your **ImGui** window you call/declare a widget...
+```cpp
+    // Call new function available from v.3.0 imGuIZMO.quat
+    ImGui::gizmo3D("##gizmo1", PanDolly, qRot /*, size,  mode */);
+    // PanDolly returns/changes (x,y,z) values, depending on Pan/Dolly movements
+```
+In your render function (or where you prefer) you can get back the transformations matrix
+```cpp
+    // if you need a "translation" matrix with Pan/Dolly values 
+    mat4 mTranslate(1.f); translate(mTranslate, vec4(PanDolly, 1.f));
+    
+    mat4 modelMatrix = mat4_cast(qRot);
+    // now you have modelMatrix with rotation then can build MV and MVP matrix
+```
+
 
 
 <p>&nbsp;<br>&nbsp;<br></p>
@@ -134,8 +167,31 @@ but the essence of the code does not change
     // Default mode: guiGizmo::mode3Axes|guiGizmo::cubeAtOrigin -> 3 Axes with cube @ origin
     // Default spot color is same of default arrow color: YELLOW -> ImVec4(1.0, 1.0, 0.0, 1.0);
 ```
+### Added since version 3.0
 
-**Prototypes** - all possible widget calls:
+To each of the functions listed above was added a vec3 parameter, as second parameter, to get the object movement (Pan/Dolly), so the **Axes mode** function becomes:
+
+**Axes mode + Pan/Dolly:**
+```cpp
+    quat qt = getRotation();
+    vec3 pos = getPosition();
+// get/setRotation and get/setPosition are helper funcs that you have ideally defined to manage your global/member objs
+    if(ImGui::gizmo3D("##gizmo1", pos, qt /*, size,  mode */)) {  setRotation(qt); setPosition(pos); }
+    // or explicitly
+    static quat q(1.f, 0.f, 0.f, 0.f);
+    static vec3 pos(0.f);
+    ImGui::gizmo3D("##Dir1", pos, q, 100, imguiGizmo::mode3Axes|guiGizmo::cubeAtOrigin);
+
+    // Default size: ImGui::GetFrameHeightWithSpacing()*4
+    // Default mode: guiGizmo::mode3Axes|guiGizmo::cubeAtOrigin -> 3 Axes with cube @ origin
+```
+
+... and so on, for all listed above functions: &nbsp; **look the new function prototypes, below.*
+
+
+
+### **Prototypes** 
+All possible widget calls:
 ```cpp
 IMGUI_API bool gizmo3D(const char*, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
 IMGUI_API bool gizmo3D(const char*, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
@@ -144,6 +200,18 @@ IMGUI_API bool gizmo3D(const char*, vec3&, float=IMGUIZMO_DEF_SIZE, const int=im
 IMGUI_API bool gizmo3D(const char*, quat&, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 IMGUI_API bool gizmo3D(const char*, quat&, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 IMGUI_API bool gizmo3D(const char*, quat&, vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+```
+
+from v.3.0 have been added other calls that pass/return Pan-Dolly (x,y,z) position: same as above, but with vec3 (Pan/Dolly position) as second parameter:
+```cpp
+//with Pan & Dolly feature
+IMGUI_API bool gizmo3D(const char*, vec3&, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, vec3&, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, vec3&, vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDirection);
+
+IMGUI_API bool gizmo3D(const char*, vec3&, quat&, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, vec3&, quat&, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char*, vec3&, quat&, vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 ```
 
 
@@ -172,6 +240,40 @@ Instead to change the color of a single widget:
     imguiGizmo::restoreDirectionColor();                       // restore old ArrowDirection color
 ```
 It's like the push/pop mechanism used in **ImGui**, but only that I don't have a stack (for now I don't see the reason): just a single variable where to save the value. The other functions work in the same way.
+
+**Mouse sensitivity** - since v2.2
+
+```cpp    
+    // Call it once, to set all widgets... or if you need it
+    // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
+    static void setGizmoFeelingRot(float f) { gizmoFeelingRot = f; } 
+    static float getGizmoFeelingRot() { return gizmoFeelingRot; }
+```
+
+**Pan/Dolly change/set key modifier** - since v3.0
+```cpp    
+// available vgModifiers values:
+//      evShiftModifier   -> Shift
+//      evControlModifier -> Ctrl
+//      evAltModifier     -> Alt
+//      evSuperModifier   -> Super
+    static void setPanModifier(vgModifiers v) { panMod = v; }    // Change default assignment for Pan
+    static void setDollyModifier(vgModifiers v) { panMod = v; }  // Change default assignment for Dolly
+```
+
+**Pan/Dolly scale** - since v3.0
+```cpp    
+    // Call it once, to set all widgets... or if you need it
+    // default 1.0, >1 more, <1 less
+
+    //  Set the mouse response for the dolly operation... also wheel
+    static void setDollyScale(float  scale) { dollyScale = scale;  }
+    static float getDollyScale() { return dollyScale;  }
+
+    //  Set the mouse response for pan    
+    static void setPanScale(float scale) { panScale = scale; }
+    static float getPanScale() { return panScale; }
+```
 
 <p>&nbsp;<br></p>
 

@@ -17,8 +17,10 @@
 
 #ifdef VGM_USES_TEMPLATE
     #define VGIZMO_BASE_CLASS virtualGizmoBaseClass<T>
+    #define imGuIZMO_BASE_CLASS virtualGizmoBaseClass<float>
 #else
     #define VGIZMO_BASE_CLASS virtualGizmoBaseClass
+    #define imGuIZMO_BASE_CLASS VGIZMO_BASE_CLASS
     #define T VG_T_TYPE
 #endif
 
@@ -236,7 +238,7 @@ public:
     }
     //  for imGuIZMO or immediate mode control
     //////////////////////////////////////////////////////////////////
-    void motionImmediateMode( T x, T y, T dx, T dy,  vgModifiers mod) {
+    virtual void motionImmediateMode( T x, T y, T dx, T dy,  vgModifiers mod) {
         tbActive = true;
         delta.x = dx; delta.y = -dy;
         pos.x = x;   pos.y = y;
@@ -478,6 +480,20 @@ public:
     tVec3 getPosition() const { return tVec3(pan.x, pan.y, dolly.z); }
     void  setPosition(const tVec3 &p) { pan.x = p.x; pan.y = p.y; dolly.z = p.z; }
 
+    bool isDollyActive() { return dollyActive; }
+    bool isPanActive() { return panActive; }
+
+    void motionImmediateMode( T x, T y, T dx, T dy,  vgModifiers mod) {
+        tbActive = true;
+        delta.x = dx; delta.y = -dy;
+        pos.x = x;   pos.y = y;
+        if (dollyControlModifiers & mod) dollyActive = true;
+        else if (panControlModifiers & mod) panActive = true;
+
+        update();
+    }
+
+
 private:
     // UI commands that this virtualGizmo responds to (defaults to left mouse button with no modifier key)
     vgButtons   dollyControlButton,    panControlButton;
@@ -503,16 +519,20 @@ private:
         using vGizmo   = virtualGizmoClass<float>;
         using vGizmo3D = virtualGizmo3DClass<float>;
     #endif
-    using vImGuIZMO = virtualGizmoClass<float>;
-    using vImGuIZMO3D = virtualGizmo3DClass<float>;
+    #ifdef IGQ_USE_FULL_3D
+        using vImGuIZMO = virtualGizmo3DClass<float>;
+    #else
+        using vImGuIZMO = virtualGizmoClass<float>;
+    #endif
 #else
-    using vImGuIZMO = virtualGizmoClass;
-    using vImGuIZMO3D = virtualGizmo3DClass;
-
+    #ifdef IGQ_USE_FULL_3D
+        using vImGuIZMO = virtualGizmo3DClass;
+    #else
+        using vImGuIZMO = virtualGizmoClass;
+    #endif
     using vGizmo    = virtualGizmoClass;
     using vGizmo3D  = virtualGizmo3DClass;
 #endif
-
 } // end namespace vg::
 
 #undef T  // if used T as #define, undef it

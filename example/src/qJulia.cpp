@@ -59,6 +59,7 @@ void qJulia::initShaders()
     _matOrientation     = getUniformLocation("matOrientation");
     _Light              = getUniformLocation("Light");
     _epsilon            = getUniformLocation("epsilon");
+    _position           = getUniformLocation("position");
     
     reset();
 }
@@ -83,6 +84,7 @@ void qJulia::render()
     glUniform1i (_useShadow    , useShadow   );
     glUniform1i (_useAO        , useAO       );
 
+    glUniform3fv(_position, 1, value_ptr(-position));
         
     glUniformMatrix3fv(_matOrientation, 1, GL_FALSE, value_ptr(transpose(matOrientation)));
 

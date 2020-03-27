@@ -43,6 +43,7 @@ uniform bool useShadow;
 uniform bool useAO;
 
 uniform mat3 matOrientation;
+uniform vec3 position;
 uniform vec3 Light;
 uniform float epsilon;
 //uniform mat3 Orientation;
@@ -239,8 +240,8 @@ void main() {
         vec2 coord = (gl_FragCoord.xy*2. + sampleCoord[i].xy) / resolution.xy - vec2(1.);
 
         vec3 ray = vec3(coord.x * resolution.z, coord.y, -1.);
-        vec3 dir = orient * ray;
-        vec3 origin = orient * Eye;
+        vec3 dir = orient * ray + position;
+        vec3 origin = orient * Eye + position;
         vec4 col;
         float AO, shadow = 1.0;
 
@@ -248,14 +249,6 @@ void main() {
         float dist = IntersectQJulia(origin, dir, Quat, Slice, AO, col);
         if (dist < epsilon) {
             vec3 N = NormEstimate(origin, Quat, Slice);
-/*
-            float t;
-            vec3 LightRay = normalize(orient * Light);
-            vec3 LightPos = (origin + LightRay);
-            LightRay = LightRay;
-            //shadow = ;
-            shadow = IntersectQJulia(LightPos, LightRay, Quat, Slice, t)<.0001 ? .0 : 1.0;
-*/
 
 #else
 		float dist;
@@ -279,14 +272,10 @@ void main() {
                  else                 colorShadow += 1.0;
             }
 
-			//color = vec3(1.)* (.5+.5*clamp( 1.5*ao , .0, 1.0 ));
-            //color += vec3(.9 ,.9, .9);
         }
-		//colorMul = 1.0;
     	if(!isFullRender) { colorDiv = 1.; shadowDiv = 1.; break; } // fast and approximative render, but looks alredy good 
 
     }
-	//color = Orientation[1];
     outColor = vec4(color/colorDiv, 1.);
     if(useShadow) outColor.xyz *= colorShadow/shadowDiv;
 

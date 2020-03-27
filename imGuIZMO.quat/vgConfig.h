@@ -98,5 +98,17 @@
 //------------------------------------------------------------------------------
 //#define VGM_USES_HLSL_TYPES 
 
+//------------------------------------------------------------------------------
+// imGuiZmo.quat - v2.5 and later - (used only inside it)
+//
+//      Used to add Pan & Dolly feature to imGuIZMO.quat widget
+//          It uses virtualGizmo3DClass just a little bit complex of
+//          virtualGizmoClass. 
+//          Comment for very low resources ==> Pan & Dolly will be disabled
+//
+// Default (uncommented) ==> Pan & Dolly enabled 
+//------------------------------------------------------------------------------
+#define IGQ_USE_FULL_3D
+
 //  v g M a t h   C O N F I G   end
 ////////////////////////////////////////////////////////////////////////////////

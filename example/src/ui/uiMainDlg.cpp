@@ -20,15 +20,19 @@
 #include "uiMainDlg.h"
 #include "../tools/imGuIZMOquat.h"
 
-
 void setRotation(const quat &q);
-quat& getRotation();
+void setPosition(const vec3 &p);
+#ifdef GLAPP_USE_VIRTUALGIZMO // Enable it in glWindows.h or with compiler define
+    quat getRotation();
+    vec3 getPosition();
+#else
+    quat const &getRotation();
+    vec3 const &getPosition();
+#endif
 
-    bool show_test_window = true;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-
+bool show_test_window = true;
+bool show_another_window = false;
+ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 void mainImGuiDlgClass::renderImGui()
 {
@@ -127,6 +131,9 @@ void mainImGuiDlgClass::renderImGui()
 
         } ImGui::End();
 
+
+// Right Side Widgets
+/////////////////////////////////////////////////////////////////////
     static bool vis = true;
     //quaternionf qt = theWnd->getTrackball().getRotation();
     quat qt = getRotation();
@@ -163,10 +170,13 @@ void mainImGuiDlgClass::renderImGui()
     if(ImGui::DragFloat("##u3",(float *)&qt.w,0.01f, -1.0, 1.0, "w: %.2f",1.f)) quatChanged=true;
     ImGui::PopItemWidth();
 
-    //If you modify quaternion parameters outside control, with DragFloat or other, remembre to NORMALIZE it
+    //If you modify quaternion parameters outside control, with DragFloat or other, remember to NORMALIZE it
     if(quatChanged) setRotation(normalize(qt));
     ImGui::DragFloat3("Light",value_ptr(tLight),0.01f);
 
+
+    // Upper right corner widget
+    ///////////////////////////////////
     vec3 lL(-tLight);
     if(ImGui::gizmo3D("##aaa", qt, lL, sz))  { 
         tLight = -lL;
@@ -195,7 +205,28 @@ void mainImGuiDlgClass::renderImGui()
     //ImGui::PushItemWidth(sz);
     //quat form gizmo is normalized!
     char s[50];
-    if(ImGui::gizmo3D("##gizmo1", qt, sz)) {  setRotation(qt); }
+
+    // Other rigth widgets
+    ///////////////////////////////////
+    {
+#ifdef IGQ_USE_FULL_3D // Widget with Pan & Dolly
+    ///////////////////////////////////////////////////////
+    // example of direct call ==> works w/o GLAPP_USE_VIRTUALGIZMO
+    //////////////////////////////////
+    //extern vec3 position; 
+    //extern quat qRot;
+    //ImGui::gizmo3D("##gizmo1", position, qRot, sz);
+
+    ///////////////////////////////////////////////////////
+    // using helper funcs 
+    vec3 pos = getPosition(); // my saved position
+    quat qt = getRotation();
+    if(ImGui::gizmo3D("Pan & Dolly", pos, qt, sz)) { setRotation(qt); setPosition(pos); }
+#else
+    quat qt = getRotation();
+    if(ImGui::gizmo3D("##gizmo1", qt, sz)) { setRotation(qt); }
+#endif
+    }
 
     ImGui::SameLine();
 
@@ -206,16 +237,28 @@ void mainImGuiDlgClass::renderImGui()
 
     ImVec2 cPos(ImGui::GetCursorPos());
 
-    ImGui::SetCursorPos(ImVec2(0,theApp->GetHeight()-ImGui::GetFrameHeightWithSpacing()*7));
+    ImGui::SetCursorPos(ImVec2(0,theApp->GetHeight()-ImGui::GetFrameHeightWithSpacing()*15));
 
     if(!otherExamples) {
-        ImGui::Text("imguiGizmo usage:");
-        ImGui::Text("- Left/Right mouse buttons:");
-        ImGui::Text("      FREE move axes/spot");
+        ImGui::TextColored(ImVec4(0.f, 1.f, 1.f, 1.f),"     imGuIZMO.quad usage");
+        ImGui::NewLine();
+        ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f),"Main rotations:");
+        ImGui::Text("- Left  btn -> free rotation axes");
+        ImGui::Text("- Right btn -> free rotation spot");
+        ImGui::Text("- Middle/Both btns move together");
+        ImGui::NewLine();
+        ImGui::TextColored(ImVec4(1.f, 1.f, 1.f, 1.f),"Based on widget type it can do...");
+        ImGui::NewLine();
+
+        ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f),"Rotation around a fixed axis:");
         ImGui::Text("- Shft+btn -> rot ONLY around X");
         ImGui::Text("- Ctrl+btn -> rot ONLY around Y");
         ImGui::Text("- Alt|Super+btn-> rot ONLY on Z");
-        ImGui::Text("- Both btns to move together...");
+        ImGui::NewLine();
+        ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f),"Pan & Dolly");
+        ImGui::Text("- Shft+btn -> Dolly/Zoom");
+        ImGui::Text("- Wheel    -> Dolly/Zoom");
+        ImGui::Text("- Ctrl+btn -> Pan/Move");
     }
 
     ImGui::SetCursorPos(ImVec2(0,theApp->GetHeight()-ImGui::GetFrameHeightWithSpacing()));
@@ -286,12 +329,14 @@ void mainImGuiDlgClass::renderImGui()
     style.WindowBorderSize = prevWindowBorderSize;
 
     
-    const int dimY =260;
-    ImGui::SetNextWindowSize(ImVec2(500, dimY), ImGuiCond_FirstUseEver);
+    const int dimY =300;
+    ImGui::SetNextWindowSize(ImVec2(540, dimY), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowPos(ImVec2(0,theWnd->GetHeight()-dimY), ImGuiCond_FirstUseEver);
 
     static bool vertexChange = false;
 
+// imGuIZMO.quat - Window Settings 
+/////////////////////////////////////////////////////////////////////
     if(ImGui::Begin("gizmo options", &isVisible, ImGuiWindowFlags_NoScrollbar)) {
         ImGui::BeginGroup(); {
             ImGui::Columns(2);
@@ -366,20 +411,43 @@ void mainImGuiDlgClass::renderImGui()
                 //ImGui::SameLine();
                 ImGui::ColorEdit4("##Sph2",(float *) &sphCol2);
                 ImGui::PopItemWidth();
-            }
+            } 
 
 
 
             if(isFull) draw |= imguiGizmo::modeFullAxes;
             else       draw &= ~imguiGizmo::modeFullAxes;
 
-            static quat qv1(1.0f,0,0,0);
-            static quat qv2(1.0f,0,0,0);
 
-            ImGui::SetCursorPos(ImVec2(0,dimY-ImGui::GetFrameHeightWithSpacing()*2));
+            ImGui::SetCursorPos(ImVec2(0,dimY-ImGui::GetFrameHeightWithSpacing()*4));
 
             static float mouseFeeling = imguiGizmo::getGizmoFeelingRot(); // default 1.0
-            if(ImGui::SliderFloat("##MouseFeeling", &mouseFeeling, .25, 2.0, "mouse feelRot %.2f")) imguiGizmo::setGizmoFeelingRot(mouseFeeling);
+            if(ImGui::SliderFloat(" Mouse", &mouseFeeling, .25, 2.0, "sensitivity %.2f")) imguiGizmo::setGizmoFeelingRot(mouseFeeling);
+#ifdef IGQ_USE_FULL_3D
+            static bool isPanDolly = false;
+            ImVec4 col(1.f, 0.5f, 0.5f, 1.f);
+            ImGui::TextColored(col,"Pan & Dolly "); ImGui::SameLine();
+            ImGui::Checkbox("##Pan & Dolly", &isPanDolly);
+            if(isPanDolly) {
+                ImGui::SameLine(); ImGui::Text(" (Ctrl / Shift)");
+                float panScale = imguiGizmo::getPanScale(), dollyScale = imguiGizmo::getDollyScale();
+                ImGui::PushItemWidth(half);
+                if(ImGui::SliderFloat("##PanScale", &panScale, .1, 5.0, "panScale %.2f")) imguiGizmo::setPanScale(panScale);
+                ImGui::SameLine();
+                if(ImGui::SliderFloat("##DollyScale", &dollyScale, .1, 5.0, "dollyScale %.2f")) imguiGizmo::setDollyScale(dollyScale);
+                ImGui::PopItemWidth();
+            } else {
+                ImGui::AlignTextToFramePadding();
+                ImGui::NewLine();
+            }
+#else
+                ImGui::AlignTextToFramePadding();
+                ImGui::NewLine();
+                ImGui::AlignTextToFramePadding();
+                ImGui::NewLine();
+                ImGui::AlignTextToFramePadding();
+                ImGui::NewLine();
+#endif
 
             if(ImGui::Button(" -= Change solids attributes =- ")) vertexChange ^=1;
 
@@ -392,8 +460,28 @@ void mainImGuiDlgClass::renderImGui()
             //plane & dir with same color - > imguiGizmo::setDirectionColor(ImVec4(dirCol.x,dirCol.y, dirCol.z, 1.0)); 
 
 
-            if(mode != imguiGizmo::modeDual) ImGui::gizmo3D("##gizmoV1", qv1, w, mode|draw );
-            else                           ImGui::gizmo3D("##gizmoV2", qv1, qv2, w, mode|draw);
+            quat qv1(getRotation()); // my saved rotation
+            vec3 vL(-tLight);        // my light 
+
+            static quat qv2(1.0f,0,0,0);
+
+#ifdef IGQ_USE_FULL_3D
+            if(isPanDolly) {
+                vec3 pos = getPosition(); // my saved position os space
+                if(mode & imguiGizmo::modeDual) {
+                    if(ImGui::gizmo3D("pan & zoom mode", qv1, vL, w, mode|draw)) { setPosition(pos); setRotation(qv1); tLight = -vL; }
+                } else {
+                    if(ImGui::gizmo3D("pan & zoom mode", pos, qv1, w, mode|draw )) { setPosition(pos); setRotation(qv1); }
+                }
+            } else
+#endif
+            {
+                if(mode & imguiGizmo::modeDual) {
+                    if(ImGui::gizmo3D("##gizmoV2", qv1, vL, w, mode|draw)) { setRotation(qv1); tLight = -vL; }
+                } else {
+                    if(ImGui::gizmo3D("##gizmoV1", qv1, w, mode|draw )) { setRotation(qv1); }
+                }
+            }
 
             imguiGizmo::restoreSolidSize();
             imguiGizmo::restoreDirectionColor();
