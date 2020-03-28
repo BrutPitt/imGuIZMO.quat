@@ -232,16 +232,16 @@ public:
     //////////////////////////////////////////////////////////////////
     void motionImmediateLeftButton( T x, T y, T dx, T dy) {
         tbActive = true;
-        delta.x = dx; delta.y = -dy;
-        pos.x = x;   pos.y = y;
+        delta = tVec2(dx,-dy);
+        pos   = tVec2( x,  y);
         update();
     }
     //  for imGuIZMO or immediate mode control
     //////////////////////////////////////////////////////////////////
     virtual void motionImmediateMode( T x, T y, T dx, T dy,  vgModifiers mod) {
         tbActive = true;
-        delta.x = dx; delta.y = -dy;
-        pos.x = x;   pos.y = y;
+        delta = tVec2(dx,-dy);
+        pos   = tVec2( x,  y);
         if      (xRotationModifier & mod) { rotationVector = tVec3(T(1), T(0), T(0)); }
         else if (yRotationModifier & mod) { rotationVector = tVec3(T(0), T(1), T(0)); }
         else if (zRotationModifier & mod) { rotationVector = tVec3(T(0), T(0), T(1)); }
@@ -485,8 +485,8 @@ public:
 
     void motionImmediateMode( T x, T y, T dx, T dy,  vgModifiers mod) {
         this->tbActive = true;
-        this->delta.x = dx; this->delta.y = -dy;
-        this->pos.x = x;   this->pos.y = y;
+        this->delta = tVec2(dx,-dy);
+        this->pos   = tVec2( x,  y);
         if (dollyControlModifiers & mod) dollyActive = true;
         else if (panControlModifiers & mod) panActive = true;
         update();
@@ -517,13 +517,13 @@ private:
         using vGizmo   = virtualGizmoClass<float>;
         using vGizmo3D = virtualGizmo3DClass<float>;
     #endif
-    #ifdef IGQ_USE_FULL_3D
+    #ifndef IMGUIZMO_USE_ONLY_ROT
         using vImGuIZMO = virtualGizmo3DClass<float>;
     #else
         using vImGuIZMO = virtualGizmoClass<float>;
     #endif
 #else
-    #ifdef IGQ_USE_FULL_3D
+    #ifndef IMGUIZMO_USE_ONLY_ROT
         using vImGuIZMO = virtualGizmo3DClass;
     #else
         using vImGuIZMO = virtualGizmoClass;

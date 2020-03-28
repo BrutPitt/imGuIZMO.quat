@@ -95,7 +95,7 @@ ImU32 imguiGizmo::savedSphereColors[2]  = { 0xff401010, 0xffc0a0a0 };
 ///////////////////////////////////////
 float imguiGizmo::gizmoFeelingRot = 1.f; // >1 more mouse sensibility, <1 less mouse sensibility
 
-#ifdef IGQ_USE_FULL_3D
+#ifndef IMGUIZMO_USE_ONLY_ROT
 float imguiGizmo::dollyScale = 1.f, imguiGizmo::panScale = 1.f;
 vgModifiers imguiGizmo::panMod = vg::evControlModifier, imguiGizmo::dollyMod = vg::evShiftModifier;
 #endif
@@ -212,7 +212,7 @@ bool gizmo3D(const char* label, quat& axes, vec4& axesAngle, float size, const i
     return ret;
 
 }
-#ifdef IGQ_USE_FULL_3D
+#ifndef IMGUIZMO_USE_ONLY_ROT
 //  Quaternion control + Pan & Dolly
 //      in/out: 
 //          - vec3 Pan(x,y) Dolly(z)
@@ -472,7 +472,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         track.viewportSize(innerSize.x, innerSize.y);
         track.setRotation(q);
         track.setGizmoFeeling(gizmoFeelingRot);
-#ifdef IGQ_USE_FULL_3D
+#ifndef IMGUIZMO_USE_ONLY_ROT
         if(drawMode&modePanDolly || io.MouseWheel!=0) {
             float screenFactor = 1.f/(io.DisplaySize.x<io.DisplaySize.y ? io.DisplaySize.x : io.DisplaySize.y);
             track.setPosition(posPanDolly);
@@ -510,7 +510,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         highlighted = ImGui::IsItemHovered();
         if(highlighted && (drawMode&modeDual) && ImGui::IsMouseDragging(1)) getTrackball(qtV2);
         else if(highlighted && (drawMode&modeDual) && ImGui::IsMouseDragging(2)) { getTrackball(qtV);  getTrackball(qtV2); }
-#ifdef IGQ_USE_FULL_3D
+#ifndef IMGUIZMO_USE_ONLY_ROT
         else if(highlighted && io.MouseWheel!=0) getTrackball(qtV);
 #endif
 
@@ -802,7 +802,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
     // Helper on vgModifier active
     if(vgModsActive && (ImGui::IsItemHovered() && (!ImGui::IsMouseDown(0) && !ImGui::IsMouseDown(1)) )) {
-#ifdef IGQ_USE_FULL_3D
+#ifndef IMGUIZMO_USE_ONLY_ROT
         if(drawMode & modePanDolly) {
             if(panMod & vgMods)        drawPanHelper();
             else if(dollyMod & vgMods) drawDollyHelper();

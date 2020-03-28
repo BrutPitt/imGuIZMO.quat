@@ -209,7 +209,7 @@ void mainImGuiDlgClass::renderImGui()
     // Other rigth widgets
     ///////////////////////////////////
     {
-#ifdef IGQ_USE_FULL_3D // Widget with Pan & Dolly
+#ifndef IMGUIZMO_USE_ONLY_ROT // Widget with Pan & Dolly
     ///////////////////////////////////////////////////////
     // example of direct call ==> works w/o GLAPP_USE_VIRTUALGIZMO
     //////////////////////////////////
@@ -423,7 +423,7 @@ void mainImGuiDlgClass::renderImGui()
 
             static float mouseFeeling = imguiGizmo::getGizmoFeelingRot(); // default 1.0
             if(ImGui::SliderFloat(" Mouse", &mouseFeeling, .25, 2.0, "sensitivity %.2f")) imguiGizmo::setGizmoFeelingRot(mouseFeeling);
-#ifdef IGQ_USE_FULL_3D
+#ifndef IMGUIZMO_USE_ONLY_ROT
             static bool isPanDolly = false;
             ImVec4 col(1.f, 0.5f, 0.5f, 1.f);
             ImGui::TextColored(col,"Pan & Dolly "); ImGui::SameLine();
@@ -465,7 +465,7 @@ void mainImGuiDlgClass::renderImGui()
 
             static quat qv2(1.0f,0,0,0);
 
-#ifdef IGQ_USE_FULL_3D
+#ifndef IMGUIZMO_USE_ONLY_ROT
             if(isPanDolly) {
                 vec3 pos = getPosition(); // my saved position os space
                 if(mode & imguiGizmo::modeDual) {

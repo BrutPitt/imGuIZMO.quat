@@ -185,7 +185,7 @@ void glWindow::onRender()
 ////////////////////////////////////////////////////////////////////
 // imGuIZMO: get quaternion in to orientation Matrix
 
-#ifdef IGQ_USE_FULL_3D
+#ifndef IMGUIZMO_USE_ONLY_ROT
     //qjSet->matOrientation = transfMat * (1.0+position.z);
     //mat4 modelMatrix = mat4_cast(qRot);
     //mat4 m(1.f); translate(m, vec3(position.x, position.y, position.z));

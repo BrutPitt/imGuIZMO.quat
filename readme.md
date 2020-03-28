@@ -412,15 +412,43 @@ You can do this simply by commenting / uncommenting a line in `vgConfig.h` or ad
 //------------------------------------------------------------------------------
 // imGuiZmo.quat - v3.0 and later - (used only inside it)
 //
-//      Used to add Pan & Dolly feature to imGuIZMO.quat widget
-//          It uses virtualGizmo3DClass just a little bit complex of
-//          virtualGizmoClass. 
-//          Comment for very low resources ==> Pan & Dolly will be disabled
+//      Used to remove Pan & Dolly feature to imGuIZMO.quat widget and to use
+//          only rotation feature (like v2.2 and above)
 //
-// Default (uncommented) ==> Pan & Dolly enabled 
+//          Pan/Dolly use virtualGizmo3DClass just a little bit complex of
+//          virtualGizmoClass that uses only "quat" rotations
+//          uncomment for very low resources ==> Pan & Dolly will be disabled
+//
+// Default ==> Pan & Dolly enabled 
 //------------------------------------------------------------------------------
-#define IGQ_USE_FULL_3D
+//#define IMGUIZMO_USE_ONLY_ROT
 ```
+For default **imGuIZMO.quat** search **dear imgui** `.h` files inside a `imgui` subfolder insert in your INCLUDE search paths, according this call: `#include <imgui/imgui.h>`
+
+You can modify this behavior modifing the following parameter/define:
+```cpp
+//------------------------------------------------------------------------------
+// imGuiZmo.quat - v3.0 and later - (used only inside it)
+//
+//      used to specify where ImGui include files should be searched
+//          #define IMGUIZMO_IMGUI_FOLDER  
+//              is equivalent to use:
+//                  #include <imgui.h>
+//                  #include <imgui_internal.h>
+//          #define IMGUIZMO_IMGUI_FOLDER myLibs/ImGui/
+//              (final slash is REQUIRED) is equivalent to use: 
+//                  #include <myLib/ImGui/imgui.h>
+//                  #include <myLib/ImGui/imgui_internal.h>
+//          Default: IMGUIZMO_IMGUI_FOLDER commented/undefined
+//              is equivalent to use:
+//                  #include <imgui/imgui.h>
+//                  #include <imgui/imgui_internal.h>
+//
+// N.B. Final slash to end of path is REQUIRED!
+//------------------------------------------------------------------------------
+// #define IMGUIZMO_IMGUI_FOLDER ImGui/
+```
+**about this last `#define` you can read also the [**issue #5**](https://github.com/BrutPitt/imGuIZMO.quat/issues/5)*
 
 
 - *If your project grows you can upgrade/pass to **glm**, in any moment*
@@ -435,7 +463,9 @@ The source code example shown in the animated gif screenshot, is provided.
 In  example I use **GLFW** or **SDL2** (via `#define GLAPP_USE_SDL`) with **OpenGL**, but it is simple to change if you use Vulkan/DirectX/etc, other frameworks (like GLUT) or native OS access.
 
 To build it you can use CMake (3.10 or higher) or the Visual Studio solution project (for VS 2017) in Windows.
-You need to have [**GLFW**](https://www.glfw.org/) (or [**SDL**](https://libsdl.org/)) in your compiler search path (LIB/INCLUDE). Instead copy of [**glm**](https://github.com/g-truc/glm) and [**ImGui**](https://github.com/ocornut/imgui) are attached and included in the example.
+You need to have [**GLFW**](https://www.glfw.org/) (or [**SDL**](https://libsdl.org/)) in your compiler search path (LIB/INCLUDE). Instead copy of [**ImGui**](https://github.com/ocornut/imgui) is attached and included in the example.
+
+If want use [**glm**](https://github.com/g-truc/glm), in place of internal [**vgMath**](https://github.com/BrutPitt/vgMath), you need to download it
 
 **CMake**
 
