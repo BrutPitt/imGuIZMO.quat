@@ -19,11 +19,11 @@ If need a larger/complete library, as alternative to **vgMath**, is also possibl
 ### Live WebGL2 demo
 
 You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
-- [**imGuIZMO.quat** ImGui widget + 3D Pan/Dolly (move/zoom) screen manipulator](https://brutpitt.github.io/myRepoImages/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
-- [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/myRepoImages/imGuIZMO/example/WebGL/wgl_qjSet.html), now with 3D Pan/Dolly (move/zoom) features - **since v3.0*
+- [**imGuIZMO.quat** ImGui widget + 3D Pan/Dolly (move/zoom) screen manipulator](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
+- [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSet.html), now with 3D Pan/Dolly (move/zoom) features - **since v3.0*
 
 <p align="center"><a href="https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/wgl_qjSetVG.html"> 
-<img src="https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/imGuIZMO.gif"></a>
+<img src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/imGuIZMO.gif"></a>
 </p>
 
 It works only on browsers with **WebGl 2** and *webAssembly* support (FireFox/Opera/Chrome and Chromium based). Test if your browser supports **WebGL2**, here: [WebGL2 Report](http://webglreport.com/?v=2)
@@ -285,27 +285,27 @@ It's like the push/pop mechanism used in **ImGui**, but only that I don't have a
 **FOUR** widget types are provided, (six function calls with different parameters: *quaternion, vec4, vec3* for different uses) each of them customizable with several graphics options:
 
 ### Axes mode
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/A001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/A002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/A003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/A004.jpg) |
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/A001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/A002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/A003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/A004.jpg) |
 | :---: | :---: | :---: | :---: |
 
 
 ### Directional arrow
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/B001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/B002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0009.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/B003.jpg) |
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/B001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/B002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/U0009.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/B003.jpg) |
 | :---: | :---: | :---: | :---: | 
 
 ### Plane direction 
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0006.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0008.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0010.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0011.jpg) | 
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/U0006.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/U0008.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/U0010.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/U0011.jpg) | 
 | :---: | :---: | :---: | :---: |
 
 ### Axes + spot
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/C004.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/C003.jpg) |
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/U0003.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/C004.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/U0001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/C003.jpg) |
 | :---: | :---: | :---: | :---: |
 
 
 ### And much more...
 Full configurable: length, thickness, dimensions, number of polygon slices, colors and sphere tessellation:
 
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/D002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0005.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/D001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/U0007.jpg)| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/D003.jpg) |
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/D002.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/U0005.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/D001.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/U0007.jpg)| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/D003.jpg) |
 | :---: | :---: | :---: | :---: | :---: |
 
 ### Helper on specific feature
@@ -313,7 +313,7 @@ Now, when the mouse is hovered and the modifier key is pressed, a graphic helper
 
 | rotation around X | rotation around Y | rotation around Z | Pan / move | Dolly / zoom |
 | :---: | :---: | :---: | :---: | :---: |
-| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/rotX.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/rotY.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/rotZ.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/Pan.jpg)| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepoImages/master/imGuIZMO/screenshots/Dolly.jpg) |
+| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/rotX.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/rotY.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/rotZ.jpg) | ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/Pan.jpg)| ![alt text](https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/Dolly.jpg) |
 
 
 
