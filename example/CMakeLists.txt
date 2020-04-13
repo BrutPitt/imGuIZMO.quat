@@ -12,7 +12,7 @@ set(IMGUI_DIR imgui)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(M_GLOBAL_FLAGS "-DIMGUI_DIR -DGLM_ENABLE_EXPERIMENTAL -fpermissive")
+set(M_GLOBAL_FLAGS "-DIMGUI_DIR -DGLM_ENABLE_EXPERIMENTAL")
 
 if(USE_VIRTUALGIZMO)
     set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DGLAPP_USE_VIRTUALGIZMO")
@@ -57,9 +57,12 @@ set(SOURCE_FILES
 include_directories(${SRC})
 include_directories(${SRC}/libs)
 include_directories(${SRC}/tools)
+include_directories(${SRC}/tools)
+#include_directories($ENV{INCLUDE})
+#include_directories("D:/Lang/mingw64/include")
 
 # additional LIB directories
-# link_directories()
+# link_directories($ENV{LIB})
 
 
 if (${BUILD_EMSCRIPTEN})
@@ -160,12 +163,17 @@ else()
         include_directories(${SDL2_INCLUDE_DIRS})
         target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} ${SDL2_LIBRARIES} ${TARGET_LIBS})
     else()
+        list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
         if(WIN32)
             find_package(glfw3 REQUIRED)
-        else()    
+            #link_directories(${SRC}/libs/glfw/buildWin/lib/${CMAKE_BUILD_TYPE})
+            #set(TARGET_LIBS ${CMAKE_DL_LIBS} "${SRC}/libs/glfw/buildWin/lib/${CMAKE_BUILD_TYPE}/glfw3.lib")
+            #set(TARGET_LIBS ${CMAKE_DL_LIBS} "-lglfw3.lib")
+        else()
             #find_package(glfw3 REQUIRED)
-        endif()
-        target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} ${TARGET_LIBS} glfw)
+            set(TARGET_LIBS ${CMAKE_DL_LIBS} "-lglfw3 -lpthread -lX11")
+        endif(WIN32)
+        target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} ${GLFW3_LIBRARY})
     endif()
 
 endif ()
