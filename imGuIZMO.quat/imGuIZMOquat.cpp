@@ -629,12 +629,11 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 #endif
                     for(int h=0; h<3; h++) {
                         vec3 coord(*itVtx++ * resizeAxes); //  reduction
-
                     // reposition starting point...
                         if(!skipCone && coord.x >  0)                          coord.x = -arrowStartingPoint; 
                         if((skipCone && coord.x <= 0) || 
                            (!showFullAxes && (coord.x < arrowStartingPoint)) ) coord.x =  arrowStartingPoint;
-                        //transform
+                    //transform
                         coord = _q * fastRotate(arrowAxis, coord); 
                         uv[h] = normalizeToControlSize(coord.x,coord.y);
 #ifdef imguiGizmo_INTERPOLATE_NORMALS
@@ -671,7 +670,6 @@ bool imguiGizmo::drawFunc(const char* label, float size)
             }
             addTriangle();
         }
-
     };
 
     //////////////////////////////////////////////////////////////////
@@ -683,7 +681,6 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
         if(arrowCoord.z <= 0) { for(int i = 0; i <  4; i++) drawComponent(i, q, func); if(mode & modeDirPlane) drawPlane(); }
         else                  { if(mode & modeDirPlane) drawPlane(); for(int i = 3; i >= 0; i--) drawComponent(i, q, func); }
-            
     };
     
     //////////////////////////////////////////////////////////////////
@@ -696,7 +693,6 @@ bool imguiGizmo::drawFunc(const char* label, float size)
             drawComponent(CYL_CAP  , q, adjustSpotCyl ); drawComponent(CYL_SURF , q, adjustSpotCyl );
             drawComponent(CONE_CAP , q, adjustSpotCone); drawComponent(CONE_SURF, q, adjustSpotCone);
         }
-            
     };
 
     //////////////////////////////////////////////////////////////////

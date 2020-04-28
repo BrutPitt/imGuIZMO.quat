@@ -255,8 +255,8 @@ It's like the push/pop mechanism used in **ImGui**, but only that I don't have a
 **Pan/Dolly change/set key modifier** - since v3.0
 ```cpp    
 // available vgModifiers values:
-//      evShiftModifier   -> Shift
-//      evControlModifier -> Ctrl
+//      evShiftModifier   -> Shift - default for Dolly
+//      evControlModifier -> Ctrl  - default for Pan
 //      evAltModifier     -> Alt
 //      evSuperModifier   -> Super
     static void setPanModifier(vgModifiers v) { panMod = v; }    // Change default assignment for Pan
