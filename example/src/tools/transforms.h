@@ -142,10 +142,17 @@ public:
                              vec3(0.0f, 1.0f, 0.0f));
     }
     void setLightView(const vec3 &lightPos) {
-        tM.mvLightM = lookAt(lightPos + povVec,
+        tM.mvLightM = lookAt(lightPos,
                              tgtVec, //getTrackball().getRotationCenter(),
                              vec3(0.0f, 1.0f, 0.0f));
     }
+    void setLightView(const vec3 &pov, const vec3 &tgt) {
+        tM.mvLightM = lookAt(pov,
+                             tgt, //getTrackball().getRotationCenter(),
+                             vec3(0.0f, 1.0f, 0.0f));
+    }
+
+    float getOverallDistance() { return getPOV().z - getTrackball().getDollyPosition().z; }
 
 #define MIN_NEAR .01f //(_far*.01f)
     void setPerspective(float angle, float aspect, float _near, float _far) {        
