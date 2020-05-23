@@ -93,7 +93,7 @@ public:
     //      pressed: if Button is pressed (TRUE) or released (FALSE)
     //      x, y:    mouse coordinates
     ////////////////////////////////////////////////////////////////////////////
-    void mouse( vgButtons button, vgModifiers mod, bool pressed, T x, T y) 
+    virtual void mouse( vgButtons button, vgModifiers mod, bool pressed, T x, T y)
     {
         if ( (button == tbControlButton) && pressed && (tbControlModifiers ? tbControlModifiers & mod : tbControlModifiers == mod) ) {
             tbActive = true;
@@ -116,21 +116,21 @@ public:
 
     //    Call on Mouse motion
     ////////////////////////////////////////////////////////////////////////////
-    void motion( T x, T y) {
+    virtual void motion( T x, T y) {
         delta.x = x - pos.x;   delta.y = pos.y - y;
         pos.x = x;   pos.y = y;
         update();
     }
     //    Call on Pinching
     ////////////////////////////////////////////////////////////////////////////
-    void pinching( T d ) {
-        delta.y = d;
+    void pinching(T d, T z = T(0)) {
+        delta.y = d * z;
         update();
     }
 
     //    Call every rendering to implement continue spin rotation 
     ////////////////////////////////////////////////////////////////////////////
-    void idle() { qtV = qtStep*qtV;  }
+    void idle() { qtV = qtIdle*qtV;  }
 
     //    Call after changed settings
     ////////////////////////////////////////////////////////////////////////////
@@ -139,7 +139,7 @@ public:
     {
 
         if(!delta.x && !delta.y) {
-            qtStep = tQuat(T(1), T(0), T(0), T(0)); //no rotation
+            qtIdle = qtStep = tQuat(T(1), T(0), T(0), T(0)); //no rotation
             return;
         }
 
@@ -163,7 +163,8 @@ public:
         T AdotB = dot(a, b); 
         T angle = acos( AdotB>T(1) ? T(1) : (AdotB<-T(1) ? -T(1) : AdotB)); // clamp need!!! corss float is approximate to FLT_EPSILON
 
-        qtStep = normalize(angleAxis(angle * tbScale * fpsRatio, axis * rotationVector));
+        qtStep = normalize(angleAxis(angle * tbScale * fpsRatio                  , axis * rotationVector));
+        qtIdle = normalize(angleAxis(angle * tbScale * fpsRatio * qIdleSpeedRatio, axis * rotationVector));
         qtV = qtStep*qtV;
 
     }
@@ -211,7 +212,7 @@ public:
 
     //  get the rotation quaternion
     //////////////////////////////////////////////////////////////////
-    tQuat &getRotation() { return qtV; }
+    virtual tQuat &getRotation() { return qtV; }
 
     //  get the rotation increment
     //////////////////////////////////////////////////////////////////
@@ -224,6 +225,17 @@ public:
     //  get the rotation increment
     //////////////////////////////////////////////////////////////////
     void setStepRotation(const tQuat &q) { qtStep = q; }
+
+    // attenuation<1.0 / increment>1.0 of rotation speed in idle
+    ////////////////////////////////////////////////////////////////////////////
+    void setIdleRotSpeed(T f) { qIdleSpeedRatio = f;    }
+    T    getIdleRotSpeed()    { return qIdleSpeedRatio; }
+
+    //  return current transformations as 4x4 matrix.
+    ////////////////////////////////////////////////////////////////////////////
+    virtual tMat4 getTransform() = 0;
+    ////////////////////////////////////////////////////////////////////////////
+    virtual void applyTransform(tMat4 &model) = 0;
 
 // Immediate mode helpers
 //////////////////////////////////////////////////////////////////////
@@ -248,12 +260,6 @@ public:
         update();
     }
 
-    //  return current transformations as 4x4 matrix.
-    ////////////////////////////////////////////////////////////////////////////
-    virtual tMat4 getTransform() = 0;
-    ////////////////////////////////////////////////////////////////////////////
-    virtual void applyTransform(tMat4 &model) = 0;
-
 protected:
 
     tVec2 pos, delta;
@@ -266,13 +272,15 @@ protected:
 
     tQuat qtV    = tQuat(T(1), T(0), T(0), T(0));
     tQuat qtStep = tQuat(T(1), T(0), T(0), T(0));
+    tQuat qtIdle = tQuat(T(1), T(0), T(0), T(0));
 
     tVec3 rotationCenter = tVec3(T(0));
 
     //  settings for the sensitivity
     //////////////////////////////////////////////////////////////////
-    T tbScale = T(1);   //base scale sensibility
-    T fpsRatio = T(1);  //auto adjust by FPS (call idle with current FPS)
+    T tbScale = T(1);    //base scale sensibility
+    T fpsRatio = T(1);   //auto adjust by FPS (call idle with current FPS)
+    T qIdleSpeedRatio = T(.33); //autoRotation factor to speedup/slowdown
     
     T minVal;
     tVec3 offset;
@@ -348,7 +356,7 @@ public:
 
     //////////////////////////////////////////////////////////////////
     void mouse( vgButtons button, vgModifiers mod, bool pressed, int x, int y) { mouse(button, mod, pressed, T(x), T(y)); }
-    void mouse( vgButtons button, vgModifiers mod, bool pressed, T x, T y) 
+    void mouse( vgButtons button, vgModifiers mod, bool pressed, T x, T y)
     {
         VGIZMO_BASE_CLASS::mouse(button, mod, pressed,  x,  y);
         if ( button == dollyControlButton && pressed && (dollyControlModifiers ? dollyControlModifiers & mod : dollyControlModifiers == mod) ) {
@@ -372,26 +380,28 @@ public:
 
     //    Call on wheel (only for Dolly/Zoom)
     ////////////////////////////////////////////////////////////////////////////
-    void wheel( T x, T y) {
-        dolly.z += y * dollyScale * T(5);
+    void wheel( T x, T y, T z=T(0)) {
+        povPanDollyFactor = z;
+        dolly.z += y * dollyScale * wheelScale * (povPanDollyFactor>T(0) ? povPanDollyFactor : T(1));
     }
 
     //////////////////////////////////////////////////////////////////
-    void motion( int x, int y) { motion( T(x), T(y)); }
-    void motion( T x, T y) {
+    void motion( int x, int y, T z=T(0)) { motion( T(x), T(y), z); }
+    void motion( T x, T y, T z=T(0)) {
+        povPanDollyFactor = z;
         if( this->tbActive || dollyActive || panActive) VGIZMO_BASE_CLASS::motion(x,y);
     }
 
     //////////////////////////////////////////////////////////////////
     void updatePan() {
         tVec3 v(delta.x, delta.y, T(0));
-        pan += v * panScale;
+        pan += v * panScale * (povPanDollyFactor>T(0) ? povPanDollyFactor : T(1));
     }
 
     //////////////////////////////////////////////////////////////////
     void updateDolly() {
         tVec3 v(T(0), T(0), delta.y);
-        dolly -= v * dollyScale;
+        dolly -= v * dollyScale * (povPanDollyFactor>T(0) ? povPanDollyFactor : T(1));
     }
 
     //////////////////////////////////////////////////////////////////
@@ -445,18 +455,30 @@ public:
     int getPanControlButton() { return panControlButton; }
     int getPanControlModifier() { return panControlModifiers; }
 
-    //  Set the speed for the dolly operation.
+    // Sensitivity for Wheel movements -> Normalized: less < 1 < more
     //////////////////////////////////////////////////////////////////
-    void setWheelScale( T scale) { wheelScale = scale;  }
-    T getWheelScale() { return wheelScale;  }
-    //  Set the speed for the dolly operation.
+    void setNormalizedWheelScale( T scale) { wheelScale = scale*constWheelScale;  }
+    void setWheelScale( T scale)           { wheelScale = scale;  }
+    T getNormalizedWheelScale() { return wheelScale/constWheelScale;  }
+    T getWheelScale()           { return wheelScale;  }
+    // Sensitivity for Dolly movements -> Normalized: less < 1 < more
     //////////////////////////////////////////////////////////////////
-    void setDollyScale( T scale) { dollyScale = scale;  }
-    T getDollyScale() { return dollyScale;  }
-    //  Set the speed for pan
+    void setNormalizedDollyScale( T scale) { dollyScale = scale*constDollyScale;  }
+    void setDollyScale( T scale)           { dollyScale = scale;  }
+    T getNormalizedDollyScale() { return dollyScale/constDollyScale;  }
+    T getDollyScale()           { return dollyScale;  }
+    // Sensitivity for Pan movements -> Normalized: less < 1 < more
     //////////////////////////////////////////////////////////////////
-    void setPanScale( T scale) { panScale = scale; }
-    T getPanScale() { return panScale; }
+    void setNormalizedPanScale( T scale) { panScale = scale*constPanScale; }
+    void setPanScale( T scale)           { panScale = scale; }
+    T getNormalizedPanScale() { return panScale/constPanScale; }
+    T getPanScale()           { return panScale; }
+    // Sensitivity for pan/dolly by distance -> Normalized: less < 1 < more
+    //////////////////////////////////////////////////////////////////
+    void setNormalizedDistScale( T scale) { distScale = scale*constDistScale; }
+    void setDistScale( T scale)           { distScale = scale; }
+    T getNormalizedDistScale() { return distScale/constDistScale; }
+    T getDistScale()           { return distScale; }
 
     //  Set the Dolly to a specified distance.
     //////////////////////////////////////////////////////////////////
@@ -503,10 +525,18 @@ private:
 
     tVec3 pan   = tVec3(T(0));
     tVec3 dolly = tVec3(T(0));
-    
-    T dollyScale = T(.01);  //dolly scale
-    T panScale   = T(.01);  //pan scale
-    T wheelScale = T(5);   //dolly multiply for wheel
+
+    const T constDollyScale = T(.01);
+    const T constPanScale   = T(.01);  //pan scale
+    const T constWheelScale = T(7.5);  //dolly multiply for wheel step
+    const T constDistScale  = T( .1);  //speed by distance sensibility
+
+    T dollyScale = constDollyScale;  //dolly scale
+    T panScale   = constPanScale  ;  //pan scale
+    T wheelScale = constWheelScale;  //dolly multiply for wheel step
+    T distScale  = constDistScale ;  //speed by distance sensibility
+
+    T povPanDollyFactor = T(0); // internal use, maintain memory of current distance (pan/zoom speed by distance)
 };
 
 #ifdef VGM_USES_TEMPLATE
