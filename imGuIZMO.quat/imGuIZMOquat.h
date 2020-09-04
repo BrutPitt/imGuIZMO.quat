@@ -75,7 +75,7 @@ struct imguiGizmo
     vgButtons buttonPanDolly = vg::evLeftButton;
 #endif
 
-    enum      {                              //0b0000'0000, //C++14 notation
+    enum      igqMODE{                              //0b0000'0000, //C++14 notation
                 mode3Axes          = 0x0001, //0b0000'0001, 
                 modeDirection      = 0x0002, //0b0000'0010,
                 modeDirPlane       = 0x0004, //0b0000'0100,
@@ -91,11 +91,11 @@ struct imguiGizmo
                 axesModeMask       = 0xff00  
     };
 
-    enum { sphereTess16, sphereTess8, sphereTess4, sphereTess2 };
-    enum { CONE_SURF, CONE_CAP, CYL_SURF, CYL_CAP };
+    enum igqTESS{ sphereTess16, sphereTess8, sphereTess4, sphereTess2 };
+    enum igqSHAPE{ CONE_SURF, CONE_CAP, CYL_SURF, CYL_CAP };
     //enum { SOLID_SURF, SOLID_CAP }
     //enum { 
-    enum { axisIsX, axisIsY, axisIsZ };
+    enum igqAXIS{ axisIsX, axisIsY, axisIsZ };
 
     enum solidSides{ backSide, frontSide  }; // or viceversa... 
     static ImVector<vec3> sphereVtx;
@@ -314,24 +314,24 @@ struct imguiGizmo
 namespace ImGui
 {
 
-IMGUI_API bool gizmo3D(const char*, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDirection);
+IMGUI_API bool gizmo3D(const char* label, quat& a, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* label, vec4& a, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* label, vec3& a, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::modeDirection);
 
-IMGUI_API bool gizmo3D(const char*, quat&, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, quat&, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, quat&, vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* label, quat& a, quat& b, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* label, quat& a, vec4& b, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* label, quat& a, vec3& b, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 
 #ifndef IMGUIZMO_USE_ONLY_ROT
 
 //with Pan & Dolly feature
-IMGUI_API bool gizmo3D(const char*, vec3&, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, vec3&, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, vec3&, vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDirection);
+IMGUI_API bool gizmo3D(const char* label, vec3& a, quat& b, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* label, vec3& a, vec4& b, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* label, vec3& a, vec3& b, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::modeDirection);
 
-IMGUI_API bool gizmo3D(const char*, vec3&, quat&, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, vec3&, quat&, vec4&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
-IMGUI_API bool gizmo3D(const char*, vec3&, quat&, vec3&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* label, vec3& a, quat& b, quat& c, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* label, vec3& a, quat& b, vec4& c, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* label, vec3& a, quat& b, vec3& c, float size=IMGUIZMO_DEF_SIZE, const int mode=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 
 #endif
 }
