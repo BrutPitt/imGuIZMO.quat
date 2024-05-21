@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2020 Michele Morrone
+//  Copyright (c) 2018-2024 Michele Morrone
 //  All rights reserved.
 //
-//  https://michelemorrone.eu - https://BrutPitt.com
+//  https://michelemorrone.eu - https://brutpitt.com
 //
-//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//  X: https://x.com/BrutPitt - GitHub: https://github.com/BrutPitt
 //
-//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
-//  
+//  direct mail: brutpitt(at)gmail.com - me(at)michelemorrone.eu
+//
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
 #pragma once
@@ -197,6 +197,7 @@ public:
     Vec4(T x, T y, T z, T w)            : x(x),   y(y),   z(z),   w(w)   {}
     explicit Vec4(const VEC3_T& v, T s) : x(v.x), y(v.y), z(v.z), w(s)   {}
     explicit Vec4(T s, const VEC3_T& v) : x(s),   y(v.x), z(v.y), w(v.z) {}
+    Vec4(const VEC3_T& v)               : x(v.x), y(v.y), z(v.z) {}
 
     //operator VEC3_T() const { return *((VEC3_T *) &x); }
     Vec4 operator-() const { return {-x, -y, -z, -w}; }
