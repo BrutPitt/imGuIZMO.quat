@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2020 Michele Morrone
+//  Copyright (c) 2018-2024 Michele Morrone
 //  All rights reserved.
 //
-//  https://michelemorrone.eu - https://BrutPitt.com
+//  https://michelemorrone.eu - https://brutpitt.com
 //
-//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//  X: https://x.com/BrutPitt - GitHub: https://github.com/BrutPitt
 //
-//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
-//  
+//  direct mail: brutpitt(at)gmail.com - me(at)michelemorrone.eu
+//
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
 #pragma once
@@ -57,7 +57,7 @@ public:
         glGenBuffers(1, &uBuffer);
         glBindBuffer(GL_UNIFORM_BUFFER,uBuffer);
 
-        glBufferData(GL_UNIFORM_BUFFER,  uBlockSize, nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER,  uBlockSize, nullptr, GL_DYNAMIC_DRAW);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, SZ, PTR); 
     #endif
     }
@@ -90,7 +90,7 @@ public:
     void updateMVmatrix (GLuint loc) { glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.mvMatrix) ); }
     void updateMVPmatrix(GLuint loc) { glUniformMatrix4fv(loc, 1, GL_FALSE, value_ptr(tM.mvpMatrix)); }
 
-#if !defined(GLAPP_NO_GLSL_PIPELINE)
+#ifdef GLAPP_USES_GLSL_PIPELINE
     void updatePmatrix  (GLuint prog, GLuint loc) { glProgramUniformMatrix4fv(prog, loc, 1, GL_FALSE, value_ptr(tM.pMatrix)  ); }
     void updateMmatrix  (GLuint prog, GLuint loc) { glProgramUniformMatrix4fv(prog, loc, 1, GL_FALSE, value_ptr(tM.mMatrix)  ); }
     void updateVmatrix  (GLuint prog, GLuint loc) { glProgramUniformMatrix4fv(prog, loc, 1, GL_FALSE, value_ptr(tM.vMatrix)  ); }
