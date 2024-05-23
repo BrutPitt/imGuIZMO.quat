@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2020 Michele Morrone
+//  Copyright (c) 2018-2024 Michele Morrone
 //  All rights reserved.
 //
-//  https://michelemorrone.eu - https://BrutPitt.com
+//  https://michelemorrone.eu - https://glchaosp.com - https://brutpitt.com
 //
-//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//  X: https://x.com/BrutPitt - GitHub: https://github.com/BrutPitt
 //
-//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
-//  
+//  direct mail: brutpitt(at)gmail.com - me(at)michelemorrone.eu
+//
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
 #pragma once
@@ -19,10 +19,17 @@ using namespace std;
 class ProgramObject
 {
 public:
-    ProgramObject();
-    virtual ~ProgramObject();
+    ProgramObject() = default;
+
+    virtual ~ProgramObject() {  deleteProgram(); deletePipeline(); }
+
     void createProgram();
-    void deleteProgram();
+    void deleteProgram()  { if(program) glDeleteProgram(program); }
+    void deletePipeline() {
+#ifdef GLAPP_USES_GLSL_PIPELINE
+        if(pipeline) glDeleteProgramPipelines(1, &pipeline);
+#endif
+    }
 
     void addShader(ShaderObject* shader);
     void removeShader(ShaderObject* shader, bool wantDelete = false);
@@ -30,89 +37,111 @@ public:
 
     void link();
 
-    void bindPipeline();
-    void useProgram();
-    static void reset();
+    void bindShaderProg() { bindPipeline(); bindProgram(); }
+
+    void bindPipeline() {
+#ifdef GLAPP_USES_GLSL_PIPELINE
+        glBindProgramPipeline(pipeline);
+#endif
+    }
+    void bindProgram() {
+#if !defined(GLAPP_USES_GLSL_PIPELINE)
+        glUseProgram(program);
+#endif
+    }
+
+    static void resetPipeline() {
+#ifdef GLAPP_USES_GLSL_PIPELINE
+        glBindProgramPipeline(0);
+#endif
+    }
+    static void resetProgram() {
+#if !defined(GLAPP_USES_GLSL_PIPELINE)
+        glUseProgram(0);
+#endif
+    }
+
+    static void resetShaderProg() { resetProgram(); resetPipeline(); }
 
     GLuint  getHandle() { return program; }
     GLuint  getProgram() { return program; }
     GLuint  getPipeline() { return pipeline; }
 
-#ifdef GLAPP_NO_GLSL_PIPELINE
-#define USE_PROGRAM useProgram();
-  void setUniform1f(GLuint loc, GLfloat v0)                                     { glUniform1f(loc, v0); }  
-  void setUniform2f(GLuint loc, GLfloat v0, GLfloat v1)                         { glUniform2f(loc, v0, v1); }    
-  void setUniform3f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2)             { glUniform3f(loc, v0, v1, v2); }    
-  void setUniform4f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) { glUniform4f(loc, v0, v1, v2, v3); } 
-
-  void setUniform1i(GLuint loc, GLint v0)                                       { glUniform1i(loc, v0); }  
-  void setUniform2i(GLuint loc, GLint v0, GLint v1)                             { glUniform2i(loc, v0, v1); }    
-  void setUniform3i(GLuint loc, GLint v0, GLint v1, GLint v2)                   { glUniform3i(loc, v0, v1, v2); }    
-  void setUniform4i(GLuint loc, GLint v0, GLint v1, GLint v2, GLint v3)         { glUniform4i(loc, v0, v1, v2, v3); }
-
-  void setUniform1ui(GLuint loc, GLuint v0)                                     { glUniform1ui(loc, v0); }  
-  void setUniform2ui(GLuint loc, GLuint v0, GLuint v1)                          { glUniform2ui(loc, v0, v1); }    
-  void setUniform3ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2)               { glUniform3ui(loc, v0, v1, v2); }    
-  void setUniform4ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2, GLuint v3)    { glUniform4ui(loc, v0, v1, v2, v3); }
-
-  // Arrays
-  void setUniform1fv(GLuint loc, GLsizei count, const GLfloat *v)               { glUniform1fv(loc, count, v); }  
-  void setUniform2fv(GLuint loc, GLsizei count, const GLfloat *v)               { glUniform2fv(loc, count, v); }  
-  void setUniform3fv(GLuint loc, GLsizei count, const GLfloat *v)               { glUniform3fv(loc, count, v); }  
-  void setUniform4fv(GLuint loc, GLsizei count, const GLfloat *v)               { glUniform4fv(loc, count, v); }  
-  
-  void setUniform1iv(GLuint loc, GLsizei count, const GLint *v)                 { glUniform1iv(loc, count, v); }  
-  void setUniform2iv(GLuint loc, GLsizei count, const GLint *v)                 { glUniform2iv(loc, count, v); }  
-  void setUniform3iv(GLuint loc, GLsizei count, const GLint *v)                 { glUniform3iv(loc, count, v); }  
-  void setUniform4iv(GLuint loc, GLsizei count, const GLint *v)                 { glUniform4iv(loc, count, v); }  
-  
-  void setUniform1uiv(GLuint loc, GLsizei count, const GLuint *v)               { glUniform1uiv(loc, count, v); }  
-  void setUniform2uiv(GLuint loc, GLsizei count, const GLuint *v)               { glUniform2uiv(loc, count, v); }  
-  void setUniform3uiv(GLuint loc, GLsizei count, const GLuint *v)               { glUniform3uiv(loc, count, v); }  
-  void setUniform4uiv(GLuint loc, GLsizei count, const GLuint *v)               { glUniform4uiv(loc, count, v); }  
-  
-  // Matrix
-  void setUniformMatrix2fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glUniformMatrix2fv(loc, count, transpose, v); }  
-  void setUniformMatrix3fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glUniformMatrix3fv(loc, count, transpose, v); }  
-  void setUniformMatrix4fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glUniformMatrix4fv(loc, count, transpose, v); }  
-#else
+#ifdef GLAPP_USES_GLSL_PIPELINE
 #define USE_PROGRAM
-  void setUniform1f(GLuint loc, GLfloat v0)                                     { glProgramUniform1f(program, loc, v0); }  
-  void setUniform2f(GLuint loc, GLfloat v0, GLfloat v1)                         { glProgramUniform2f(program, loc, v0, v1); }    
-  void setUniform3f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2)             { glProgramUniform3f(program, loc, v0, v1, v2); }    
-  void setUniform4f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) { glProgramUniform4f(program, loc, v0, v1, v2, v3); } 
+  void setUniform1f(GLuint loc, GLfloat v0)                                     { glProgramUniform1f(program, loc, v0); }
+  void setUniform2f(GLuint loc, GLfloat v0, GLfloat v1)                         { glProgramUniform2f(program, loc, v0, v1); }
+  void setUniform3f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2)             { glProgramUniform3f(program, loc, v0, v1, v2); }
+  void setUniform4f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) { glProgramUniform4f(program, loc, v0, v1, v2, v3); }
 
-  void setUniform1i(GLuint loc, GLint v0)                                       { glProgramUniform1i(program, loc, v0); }  
-  void setUniform2i(GLuint loc, GLint v0, GLint v1)                             { glProgramUniform2i(program, loc, v0, v1); }    
-  void setUniform3i(GLuint loc, GLint v0, GLint v1, GLint v2)                   { glProgramUniform3i(program, loc, v0, v1, v2); }    
+  void setUniform1i(GLuint loc, GLint v0)                                       { glProgramUniform1i(program, loc, v0); }
+  void setUniform2i(GLuint loc, GLint v0, GLint v1)                             { glProgramUniform2i(program, loc, v0, v1); }
+  void setUniform3i(GLuint loc, GLint v0, GLint v1, GLint v2)                   { glProgramUniform3i(program, loc, v0, v1, v2); }
   void setUniform4i(GLuint loc, GLint v0, GLint v1, GLint v2, GLint v3)         { glProgramUniform4i(program, loc, v0, v1, v2, v3); }
 
-  void setUniform1ui(GLuint loc, GLuint v0)                                     { glProgramUniform1ui(program, loc, v0); }  
-  void setUniform2ui(GLuint loc, GLuint v0, GLuint v1)                          { glProgramUniform2ui(program, loc, v0, v1); }    
-  void setUniform3ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2)               { glProgramUniform3ui(program, loc, v0, v1, v2); }    
+  void setUniform1ui(GLuint loc, GLuint v0)                                     { glProgramUniform1ui(program, loc, v0); }
+  void setUniform2ui(GLuint loc, GLuint v0, GLuint v1)                          { glProgramUniform2ui(program, loc, v0, v1); }
+  void setUniform3ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2)               { glProgramUniform3ui(program, loc, v0, v1, v2); }
   void setUniform4ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2, GLuint v3)    { glProgramUniform4ui(program, loc, v0, v1, v2, v3); }
 
   // Arrays
-  void setUniform1fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform1fv(program, loc, count, v); }  
-  void setUniform2fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform2fv(program, loc, count, v); }  
-  void setUniform3fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform3fv(program, loc, count, v); }  
-  void setUniform4fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform4fv(program, loc, count, v); }  
-  
-  void setUniform1iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform1iv(program, loc, count, v); }  
-  void setUniform2iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform2iv(program, loc, count, v); }  
-  void setUniform3iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform3iv(program, loc, count, v); }  
-  void setUniform4iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform4iv(program, loc, count, v); }  
-  
-  void setUniform1uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform1uiv(program, loc, count, v); }  
-  void setUniform2uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform2uiv(program, loc, count, v); }  
-  void setUniform3uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform3uiv(program, loc, count, v); }  
-  void setUniform4uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform4uiv(program, loc, count, v); }  
-  
+  void setUniform1fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform1fv(program, loc, count, v); }
+  void setUniform2fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform2fv(program, loc, count, v); }
+  void setUniform3fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform3fv(program, loc, count, v); }
+  void setUniform4fv(GLuint loc, GLsizei count, const GLfloat *v)               { glProgramUniform4fv(program, loc, count, v); }
+
+  void setUniform1iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform1iv(program, loc, count, v); }
+  void setUniform2iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform2iv(program, loc, count, v); }
+  void setUniform3iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform3iv(program, loc, count, v); }
+  void setUniform4iv(GLuint loc, GLsizei count, const GLint *v)                 { glProgramUniform4iv(program, loc, count, v); }
+
+  void setUniform1uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform1uiv(program, loc, count, v); }
+  void setUniform2uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform2uiv(program, loc, count, v); }
+  void setUniform3uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform3uiv(program, loc, count, v); }
+  void setUniform4uiv(GLuint loc, GLsizei count, const GLuint *v)               { glProgramUniform4uiv(program, loc, count, v); }
+
   // Matrix
-  void setUniformMatrix2fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix2fv(program, loc, count, transpose, v); }  
-  void setUniformMatrix3fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix3fv(program, loc, count, transpose, v); }  
-  void setUniformMatrix4fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix4fv(program, loc, count, transpose, v); }  
-#endif                       
+  void setUniformMatrix2fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix2fv(program, loc, count, transpose, v); }
+  void setUniformMatrix3fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix3fv(program, loc, count, transpose, v); }
+  void setUniformMatrix4fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glProgramUniformMatrix4fv(program, loc, count, transpose, v); }
+#else
+#define USE_PROGRAM bindProgram();
+  void setUniform1f(GLuint loc, GLfloat v0)                                     { glUniform1f(loc, v0); }
+  void setUniform2f(GLuint loc, GLfloat v0, GLfloat v1)                         { glUniform2f(loc, v0, v1); }
+  void setUniform3f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2)             { glUniform3f(loc, v0, v1, v2); }
+  void setUniform4f(GLuint loc, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) { glUniform4f(loc, v0, v1, v2, v3); }
+
+  void setUniform1i(GLuint loc, GLint v0)                                       { glUniform1i(loc, v0); }
+  void setUniform2i(GLuint loc, GLint v0, GLint v1)                             { glUniform2i(loc, v0, v1); }
+  void setUniform3i(GLuint loc, GLint v0, GLint v1, GLint v2)                   { glUniform3i(loc, v0, v1, v2); }
+  void setUniform4i(GLuint loc, GLint v0, GLint v1, GLint v2, GLint v3)         { glUniform4i(loc, v0, v1, v2, v3); }
+
+  void setUniform1ui(GLuint loc, GLuint v0)                                     { glUniform1ui(loc, v0); }
+  void setUniform2ui(GLuint loc, GLuint v0, GLuint v1)                          { glUniform2ui(loc, v0, v1); }
+  void setUniform3ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2)               { glUniform3ui(loc, v0, v1, v2); }
+  void setUniform4ui(GLuint loc, GLuint v0, GLuint v1, GLuint v2, GLuint v3)    { glUniform4ui(loc, v0, v1, v2, v3); }
+
+  // Arrays
+  void setUniform1fv(GLuint loc, GLsizei count, const GLfloat *v)               { glUniform1fv(loc, count, v); }
+  void setUniform2fv(GLuint loc, GLsizei count, const GLfloat *v)               { glUniform2fv(loc, count, v); }
+  void setUniform3fv(GLuint loc, GLsizei count, const GLfloat *v)               { glUniform3fv(loc, count, v); }
+  void setUniform4fv(GLuint loc, GLsizei count, const GLfloat *v)               { glUniform4fv(loc, count, v); }
+
+  void setUniform1iv(GLuint loc, GLsizei count, const GLint *v)                 { glUniform1iv(loc, count, v); }
+  void setUniform2iv(GLuint loc, GLsizei count, const GLint *v)                 { glUniform2iv(loc, count, v); }
+  void setUniform3iv(GLuint loc, GLsizei count, const GLint *v)                 { glUniform3iv(loc, count, v); }
+  void setUniform4iv(GLuint loc, GLsizei count, const GLint *v)                 { glUniform4iv(loc, count, v); }
+
+  void setUniform1uiv(GLuint loc, GLsizei count, const GLuint *v)               { glUniform1uiv(loc, count, v); }
+  void setUniform2uiv(GLuint loc, GLsizei count, const GLuint *v)               { glUniform2uiv(loc, count, v); }
+  void setUniform3uiv(GLuint loc, GLsizei count, const GLuint *v)               { glUniform3uiv(loc, count, v); }
+  void setUniform4uiv(GLuint loc, GLsizei count, const GLuint *v)               { glUniform4uiv(loc, count, v); }
+
+  // Matrix
+  void setUniformMatrix2fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glUniformMatrix2fv(loc, count, transpose, v); }
+  void setUniformMatrix3fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glUniformMatrix3fv(loc, count, transpose, v); }
+  void setUniformMatrix4fv(GLuint loc, GLsizei count, GLboolean transpose, GLfloat *v) { glUniformMatrix4fv(loc, count, transpose, v); }
+#endif
   // Receive Uniform variables:
   void getUniformfv(GLuint loc, GLfloat* v)  { glGetUniformfv(program,  loc, v); }
   void getUniformiv(GLuint loc, GLint*   v)  { glGetUniformiv(program,  loc, v); }
@@ -165,8 +194,8 @@ public:
 
 protected:
     /** The handle to the program object */
-    GLuint  program;
-    GLuint pipeline;
+    GLuint  program = 0;
+    GLuint pipeline = 0;
 
     VertexShader    *vertObj = nullptr;
     FragmentShader  *fragObj = nullptr;
@@ -270,7 +299,7 @@ public:
 
         glBindBuffer(GL_UNIFORM_BUFFER,uBuffer);
 // now we alloc min size permitted, but copy realDataSize
-        glBufferData(GL_UNIFORM_BUFFER,  uBlockSize < minBlockSize ? minBlockSize : uBlockSize, nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER,  uBlockSize < minBlockSize ? minBlockSize : uBlockSize, nullptr, GL_DYNAMIC_DRAW);
         if(ptrData) glBufferSubData(GL_UNIFORM_BUFFER, 0, realDataSize, ptrData);
 #endif
     }
