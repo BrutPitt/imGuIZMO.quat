@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2019 Michele Morrone
+//  Copyright (c) 2018-2024 Michele Morrone
 //  All rights reserved.
 //
-//  https://michelemorrone.eu - https://BrutPitt.com
+//  https://michelemorrone.eu - https://brutpitt.com
 //
-//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//  X: https://x.com/BrutPitt - GitHub: https://github.com/BrutPitt
 //
-//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
-//  
+//  direct mail: brutpitt(at)gmail.com - me(at)michelemorrone.eu
+//
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
 #include "qJulia.h"
@@ -44,7 +44,7 @@ void qJulia::initShaders()
 	link();
 
     bindPipeline();
-    useProgram();
+    bindProgram();
 
     _Resolution         = getUniformLocation("resolution");
     _quatPt             = getUniformLocation("quatPt");
@@ -61,13 +61,13 @@ void qJulia::initShaders()
     _epsilon            = getUniformLocation("epsilon");
     _position           = getUniformLocation("position");
     
-    reset();
+    resetProgram();
 }
 
 void qJulia::render() 
 {
     bindPipeline();
-    useProgram();
+    bindProgram();
 
     glUniform4fv(_quatPt            ,1  , value_ptr(quatPt));
     glUniform3fv(_Resolution        ,1  , value_ptr(vec3(theApp->GetWidth(), theApp->GetHeight(),float(theApp->GetWidth())/float(theApp->GetHeight()))));
@@ -93,6 +93,6 @@ void qJulia::render()
     vao.draw();
     CHECK_GL_ERROR();
 
-    reset();
+    resetProgram();
 
 }
