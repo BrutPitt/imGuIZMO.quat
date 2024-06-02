@@ -1,3 +1,15 @@
+#------------------------------------------------------------------------------
+#  Copyright (c) 2018-2024 Michele Morrone
+#  All rights reserved.
+#
+#  https://michelemorrone.eu - https://brutpitt.com
+#
+#  X: https://x.com/BrutPitt - GitHub: https://github.com/BrutPitt
+#
+#  direct mail: brutpitt(at)gmail.com - me(at)michelemorrone.eu
+#
+#  This software is distributed under the terms of the BSD 2-Clause license
+#------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.10)
 
 set(BUILD_EMSCRIPTEN FALSE CACHE BOOL FALSE)
@@ -15,6 +27,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(M_GLOBAL_FLAGS "-DIMGUI_DIR -DGLM_ENABLE_EXPERIMENTAL")
 
 if(USE_VIRTUALGIZMO)
+    message("VirtualGizmo ... ")
     set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DGLAPP_USE_VIRTUALGIZMO")
 endif()
 
@@ -44,6 +57,7 @@ set(SOURCE_FILES
     ${SRC}/libs/${IMGUI_DIR}/imgui.h
     ${SRC}/libs/${IMGUI_DIR}/imgui.cpp
     ${SRC}/libs/${IMGUI_DIR}/imgui_widgets.cpp
+    ${SRC}/libs/${IMGUI_DIR}/imgui_tables.cpp
     ${SRC}/libs/${IMGUI_DIR}/imgui_draw.cpp
     ${SRC}/libs/${IMGUI_DIR}/imgui_demo.cpp
     ${SRC}/libs/${IMGUI_DIR}/imgui_impl_opengl3.cpp
@@ -171,9 +185,9 @@ else()
             #set(TARGET_LIBS ${CMAKE_DL_LIBS} "-lglfw3.lib")
         else()
             #find_package(glfw3 REQUIRED)
-            set(TARGET_LIBS ${CMAKE_DL_LIBS} "-lglfw3 -lpthread -lX11")
+            set(TARGET_LIBS ${CMAKE_DL_LIBS} "-lglfw -lpthread -lX11")
         endif(WIN32)
-        target_link_libraries(${PROJECT_NAME} ${OPENGL_gl_LIBRARY} ${GLFW3_LIBRARY})
+        target_link_libraries(${PROJECT_NAME} ${TARGET_LIBS} ${OPENGL_gl_LIBRARY})
     endif()
 
 endif ()
