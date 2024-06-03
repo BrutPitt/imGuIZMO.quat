@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2019 Michele Morrone
+//  Copyright (c) 2018-2024 Michele Morrone
 //  All rights reserved.
 //
-//  https://michelemorrone.eu - https://BrutPitt.com
+//  https://michelemorrone.eu - https://brutpitt.com
 //
-//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//  X: https://x.com/BrutPitt - GitHub: https://github.com/BrutPitt
 //
-//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
-//  
+//  direct mail: brutpitt(at)gmail.com - me(at)michelemorrone.eu
+//
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
 #include <sstream>
@@ -68,7 +68,7 @@ void mainImGuiDlgClass::renderImGui()
     if(ImGui::Begin("qaternion Julia set", &isVisible)) {
         ImGui::BeginGroup(); {
 
-            const float w = ImGui::GetContentRegionAvailWidth();
+            const float w = ImGui::GetContentRegionAvail().x;
             const float half = w/2.f;
             const float third = w/3.f;
 
@@ -87,7 +87,7 @@ void mainImGuiDlgClass::renderImGui()
             ImGui::Text(" Specular Comp");
             
 
-            ImGui::DragFloat("##Specular Exp", &theWnd->qjSet->specularExponent,.1, 1.0, 250.0,"%.3f",2.f);
+            ImGui::DragFloat("##Specular Exp", &theWnd->qjSet->specularExponent,.1, 1.0, 250.0,"%.3f");
             ImGui::SameLine(half);
             ImGui::DragFloat("##Specular Comp", &theWnd->qjSet->specularComponent,.001, 0.0, 1.0);
 
@@ -98,7 +98,7 @@ void mainImGuiDlgClass::renderImGui()
             ImGui::DragFloat("##Normal Color", &theWnd->qjSet->normalComponent,.001, 0.0, 1.0);
             ImGui::SameLine(half);
             float f = theWnd->qjSet->epsilon * 1000.0;
-            if(ImGui::SliderFloat("##Accuracy", &f,.001, 1.0,"%.6f",5.f)) theWnd->qjSet->epsilon = f/1000.0;
+            if(ImGui::SliderFloat("##Accuracy", &f,.001, 1.0,"%.6f")) theWnd->qjSet->epsilon = f/1000.0;
             ImGui::PopItemWidth();
 
             ImGui::PushItemWidth(third);
@@ -340,7 +340,7 @@ void mainImGuiDlgClass::renderImGui()
     if(ImGui::Begin("gizmo options", &isVisible, ImGuiWindowFlags_NoScrollbar)) {
         ImGui::BeginGroup(); {
             ImGui::Columns(2);
-            const float w = ImGui::GetContentRegionAvailWidth();
+            const float w = ImGui::GetContentRegionAvail().x;
             const float half = w/2.f;
             const float third = w/3.f;
 
