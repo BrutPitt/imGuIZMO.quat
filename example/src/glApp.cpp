@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2019 Michele Morrone
+//  Copyright (c) 2018-2024 Michele Morrone
 //  All rights reserved.
 //
-//  https://michelemorrone.eu - https://BrutPitt.com
+//  https://michelemorrone.eu - https://brutpitt.com
 //
-//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//  X: https://x.com/BrutPitt - GitHub: https://github.com/BrutPitt
 //
-//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
-//  
+//  direct mail: brutpitt(at)gmail.com - me(at)michelemorrone.eu
+//
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
 #include <chrono>
@@ -26,7 +26,7 @@
 #include "glWindow.h"
 
 // Set the application to null for the linker
-mainGLApp* mainGLApp::theMainApp = 0;
+mainGLApp* mainGLApp::theMainApp = nullptr;
 
 #ifdef GLAPP_USE_SDL
 void mainGLApp::frameInit()
@@ -252,7 +252,7 @@ GLFWmonitor* getCurrentMonitor(GLFWwindow *window)
     const GLFWvidmode *mode;
 
     bestoverlap = 0;
-    bestmonitor = NULL;
+    bestmonitor = nullptr;
 
     glfwGetWindowPos(window, &wx, &wy);
     glfwGetWindowSize(window, &ww, &wh);
