@@ -1,13 +1,13 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2019 Michele Morrone
+//  Copyright (c) 2018-2024 Michele Morrone
 //  All rights reserved.
 //
-//  https://michelemorrone.eu - https://BrutPitt.com
+//  https://michelemorrone.eu - https://brutpitt.com
 //
-//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//  X: https://x.com/BrutPitt - GitHub: https://github.com/BrutPitt
 //
-//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
-//  
+//  direct mail: brutpitt(at)gmail.com - me(at)michelemorrone.eu
+//
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
 #include "qJulia.h"
@@ -15,11 +15,9 @@
 #include "glWindow.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-// UNCOMMENT for screen manipulato virtualGizmo3D 
+// Enable USE_VIRTUALGIZMO (CMake) for muose/screen manipulato virtualGizmo3D:
+//      cmake -DUSE_VIRTUALGIZMO:BOOL=TRUE .
 ///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// if you want use also the virtualGizmo3D, screen manipulator, uncomment this:
-
 
 // Global variable or member class
 #ifdef GLAPP_USE_VIRTUALGIZMO // Enable it in glWindows.h or with compiler define
