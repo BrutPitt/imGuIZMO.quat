@@ -12,12 +12,19 @@
 #------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.10)
 
+
+# To build a WebGL (EMSCRIPTEN) version type:
+#       cmake -DBUILD_EMSCRIPTEN:BOOL=TRUE
+# obviously is need to have emsdk installed
 set(BUILD_EMSCRIPTEN FALSE CACHE BOOL FALSE)
 
-# To build with SDL framwework and VirtualGizmo type:
-# cmake -DUSE_SDL:BOOL=TRUE -DUSE_VIRTUALGIZMO:BOOL=TRUE .
-
+# To use SDL2 as backend (instead of GLFW) type:
+#       cmake -DUSE_SDL:BOOL=TRUE
+# obviously is need to have SDL2 (+devel package) installed
 set(USE_SDL FALSE CACHE BOOL FALSE)
+
+# To build with VirtualGizmo type:
+#       cmake -DUSE_VIRTUALGIZMO:BOOL=TRUE
 set(USE_VIRTUALGIZMO FALSE CACHE BOOL FALSE)
 
 set(IMGUI_DIR imgui)
@@ -114,7 +121,7 @@ if (${BUILD_EMSCRIPTEN})
         else()
             if(${CMAKE_BUILD_TYPE} MATCHES "MinSizeRel")
                 # one file no memory option: -s SINGLE_FILE=1 --memory-init-file 0 
-                set(M_EMCC_BINARYEN "-s WASM=1 -s SINGLE_FILE=1 --memory-init-file 0")
+                set(M_EMCC_BINARYEN "-s WASM=1 -s SINGLE_FILE=1")
                 set(M_EMCC_SHELL_FILE "--shell-file \"${SRC}/mVeryMinimal.html\"")
             else() # Release 
                 # -s SINGLE_FILE=1 --memory-init-file 0 -s \"BINARYEN_METHOD='interpret-asm2wasm'\"
