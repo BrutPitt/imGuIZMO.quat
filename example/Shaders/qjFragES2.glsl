@@ -1,16 +1,16 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2019 Michele Morrone
+//  Copyright (c) 2018-2024 Michele Morrone
 //  All rights reserved.
 //
-//  https://michelemorrone.eu - https://BrutPitt.com
+//  https://michelemorrone.eu - https://brutpitt.com
 //
-//  twitter: https://twitter.com/BrutPitt - github: https://github.com/BrutPitt
+//  X: https://x.com/BrutPitt - GitHub: https://github.com/BrutPitt
 //
-//  mailto:brutpitt@gmail.com - mailto:me@michelemorrone.eu
-//  
+//  direct mail: brutpitt(at)gmail.com - me(at)michelemorrone.eu
+//
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
-#line 12
+#line 13
 //Added from loader
 //#version 300 es
 //#version 430 or 450
@@ -240,8 +240,8 @@ void main() {
         vec2 coord = (gl_FragCoord.xy*2. + sampleCoord[i].xy) / resolution.xy - vec2(1.);
 
         vec3 ray = vec3(coord.x * resolution.z, coord.y, -1.);
-        vec3 dir = orient * ray + position;
-        vec3 origin = orient * Eye + position;
+        vec3 dir = orient * (ray + position);
+        vec3 origin = orient * (Eye + position);
         vec4 col;
         float AO, shadow = 1.0;
 
