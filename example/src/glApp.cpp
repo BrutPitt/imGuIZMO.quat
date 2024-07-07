@@ -96,7 +96,7 @@ int mainGLApp::getModifier() {
     bool isDoubleClick(int button, int action, double x, double y, double ms);
 #endif
 
-bool        ImGui_ImplGlfwGL3_Init(GLFWwindow* , bool , const char* );
+//bool        ImGui_ImplGlfwGL3_Init(GLFWwindow* , bool , const char* );
 
 static void glfwErrorCallback(int error, const char* description)
 {
