@@ -175,7 +175,7 @@ void glWindow::onRender()
     glViewport(0,0,theApp->GetWidth(), theApp->GetHeight());
     glClear(GL_COLOR_BUFFER_BIT);
 
-#ifdef GLAPP_USE_VIRTUALGIZMO 
+#ifdef GLAPP_USE_VIRTUALGIZMO
     qjSet->matOrientation = getGizmo().getTransform();
     qjSet->position = getGizmo().getPosition();
 
