@@ -240,25 +240,25 @@ void mainImGuiDlgClass::renderImGui()
     ImGui::SetCursorPos(ImVec2(0,theApp->GetHeight()-ImGui::GetFrameHeightWithSpacing()*15));
 
     if(!otherExamples) {
-        ImGui::TextColored(ImVec4(0.f, 1.f, 1.f, 1.f),"     imGuIZMO.quad usage");
+        ImGui::TextColored(ImVec4(1.f, .75f, 0.f, 1.f),"    imGuIZMO.quad MOUSE usage");
         ImGui::NewLine();
-        ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f),"Main rotations:");
-        ImGui::Text("- Left  btn -> free rotation axes");
+        ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f),"Main rotation:");
+        ImGui::Text("- Left  btn -> free rotation");
+        ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f),"Only for AXES with SPOT widget:");
         ImGui::Text("- Right btn -> free rotation spot");
-        ImGui::Text("- Middle/Both btns move together");
+        ImGui::Text("- Middle/Both btns -> rot both");
         ImGui::NewLine();
-        ImGui::TextColored(ImVec4(1.f, 1.f, 1.f, 1.f),"Based on widget type it can do...");
+        ImGui::TextColored(ImVec4(0.f, 1.f, 1.f, 1.f),"Based on WIDGET TYPE it can also:");
         ImGui::NewLine();
-
-        ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f),"Rotation around a fixed axis:");
-        ImGui::Text("- Shft+btn -> rot ONLY around X");
-        ImGui::Text("- Ctrl+btn -> rot ONLY around Y");
-        ImGui::Text("- Alt|Super+btn-> rot ONLY on Z");
+        ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f),"or Rotation around a fixed axis:");
+        ImGui::Text("- Shft+LBtn -> rot ONLY around X");
+        ImGui::Text("- Ctrl+LBtn -> rot ONLY around Y");
+        ImGui::Text("- Alt|Super+LBtn -> rot around Z");
         ImGui::NewLine();
-        ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f),"Pan & Dolly");
-        ImGui::Text("- Shft+btn -> Dolly/Zoom");
-        ImGui::Text("- Wheel    -> Dolly/Zoom");
-        ImGui::Text("- Ctrl+btn -> Pan/Move");
+        ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f),"or Pan & Dolly (when active):");
+        ImGui::Text("- Shft+LBtn -> Dolly/Zoom");
+        ImGui::Text("- Wheel     -> Dolly/Zoom");
+        ImGui::Text("- Ctrl+LBtn -> Pan/Move");
     }
 
     ImGui::SetCursorPos(ImVec2(0,theApp->GetHeight()-ImGui::GetFrameHeightWithSpacing()));
