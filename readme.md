@@ -1,9 +1,11 @@
 # imGuIZMO.quat &nbsp;v3.0
-**imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse, and graphically visualize their position in space, also around any single axis (*Shift/Ctrl/Alt/Super*). It uses **quaternions** algebra, internally, to manage rotations, but offers the possibility also to interfacing with **vec3**, **vec4** or **mat4x4** (rotation)
+
+**imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse <b style="color: red;">**adding only 4 code lines!**</b> and graphically visualize their position in space.
+It uses **quaternions** algebra, internally, to manage rotations, and offers the possibility (also) to interfacing with **vec3**, **vec4**, **mat3x3** or **mat4x4**
 
 - Since v3.0 you can also **move/zoom** objects via new **Pan** & **Dolly** features
 
-With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** &nbsp; &nbsp; *(read below)*
+With **imGuIZMO.quat** you can manipulate an object starting from <b style="color: red;">**only 4 code lines!**</b> &nbsp; &nbsp; *([read below](#how-to-use-imguizmoquat-to-manipulate-an-object-with-4-code-lines-))*
 
 **imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and [**vgMath**](https://github.com/BrutPitt/vgMath) a compact (my *single file header only*) vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
 
@@ -11,24 +13,23 @@ With **imGuIZMO.quat** you can manipulate an object **with only 4 code lines!** 
 
 You can use [**vgMath**](https://github.com/BrutPitt/vgMath) also externally, for your purposes: it contains classes to manipulate **vec**tors (with 2/3/4 components), **quat**ernions, square **mat**ricies (3x3 and 4x4), both as *simple* single precision `float` **classes** (*Default*) or, enabling **template classes** (*simply adding a* `#define`), both as `float` and `double` data types (also `int` and `uint` vec*). It contains also 4 helper functions to define Model/View matrix: **perspective**, **frustum**, **lookAt**, **ortho**
 
-If need a larger/complete library, as alternative to **vgMath**, is also possible to interface **imGuIZMO.quat** with [**glm** mathematics library](https://github.com/g-truc/glm) (*simply adding a* `#define`)
-
-
-==>&nbsp; **Please, read [**Configure ImGuIZMO.quad**](#Configure-ImGuIZMOquat) section.*
+In alternative to **vgMath**, if need a larger/complete library, is also possible to interface **imGuIZMO.quat** with [**glm** mathematics library](https://github.com/g-truc/glm) simply adding a `#define` (***Please, read [**Configure ImGuIZMO.quad**](#Configure-ImGuIZMOquat) section.*)
 
 ### Live WebGL2 demo
 
 You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
-- [**imGuIZMO.quat** ImGui widget + 3D Pan/Dolly (move/zoom) screen manipulator](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
+- [**imGuIZMO.quat** ImGui widget used together **virtualGizmo3D**  direct 3D mouse/screen manipulator](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
 - [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSet.html), now with 3D Pan/Dolly (move/zoom) features - **since v3.0*
 
 <p align="center"><a href="https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/wgl_qjSetVG.html"> 
 <img src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/imGuIZMO.gif"></a>
 </p>
 
-It works only on browsers with **WebGl 2** and *webAssembly* support (FireFox/Opera/Chrome and Chromium based). Test if your browser supports **WebGL2**, here: [WebGL2 Report](http://webglreport.com/?v=2)
+It works only on browsers with **WebGl 2** and *webAssembly* support (FireFox/Opera/Chrome/Edge and Chromium based): test if your browser supports **WebGL2**, here: [WebGL2 Report](http://webglreport.com/?v=2)
 
-****imGuIZMO.quat** was originally developed (currently used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** project: consult the source code for more examples.*
+****imGuIZMO.quat** was originally developed (and currently used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** project: consult the source code for more examples.*
+
+**To build examples go to [Build examples](#building-examples) section 
 
 ### Mouse buttons and key modifiers
 These are all mouse and keyModifiers controls internally used:
@@ -36,21 +37,21 @@ These are all mouse and keyModifiers controls internally used:
 - **rightButton** & drag -> free rotation spot &nbsp; &nbsp; **(used only in **Axes+Spot** widget)*
 - **middleButton** / **bothButtons** & drag -> move together axes & spot &nbsp; &nbsp; **(used only in **Axes+Spot** widget)*
 
-Based on the type of widget it can do
-- **Rotation around a fixed axis**
+Based on the widget TYPE it can also (in alternative): 
+- **or Rotation around a fixed axis** (default)
   - **leftButton**+**SHIFT** & drag -> rotation around X
   - **leftButton**+**CTRL** & drag -> rotation around Y
   - **leftButton**+**ALT**|**SUPER** & drag -> rotation around Z
-- **Pan & Dolly** (move / zoom)  - **since v3.0*
-  - **Shft+btn** -> Dolly/Zoom
+- **or Pan & Dolly** (move / zoom)  - **since v3.0*
+  - **Shft+leftButton** -> Dolly/Zoom
   - **Wheel** -> Dolly/Zoom
-  - **Ctrl+btn** -> Pan/Move
+  - **Ctrl+leftButton** -> Pan/Move
 
 **you can change default key modifier for Pan/Dolly movements, read below*
 
 <p><br></p>
 
-## How to use [imGuIZMO.quat](https://brutpitt.github.io/imGuIZMO.quat) to manipulate an object with 4 code lines 
+## How to use imGuIZMO.quat to manipulate an object with 4 code lines 
 
 To use **imGuIZMO.quat** need to include `imGuIZMOquat.h` file in your code.
 ```cpp
@@ -456,14 +457,14 @@ You can modify this behavior modifing the following parameter/define:
 
 <p>&nbsp;<br></p>
 
-### Building Example
+### Building Examples
 
 The source code example shown in the animated gif screenshot, is provided.
 
-In  example I use **GLFW** or **SDL2** (via `#define GLAPP_USE_SDL`) with **OpenGL**, but it is simple to change if you use Vulkan/DirectX/etc, other frameworks (like GLUT) or native OS access.
+In the examples I use **GLFW** (default) or **SDL2** (via `#define GLAPP_USE_SDL`) with **OpenGL**, but it is simple to change if you use Vulkan/DirectX/etc, other backends or native OS access.
 
 To build it you can use CMake (3.10 or higher) or the Visual Studio solution project (for VS 2017) in Windows.
-You need to have [**GLFW**](https://www.glfw.org/) (or [**SDL**](https://libsdl.org/)) in your compiler search path (LIB/INCLUDE). Instead copy of [**ImGui**](https://github.com/ocornut/imgui) is attached and included in the example.
+You need to have [**GLFW**](https://www.glfw.org/) (or [**SDL**](https://libsdl.org/)) installed and in your compiler search path (LIB/INCLUDE). Copy of [**ImGui**](https://github.com/ocornut/imgui) is attached and included in the example.
 
 If want use [**glm**](https://github.com/g-truc/glm), in place of internal [**vgMath**](https://github.com/BrutPitt/vgMath), you need to download it
 
@@ -471,7 +472,7 @@ If want use [**glm**](https://github.com/g-truc/glm), in place of internal [**vg
 
 Use the following command-line defines to enable different options:  
   - `-DUSE_SDL:BOOL=TRUE` to enable **SDL** framework instead of **GLFW**
-  - `-DUSE_VIRTUALGIZMO:BOOL=TRUE` to use also (together) [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) to manipulate objects
+  - `-DUSE_VIRTUALGIZMO:BOOL=TRUE` to use also (together) [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (3D mouse/screen manipulator) to manipulate objects
 
 **these flags are available also in CMakeGUI*
 
@@ -498,3 +499,5 @@ To build the **EMSCRIPTEN** version, in Windows, with CMake, need to have **ming
 * If you want use (also) full-screen manipulator [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) together with **imGuIZMO.quat**, enable `#define GLAPP_USE_VIRTUALGIZMO` define in `glWindow.cpp` file.
 * The current VisualStudio project solution refers to my environment variable RAMDISK (`R:`), and subsequent VS intrinsic variables to generate binary output:
 `$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\`, so without a RAMDISK variable, executable and binary files are outputted in base to the values of these VS variables, starting from root of current drive. &nbsp;&nbsp; *(you will find built binary here... or change it)*
+
+** VS Project Solution is no longer supported, it can be obsolete: please refer to CMAKE
