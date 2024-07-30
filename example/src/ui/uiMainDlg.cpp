@@ -56,7 +56,6 @@ void mainImGuiDlgClass::renderImGui()
    ImGui::SetNextWindowSize(ImVec2(250, 400), ImGuiCond_FirstUseEver);
    ImGui::SetNextWindowPos(ImVec2(0,0), ImGuiCond_FirstUseEver);
 
-
     bool isVisible = true;
 /*
     if(ImGui::Begin("uuu", &isVisible)) {

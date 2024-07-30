@@ -28,7 +28,6 @@ public:
 
     //~mainImGuiDlgClass() {}
 
-
     void renderImGui();
 /*
     void setTableAlterbateColor1(ImVec4 &c) { tableAlternateColor1 = c; }
