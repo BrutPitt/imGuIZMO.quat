@@ -1,11 +1,15 @@
 # imGuIZMO.quat &nbsp;v3.0
 
+<p align="right"> <span style="position:relative; top:-10px;"> <i> also  &nbsp; </i> </span> <a href="https://github.com/RenderKit/ospray-studio/tree/master/external/imGuIZMO.quat" target="_blank"><img width="200" height="40" src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/studio.png"/></a> &nbsp; <span style="position:relative; top:-10px;"> <i> uses <b> imGuIZMO.quat</b></i></span></p> 
+
+
+
 **imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse adding $\color{red}{\textbf{only 4 code lines!}}$ and graphically visualize their position in space.
 It uses **quaternions** algebra, internally, to manage rotations, and offers the possibility (also) to interfacing with **vec3**, **vec4**, **mat3x3** or **mat4x4**
 
 - Since v3.0 you can also **move/zoom** objects via new **Pan** & **Dolly** features
 
-With **imGuIZMO.quat** you can manipulate an object starting from $\color{red}{\textbf{ only 4 code lines!}}$ &nbsp; *([read below](#how-to-use-imguizmoquat-to-manipulate-an-object-with-4-code-lines-))*
+With **imGuIZMO.quat** you can manipulate an object starting from $\color{red}{\textbf{ only 4 code lines!}}$ &nbsp; *([read below](#how-to-use-imguizmoquat))*
 
 **imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and [**vgMath**](https://github.com/BrutPitt/vgMath) a compact (my *single file header only*) vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
 
@@ -51,13 +55,13 @@ Based on the widget TYPE it can also (in alternative):
 
 <p><br></p>
 
-## How to use imGuIZMO.quat to manipulate an object with 4 code lines 
+## How to use imGuIZMOquat
 
-To use **imGuIZMO.quat** need to include `imGuIZMOquat.h` file in your code.
+How to use **imGuIZMO.quat** in your code to manipulate an object need to include `imGuIZMOquat.h` file in your code.
 ```cpp
 #include "imGuIZMOquat.h"
 ```
-You can think of declaring declare an object of type `quat` (quaternion), global or static or as member of your class, to maintain track of rotations:
+You can think of declaring an object of type `quat` (quaternion), global or static or as member of your class, to maintain track of rotations:
 
 ```cpp
 // For imGuIZMO, declare static or global variable or member class quaternion
@@ -74,7 +78,7 @@ Finally in your render function (or where you prefer) you can get back the trans
     mat4 modelMatrix = mat4_cast(qRot);
     // now you have modelMatrix with rotation then can build MV and MVP matrix
 ```
-now you have modelMatrix with rotation then can build MV and MVP matrix
+now we have modelMatrix with rotation then we can build MV and MVP matrix
 
 ### alternately
 
