@@ -5,7 +5,7 @@ It uses **quaternions** algebra, internally, to manage rotations, and offers the
 
 - Since v3.0 you can also **move/zoom** objects via new **Pan** & **Dolly** features
 
-With **imGuIZMO.quat** you can manipulate an object starting from $${{\color{red}\textsf{  only\ 4\ code\ lines\!\ \}}}\$$ &nbsp; &nbsp; *([read below](#how-to-use-imguizmoquat-to-manipulate-an-object-with-4-code-lines-))*
+With **imGuIZMO.quat** you can manipulate an object starting from $\color{red}{\textbf{ only 4 code lines!}}$ &nbsp; &nbsp; *([read below](#how-to-use-imguizmoquat-to-manipulate-an-object-with-4-code-lines-))*
 
 **imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and [**vgMath**](https://github.com/BrutPitt/vgMath) a compact (my *single file header only*) vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
 
