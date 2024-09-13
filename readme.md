@@ -1,11 +1,11 @@
 # imGuIZMO.quat &nbsp;v3.0
 
-**imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse <b style="color: red;">**adding only 4 code lines!**</b> and graphically visualize their position in space.
+**imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse adding $\color{red}{\textbf{only 4 code lines!}}$ and graphically visualize their position in space.
 It uses **quaternions** algebra, internally, to manage rotations, and offers the possibility (also) to interfacing with **vec3**, **vec4**, **mat3x3** or **mat4x4**
 
 - Since v3.0 you can also **move/zoom** objects via new **Pan** & **Dolly** features
 
-With **imGuIZMO.quat** you can manipulate an object starting from $\color{red}{\textbf{ only 4 code lines!}}$ &nbsp; &nbsp; *([read below](#how-to-use-imguizmoquat-to-manipulate-an-object-with-4-code-lines-))*
+With **imGuIZMO.quat** you can manipulate an object starting from $\color{red}{\textbf{ only 4 code lines!}}$ &nbsp; *([read below](#how-to-use-imguizmoquat-to-manipulate-an-object-with-4-code-lines-))*
 
 **imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and [**vgMath**](https://github.com/BrutPitt/vgMath) a compact (my *single file header only*) vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
 
