@@ -2,38 +2,28 @@
 
 <p align="right"> <span style="position:relative; top:-10px;"> <i> also  &nbsp; </i> </span> <a href="https://github.com/RenderKit/ospray-studio/tree/master/external/imGuIZMO.quat" target="_blank"><img width="200" height="40" src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/studio.png"/></a> &nbsp; <span style="position:relative; top:-10px;"> <i> uses <b> imGuIZMO.quat</b></i></span></p> 
 
+With **imGuIZMO.quat** you can manipulate objects starting from $\color{red}{\textbf{ only 4 code lines!}}$ &nbsp; *([read below](#how-to-implement-imguizmoquat))*
 
-
-**imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: like a trackball it provides a way to rotate models, lights, or objects with mouse adding $\color{red}{\textbf{only 4 code lines!}}$ and graphically visualize their position in space.
-It uses **quaternions** algebra, internally, to manage rotations, and offers the possibility (also) to interfacing with **vec3**, **vec4**, **mat3x3** or **mat4x4**
-
-- Since v3.0 you can also **move/zoom** objects via new **Pan** & **Dolly** features
-
-With **imGuIZMO.quat** you can manipulate an object starting from $\color{red}{\textbf{ only 4 code lines!}}$ &nbsp; *([read below](#how-to-use-imguizmoquat))*
-
-**imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and [**vgMath**](https://github.com/BrutPitt/vgMath) a compact (my *single file header only*) vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
-
-**No other files or external libraries are required**, except [**ImGui**](https://github.com/ocornut/imgui) (of course).
-
-You can use [**vgMath**](https://github.com/BrutPitt/vgMath) also externally, for your purposes: it contains classes to manipulate **vec**tors (with 2/3/4 components), **quat**ernions, square **mat**ricies (3x3 and 4x4), both as *simple* single precision `float` **classes** (*Default*) or, enabling **template classes** (*simply adding a* `#define`), both as `float` and `double` data types (also `int` and `uint` vec*). It contains also 4 helper functions to define Model/View matrix: **perspective**, **frustum**, **lookAt**, **ortho**
-
-In alternative to **vgMath**, if need a larger/complete library, is also possible to interface **imGuIZMO.quat** with [**glm** mathematics library](https://github.com/g-truc/glm) simply adding a `#define` (***Please, read [**Configure ImGuIZMO.quad**](#Configure-ImGuIZMOquat) section.*)
-
-### Live WebGL2 demo
-
-You can run/test **WebGL 2** examples of **imGuIZMO** from following links:
-- [**imGuIZMO.quat** ImGui widget used together **virtualGizmo3D**  direct 3D mouse/screen manipulator](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
-- [**imGuIZMO.quat** ImGui widget manipulator (only)](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSet.html), now with 3D Pan/Dolly (move/zoom) features - **since v3.0*
-
-<p align="center"><a href="https://brutpitt.github.io/imGuIZMO.quat/example/WebGL/wgl_qjSetVG.html"> 
+<p align="center"><a href="https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSetVG.html"> 
 <img src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/imGuIZMO.gif"></a>
 </p>
+
+**imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: it provides a way to rotate and move (pan/dolly) models, lights, objects, cameras (etc), with mouse, adding $\color{red}{\textbf{only 4 code lines!}}$ to your code.
+It uses **quaternions** algebra, internally, to manage rotations, and offers the possibility (also) to interfacing with **vec3**, **vec4**, **mat3x3** or **mat4x4**
+
+### Live WebGL2 demo examples 
+
+You can run/try **WebGL 2** examples of **imGuIZMO** from following links:
+- [**imGuIZMO.quat** used together **virtualGizmo3D**  direct 3D mouse/screen manipulator](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
+- [**imGuIZMO.quat** manipulator (only)](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSet.html), now with 3D Pan/Dolly (move/zoom) features - **since v3.0*
+- A different example: [**imGuIZMO.quat** + **virtualGizmo3D** used to manipulate axes](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglGizmo.html)  
+
 
 It works only on browsers with **WebGl 2** and *webAssembly* support (FireFox/Opera/Chrome/Edge and Chromium based): test if your browser supports **WebGL2**, here: [WebGL2 Report](http://webglreport.com/?v=2)
 
 ****imGuIZMO.quat** was originally developed (and currently used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** project: consult the source code for more examples.*
 
-**To build examples go to [Build examples](#building-examples) section 
+
 
 ### Mouse buttons and key modifiers
 These are all mouse and keyModifiers controls internally used:
@@ -53,11 +43,20 @@ Based on the widget TYPE it can also (in alternative):
 
 **you can change default key modifier for Pan/Dolly movements, read below*
 
-<p><br></p>
 
-## How to use imGuIZMOquat
+## Technical notes
+**imGuIZMO.quat** is written in C++ (C++11) and consist of two files `imGuIZMOquat.h` and `imGuIZMOuat.cpp`, uses `vGizmo.h` [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (my *header only* screen manipulator tool in *Immediate Mode*) and [**vgMath**](https://github.com/BrutPitt/vgMath) a compact (my *single file header only*) vectors/matrices/quaternions tool/lib that makes **imGuIZMO.quat** standalone.
 
-How to use **imGuIZMO.quat** in your code to manipulate an object need to include `imGuIZMOquat.h` file in your code.
+**No other files or external libraries are required**, except [**ImGui**](https://github.com/ocornut/imgui) (of course).
+
+
+In alternative to **vgMath**, if prefer a larger/complete library, is also possible to interface **imGuIZMO.quat** with [**glm** mathematics library](https://github.com/g-truc/glm) simply adding a `#define` (***Please, read [**Configure ImGuIZMO.quad**](#Configure-ImGuIZMOquat) section.*)
+
+<p>&nbsp;<br></p>
+                 
+
+## How to implement imGuIZMOquat
+How to use **imGuIZMO.quat** in your code to manipulate an object: starting to include `imGuIZMOquat.h` file in your code.
 ```cpp
 #include "imGuIZMOquat.h"
 ```
@@ -119,9 +118,7 @@ In your render function (or where you prefer) you can get back the transformatio
     // now you have modelMatrix with rotation then can build MV and MVP matrix
 ```
 
-
-
-<p>&nbsp;<br>&nbsp;<br></p>
+<p>&nbsp;<br></p>
 
 ## Widget types
 
