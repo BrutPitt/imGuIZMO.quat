@@ -10,7 +10,7 @@
 //
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <glad/glad.h>
 #include <imgui/imgui.h>
@@ -20,7 +20,7 @@
 #include <GLFW/glfw3.h>
 
 #include "oglDebug.h"
-#include "shadersAndModel.h"
+#include "../commons/shadersAndModel.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
@@ -34,17 +34,19 @@ GLuint nElemVtx = 4;
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
-
-mat4 mvpMatrix, viewMatrix, projMatrix, lightMatrix;
-vec3 light(2.5, 2.5, 2.5);
 enum loc { vtxIdx = 0, colIdx, mvpIdx, lightIdx};     // shader locations
+
+mat4 mvpMatrix, viewMatrix, projMatrix;
+mat4 lightObj, lightMatrix, cubeObj;
+
+vec3 lightPos(2, 2, 2);        // Light Position
 
 void draw()
 {
     glUseProgram(program);
 
-    glProgramUniformMatrix4fv(program, loc::mvpIdx,   1, false, value_ptr(mvpMatrix)  );  // using vgMath instead of GLM you can cast to mat4*
-    glProgramUniformMatrix4fv(program, loc::lightIdx, 1, false, value_ptr(lightMatrix));  // vgMath also cast: (mat4*) or static_cast<mat4*>()
+    glProgramUniformMatrix4fv(program, loc::mvpIdx,   1, false, value_ptr(mvpMatrix)  );  // vgMath permits cast to mat4*
+    glProgramUniformMatrix4fv(program, loc::lightIdx, 1, false, value_ptr(lightMatrix));  // using value_ptr maintains GLM compatibility
 
     glBindVertexArray(vao);
     //glDrawArrays(GL_TRIANGLES, 0, nVertex);
@@ -53,19 +55,35 @@ void draw()
     glUseProgram(0);
 }
 
-void setCamera()
+void setPerspective()
 {
     float aspectRatio = float(height) / float(width);       // Set "camera" position and perspective
-    float fov = radians( 75.0f ) * aspectRatio;
-    vec3 upVec(0.0f, 1.0f, .0f);
-    viewMatrix = lookAt( vec3( 0.0f, 0.0f, 10.0f ),  vec3( 0.0f, 0.0f, 0.0f ),  upVec);
+    float fov = radians( 45.0f ) * aspectRatio;
     projMatrix = perspective( fov, 1/aspectRatio, 0.1f, 100.0f );
+}
+
+void setScene()
+{
+    viewMatrix = lookAt( vec3(  0.0f,  0.0f, 10.0f ),   // From / EyePos
+                         vec3(  0.0f,  0.0f,  0.0f ),   // To   /
+                         vec3(  0.0f,  1.0f,   .0f));   // Up
+
+    // Now scale cube to better view light position
+    cubeObj = scale(mat4(1), vec3(.5));
+
+
+    // light model
+
+    lightObj = translate(mat4(1), lightPos);
+    lightObj = scale(lightObj, vec3(.1));       // using same cube vertex but with 10% size
+
+    setPerspective();
 }
 
 void glfwWindowSizeCallback(GLFWwindow* window, int w, int h)
 {
     width = w; height = h;
-    setCamera();
+    setPerspective();
     glViewport(0, 0, width, height);
     draw();
 }
@@ -117,10 +135,10 @@ void initGL()
     glFrontFace(GL_CW);
 
     glDepthRange(-1.0, 1.0);
-    setCamera();
+    setScene();
 }
 
-void initGLFW()
+void initFramework()
 {
     glfwInit();
 
@@ -166,7 +184,7 @@ void initImGui()
 
 int main()
 {
-    initGLFW();         // initialize GLFW framework
+    initFramework();         // initialize GLFW framework
     initGL();           // init OpenGL building vaoBuffer and shader program (compile and link vtx/frag shaders)
 
     // other OpenGL settings... used locally
@@ -178,7 +196,7 @@ int main()
     ImGuiStyle& style = ImGui::GetStyle();
 
     // imGuIZMO: set mouse feeling and mods
-    ///////////////////////////////////
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     imguiGizmo::setGizmoFeelingRot(2.f);                    // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
     imguiGizmo::setPanScale(3.5f);                          // default 1.0, >1 more, <1 less
     imguiGizmo::setDollyScale(3.5f);                        // default 1.0, >1 more, <1 less
@@ -220,10 +238,10 @@ int main()
                                           ImGuiWindowFlags_NoScrollbar);
 
     // imGuIZMO: declare global/static/member/..
-    ///////////////////////////////////
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         static quat rotation(1,0,0,0);       // quat default constructor initialize @ quat(1,0,0,0) ==> w(1) x(0) y(0) z(0), w is left/first value
         static vec3 position;                // default initialization vec3(0)
-        vec3 tmpLight = -light;              // Light Vector have inverse direction (toward origin) so using a tmp vect
+        vec3 tmpLight = -lightPos;              // Light Vector have inverse direction (toward origin) so using a tmp vect
 
     // colored text for display quat(w,x,y,z) components
         ImGui::SetCursorPos(ImVec2(0,0));
@@ -235,12 +253,12 @@ int main()
         ImGui::PopItemWidth();
 
     // ImGuIZMO.quat widget
-    ///////////////////////////////////
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if(ImGui::gizmo3D("##aaa", rotation, tmpLight, widgetSize)) // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
-            light = -tmpLight;                                      // restore sign from acquired rotation
+            lightPos = -tmpLight;                                      // restore sign from acquired rotation
 
     // ImGuIZMO.quat with also pan and Dolly/zoom
-    ///////////////////////////////////
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         ImGui::gizmo3D("##a01", position, rotation, widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
 
     // End Imgui window (container) block
@@ -256,9 +274,9 @@ int main()
 
     // Build a "translation" matrix
         mat4 translationMatrix = translate(mat4(1), position);      // add translations (pan/dolly) to an identity matrix
-    // build MVP matrix to pass to shader
-        mvpMatrix   = projMatrix * translationMatrix * viewMatrix * static_cast<mat4>(rotation);
-        lightMatrix = projMatrix * translationMatrix * translate(mat4(1), light) * viewMatrix;
+    // build MVP matrix to pass to shader  ==> watch oglCube_05 and higher for better / more correct implementation
+        mvpMatrix   = projMatrix * viewMatrix * translationMatrix * static_cast<mat4>(rotation);
+        lightMatrix = projMatrix * translationMatrix * translate(mat4(1), lightPos) * viewMatrix * scale(mat4(1), vec3(.1));  // using same cube vertex but with 10% size
 
     // draw the cube, passing MVP matrix to the vtx shader
         draw();
@@ -280,7 +298,7 @@ int main()
     glDeleteBuffers(1, &vaoBuffer);
     glDeleteProgram(program);
 
-    // Cleanup GLFW
+    // Cleanup Framework
     glfwDestroyWindow(glfwWindow);
     glfwTerminate();
 }

@@ -10,7 +10,7 @@
 //
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <glad/glad.h>
 #include <imgui/imgui.h>
@@ -20,7 +20,7 @@
 #include <GLFW/glfw3.h>
 
 #include "oglDebug.h"
-#include "shadersAndModel.h"
+#include "../commons/shadersAndModel.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
@@ -34,17 +34,28 @@ GLuint nElemVtx = 4;
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
-
-mat4 mvpMatrix, viewMatrix, projMatrix, lightMatrix;
-vec3 light(2.5, 2.5, 2.5);
 enum loc { vtxIdx = 0, colIdx, mvpIdx, lightIdx};     // shader locations
+
+mat4 mvpMatrix, viewMatrix, projMatrix;
+mat4 lightMatrix, cubeObj;
+
+/// imGuIZMO / vGizmo3D : declare global/static/member/..
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+vg::vGizmo3D track;     // using vGizmo3D global/static/member instead of specifics variables...
+                        // have rotations & Pan/Dolly position variables inside to use with imGuIZMO.quat
+                        // And it's necessary if you want use also direct-screen manipulator
+
+mat4 compensateView; // compensate rotation of viewMatrix lookAt Matrix
+
+// light model
+vec3 lightPos(2, 2.5, 3);        // Light Position
 
 void draw()
 {
     glUseProgram(program);
 
-    glProgramUniformMatrix4fv(program, loc::mvpIdx,   1, false, value_ptr(mvpMatrix)  );  // using vgMath instead of GLM you can cast to mat4*
-    glProgramUniformMatrix4fv(program, loc::lightIdx, 1, false, value_ptr(lightMatrix));  // vgMath also cast: (mat4*) or static_cast<mat4*>()
+    glProgramUniformMatrix4fv(program, loc::mvpIdx,   1, false, value_ptr(mvpMatrix)  );  // vgMath permits cast to mat4*
+    glProgramUniformMatrix4fv(program, loc::lightIdx, 1, false, value_ptr(lightMatrix));  // using value_ptr maintains GLM compatibility
 
     glBindVertexArray(vao);
     //glDrawArrays(GL_TRIANGLES, 0, nVertex);
@@ -53,20 +64,53 @@ void draw()
     glUseProgram(0);
 }
 
-void setCamera()
+void setPerspective()
 {
     float aspectRatio = float(height) / float(width);       // Set "camera" position and perspective
-    float fov = radians( 75.0f ) * aspectRatio;
-    vec3 upVec(0.0f, 1.0f, .0f);
-    viewMatrix = lookAt( vec3( 0.0f, 0.0f, 10.0f ),  vec3( 0.0f, 0.0f, 0.0f ),  upVec);
+    float fov = radians( 45.0f ) * aspectRatio;
     projMatrix = perspective( fov, 1/aspectRatio, 0.1f, 100.0f );
+}
+
+void setScene()
+{
+    viewMatrix = lookAt( vec3( 10.0f, 10.0f, 10.0f ),   // From / EyePos
+                         vec3(  0.0f,  0.0f,  0.0f ),   // To   /
+                         vec3(  3.0f,  1.0f,   .0f));   // Up
+
+    // Now scale cube to better view light position
+    cubeObj = mat4(1); // nothing to do ... scale( vec3(.5));
+
+/// imGuIZMO / vGizmo3D
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //track.setRotation(quat(1,0,0,0));                     // vGizmo3D with NO initial rotation (default initialization)
+    //track.setRotation(eulerAngleXYZ(vec3(radians(45),
+    //                                     radians( 0),
+    //                                     radians( 0))));  // vGizmo3D with rotation of 45 degrees on X axis
+    track.setRotation(viewMatrix);                          // vGizmo3D with ViewMatrix (lookAt) rotation
+
+    // for Pan & Dolly always bounded on screen coords (x = left/right, y = up/douw, z = in/out) we remove viewMatrix rotation
+    // otherwise Pan & Dolly have as reference the Cartesian axes
+    compensateView = inverse(mat4_cast(quat(viewMatrix)));
+
+
+    // acquiring rotation for the light pos
+    const float len = length(lightPos);
+     //if(len<1.0 && len>= FLT_EPSILON) { normalize(lightPos); len = 1.0; }  // controls are not necessary: lightPos is known
+     //else if(len > FLT_EPSILON)
+        quat q = angleAxis(acosf(-lightPos.x/len), normalize(vec3(FLT_EPSILON, lightPos.z, -lightPos.y)));
+    track.setSecondRot(q);          // store secondary rotation for the Light
+
+    setPerspective();
 }
 
 void glfwWindowSizeCallback(GLFWwindow* window, int w, int h)
 {
     width = w; height = h;
-    setCamera();
+    setPerspective();
     glViewport(0, 0, width, height);
+
+    track.viewportSize(w, h);   // call it on resize window to re-adjust mouse sensitivity
+
     draw();
 }
 
@@ -117,10 +161,9 @@ void initGL()
     glFrontFace(GL_CW);
 
     glDepthRange(-1.0, 1.0);
-    setCamera();
+    setScene();
 }
-
-void initGLFW()
+void initFramework()
 {
     glfwInit();
 
@@ -166,7 +209,7 @@ void initImGui()
 
 int main()
 {
-    initGLFW();         // initialize GLFW framework
+    initFramework();         // initialize GLFW framework
     initGL();           // init OpenGL building vaoBuffer and shader program (compile and link vtx/frag shaders)
 
     // other OpenGL settings... used locally
@@ -178,10 +221,10 @@ int main()
     ImGuiStyle& style = ImGui::GetStyle();
 
     // imGuIZMO: set mouse feeling and mods
-    ///////////////////////////////////
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     imguiGizmo::setGizmoFeelingRot(2.f);                    // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
     imguiGizmo::setPanScale(3.5f);                          // default 1.0, >1 more, <1 less
-    imguiGizmo::setDollyScale(3.5f);                        // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyScale(17.5f);                        // default 1.0, >1 more, <1 less
     imguiGizmo::setDollyWheelScale(7.0f);                   // default 2.0, > more, < less ... (from v3.1 separate values)
     imguiGizmo::setPanModifier(vg::evSuperModifier);        // change KEY modifier: CTRL (default) ==> SUPER
     imguiGizmo::setDollyModifier(vg::evControlModifier);    // change KEY modifier: SHIFT (default) ==> CTRL
@@ -219,37 +262,23 @@ int main()
                                           ImGuiWindowFlags_NoResize|
                                           ImGuiWindowFlags_NoScrollbar);
 
-    // imGuIZMO: declare global/static/member/..
-    ///////////////////////////////////
-        static vg::vGizmo3D track;          // using vGizmo3D global/static/member instead of single variables...
-                                            // no real advantage for imGuIZMO.quat, but necessary if you want use also direct-screen manipulator
-                                            // you can initialize it with: setRotation(quat) and setPosition(vec3)
-
-        quat rotation = track.getRotation(); // no more global/static/member but get actual rotation before widget
-        vec3 position = track.getPosition(); // no more global/static/member but get actual position before widget
-        vec3 tmpLight = -light;              // Light Vector have inverse direction (toward origin) so using a tmp vect
 
     // colored text for display quat(w,x,y,z) components
         ImGui::SetCursorPos(ImVec2(0,0));
         ImGui::PushItemWidth(widgetSize*.25-2);
-        ImGui::TextColored(ImVec4(1,1,1,1), "w: % 1.2f", rotation.w); ImGui::SameLine();
-        ImGui::TextColored(ImVec4(1,0,0,1), "x: % 1.2f", rotation.x); ImGui::SameLine();
-        ImGui::TextColored(ImVec4(0,1,0,1), "y: % 1.2f", rotation.y); ImGui::SameLine();
-        ImGui::TextColored(ImVec4(0,0,1,1), "z: % 1.2f", rotation.z);
+        ImGui::TextColored(ImVec4(1,1,1,1), "w: % 1.2f", track.getRotation().w); ImGui::SameLine();
+        ImGui::TextColored(ImVec4(1,0,0,1), "x: % 1.2f", track.getRotation().x); ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0,1,0,1), "y: % 1.2f", track.getRotation().y); ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0,0,1,1), "z: % 1.2f", track.getRotation().z);
         ImGui::PopItemWidth();
 
     // ImGuIZMO.quat widget
-    ///////////////////////////////////
-        if(ImGui::gizmo3D("##aaa", rotation, tmpLight, widgetSize)) // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
-            light = -tmpLight;                                      // restore sign from acquired rotation
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        ImGui::gizmo3D("##aaa", track.getRotationRef(), lightPos, widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
 
     // ImGuIZMO.quat with also pan and Dolly/zoom
-    ///////////////////////////////////
-        ImGui::gizmo3D("##a01", position, rotation, widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
-
-        track.setRotation(rotation); // and restore rotation after widget
-        track.setPosition(position); // and restore position after widget
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        ImGui::gizmo3D("##a01", track.getPositionRef(), track.getRotationRef(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
 
     // End Imgui window (container) block
         ImGui::End();
@@ -259,12 +288,14 @@ int main()
 
 
     // Build a "translation" matrix
-        mat4 translationMatrix = translate(mat4(1), track.getPosition());      // add translations (pan/dolly) to an identity matrix
-    // build MVP matrix to pass to shader
-        mvpMatrix   = projMatrix * translationMatrix * viewMatrix * static_cast<mat4>(track.getRotation());
-        lightMatrix = projMatrix * translationMatrix * translate(mat4(1), light) * viewMatrix;
 
-    // draw the cube, passing MVP matrix to the vtx shader
+        mat4 translationMatrix = translate(mat4(1), track.getPosition());      // add translations (pan/dolly) to an identity matrix
+
+    // build MVPs matrices to pass to shader
+        mvpMatrix   = projMatrix * viewMatrix * compensateView * translationMatrix * cubeObj * static_cast<mat4>(track.getRotation())  ;
+        lightMatrix = projMatrix * viewMatrix * compensateView * translationMatrix * translate(mat4(1), lightPos) * scale(mat4(1), vec3(.1));
+
+    // draw the cube, passing matrices to the vtx shader
         draw();
 
     // ImGui Rendering
@@ -284,7 +315,7 @@ int main()
     glDeleteBuffers(1, &vaoBuffer);
     glDeleteProgram(program);
 
-    // Cleanup GLFW
+    // Cleanup Framework
     glfwDestroyWindow(glfwWindow);
     glfwTerminate();
 }

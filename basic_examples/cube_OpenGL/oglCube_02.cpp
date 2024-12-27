@@ -10,7 +10,7 @@
 //
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <glad/glad.h>
 #include <imgui/imgui.h>
@@ -20,7 +20,7 @@
 #include <GLFW/glfw3.h>
 
 #include "oglDebug.h"
-#include "shadersAndModel.h"
+#include "../commons/shadersAndModel.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
@@ -34,15 +34,17 @@ GLuint nElemVtx = 4;
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
-
-mat4 mvpMatrix, viewMatrix, projMatrix;
 enum loc { vtxIdx = 0, colIdx, mvpIdx};     // shader locations
 
+mat4 mvpMatrix, projMatrix;
+mat4 viewMatrix = lookAt( vec3(  0.0f,  0.0f, 10.0f ),   // From / EyePos
+                          vec3(  0.0f,  0.0f,  0.0f ),   // To   /
+                          vec3(  0.0f,  1.0f,   .0f));   // Up
 void draw()
 {
     glUseProgram(program);
 
-    glProgramUniformMatrix4fv(program, loc::mvpIdx, 1, false, value_ptr(mvpMatrix));
+    glProgramUniformMatrix4fv(program, loc::mvpIdx, 1, false, value_ptr(mvpMatrix)); // internal vgMath permits also "static_cast": use value_ptr for GLM compatibility
 
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, nVertex);
@@ -50,19 +52,17 @@ void draw()
     glUseProgram(0);
 }
 
-void setCamera()
+void setPerspective()
 {
     float aspectRatio = float(height) / float(width);       // Set "camera" position and perspective
     float fov = radians( 45.0f ) * aspectRatio;
-    vec3 upVec(0.0f, 1.0f, .0f);
-    viewMatrix = lookAt( vec3( 0.0f, 0.0f, 10.0f ),  vec3( 0.0f, 0.0f, 0.0f ),  upVec);
     projMatrix = perspective( fov, 1/aspectRatio, 0.1f, 100.0f );
 }
 
 void glfwWindowSizeCallback(GLFWwindow* window, int w, int h)
 {
     width = w; height = h;
-    setCamera();
+    setPerspective();
     glViewport(0, 0, width, height);
     draw();
 }
@@ -114,10 +114,10 @@ void initGL()
     glFrontFace(GL_CW);
 
     glDepthRange(-1.0, 1.0);
-    setCamera();
+    setPerspective();
 }
 
-void initGLFW()
+void initFramework()
 {
     glfwInit();
 
@@ -163,7 +163,7 @@ void initImGui()
 
 int main()
 {
-    initGLFW();         // initialize GLFW framework
+    initFramework();         // initialize GLFW framework
     initGL();           // init OpenGL building vaoBuffer and shader program (compile and link vtx/frag shaders)
 
     // other OpenGL settings... used locally
@@ -208,7 +208,7 @@ int main()
                                           ImGuiWindowFlags_NoScrollbar);
 
     // imGuIZMO: declare global/static/member/..
-    ///////////////////////////////////
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         static quat rotation(1,0,0,0);          // quat default constructor initialize @ quat(1,0,0,0) ==> w(1) x(0) y(0) z(0), w is left/first value
         static vec3 position;
 
@@ -222,12 +222,12 @@ int main()
         ImGui::PopItemWidth();
 
     // ImGuIZMO.quat widget
-    ///////////////////////////////////
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         ImGui::gizmo3D("##aaa", rotation, widgetSize);  // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
                                                         // it returns "only" a rotation (net of transformations) in base to mouse(x,y) movement
                                                         // and add new rotation, obtained from new "delta.xy" mouse motion, to previous one (saved in your global/static/member var)
     // ImGuIZMO.quat with also pan and Dolly/zoom
-    ///////////////////////////////////
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         ImGui::gizmo3D("##a01", position, rotation, widgetSize);     // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
 
     // End Imgui window (container) block
@@ -243,8 +243,9 @@ int main()
 
     // Build a "translation" matrix
         mat4 translationMatrix = translate(mat4(1), position);      // add translations (pan/dolly) to an identity matrix
-    // build MVP matrix to pass to shader
-        mvpMatrix = projMatrix * translationMatrix * viewMatrix * static_cast<mat4>(rotation);
+
+    // build MVP matrix to pass to shader ==> view oglCube_05 and higher for better / more correct implementation
+        mvpMatrix = projMatrix * viewMatrix * translationMatrix * static_cast<mat4>(rotation);
 
     // draw the cube, passing MVP matrix to the vtx shader
         draw();
@@ -266,7 +267,7 @@ int main()
     glDeleteBuffers(1, &vaoBuffer);
     glDeleteProgram(program);
 
-    // Cleanup GLFW
+    // Cleanup Framework
     glfwDestroyWindow(glfwWindow);
     glfwTerminate();
 }
