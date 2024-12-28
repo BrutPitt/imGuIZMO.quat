@@ -11,158 +11,110 @@
 #  This software is distributed under the terms of the BSD 2-Clause license
 #------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.16)
-project(ImGuIZMO_Cube)
-
-# To build using only ImGuIZMO.quat without vVirtualGizmo3D (screen manipulator) type  or add option:
-#       cmake -DUSE_VIRTUALGIZMO=OFF
-option(USE_VIRTUALGIZMO "Use ImGuIZMO.quat with vVirtualGizmo3D (screen manipulator)" ON )
-
-# To use SDL2 | SDL3 as backend (instead of GLFW) type or add option to cmake commandline:
-#       cmake -DUSE_SDL2=ON
-#   or
-#       cmake -DUSE_SDL3=ON
-option(USE_SDL2 "Use SDL2 instead of GLFW" OFF )
-option(USE_SDL3 "Use SDL3 instead of GLFW (if also SDL2 is ON, SDL2 is selected)" OFF )
+project(vkCube)
 
 # Debug Validation Layer is enabled in ONLY Debug mode
 #       cmake -DFORCE_VALIDATION_LAYER:BOOL=TRUE
 # enable VL anyway
-set(FORCE_VALIDATION_LAYER FALSE CACHE BOOL FALSE)
+option(FORCE_VALIDATION_LAYER "Enable Debug Validation Layer also in Release build" OFF )
 
 set(CMAKE_INCLUDE_DIRECTORIES_BEFORE, ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
+option(IMGUIZMO_USES_GLM "Use GLM instead of internal vgMath" ON)
+# glm_FOUND OR
+if(IMGUIZMO_USES_GLM)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVGIZMO_USES_GLM")
+endif(IMGUIZMO_USES_GLM)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIMGUIZMO_VMOD_AXIS_Y=- -DIMGUIZMO_VMOD_AXIS_Z=-")
+
+
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release")
-  message(STATUS "CMAKE_BUILD_TYPE not specified: use Release by default...")
+  set(CMAKE_BUILD_TYPE "Debug")
+  message(STATUS "CMAKE_BUILD_TYPE not specified: use Debug by default...")
 endif(NOT CMAKE_BUILD_TYPE)
 
-set(IMGUI_DIR libs/imgui)
 
-set(SRC "${CMAKE_SOURCE_DIR}")
+if(${CMAKE_BUILD_TYPE} MATCHES "Debug" OR FORCE_VALIDATION_LAYER)
+    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DENABLE_VALIDATION_LAYER")
+endif()
+
+
+find_package(glfw3 REQUIRED)
+
+set(SRC          ${CMAKE_SOURCE_DIR})
+set(TOOLS_DIR    ${CMAKE_SOURCE_DIR}/../../libs)
+set(IMGUI_DIR    ${TOOLS_DIR}/imgui)
+set(IMGUIZMO_DIR ${CMAKE_SOURCE_DIR}/../../imguizmo_quat)
+
+include_directories(${SRC})
+include_directories(${TOOLS_DIR})
+include_directories(${IMGUIZMO_DIR})
 
     set(SOURCE_FILES
-        ${SRC}/DrawCube_02.cpp
+        ${SRC}/vkCube_06.cpp
         ${SRC}/utils/math.cpp
         ${SRC}/utils/shaders.cpp
         ${SRC}/utils/utils.cpp
-        ${SRC}/tools/imGuIZMOquat.cpp
-        ${SRC}/tools/imGuIZMOquat.h
-        ${SRC}/tools/vGizmo.h
-        ${SRC}/tools/vgMath.h
-        ${SRC}/tools/vgConfig.h
-        ${SRC}/${IMGUI_DIR}/imconfig.h
-        ${SRC}/${IMGUI_DIR}/imgui.cpp
-        ${SRC}/${IMGUI_DIR}/imgui_widgets.cpp
-        ${SRC}/${IMGUI_DIR}/imgui_tables.cpp
-        ${SRC}/${IMGUI_DIR}/imgui.h
-        ${SRC}/${IMGUI_DIR}/imgui_draw.cpp
-        ${SRC}/${IMGUI_DIR}/imgui_demo.cpp
-        ${SRC}/${IMGUI_DIR}/imgui_impl_vulkan.cpp
-        ${SRC}/${IMGUI_DIR}/imgui_impl_vulkan.h
-        ${SRC}/${IMGUI_DIR}/imgui_internal.h
-        ${SRC}/${IMGUI_DIR}/imstb_rectpack.h
-        ${SRC}/${IMGUI_DIR}/imstb_textedit.h
-        ${SRC}/${IMGUI_DIR}/imstb_truetype.h)
+        ${IMGUIZMO_DIR}/imguizmo_quat.h
+        ${IMGUIZMO_DIR}/imguizmo_quat.cpp
+        ${IMGUI_DIR}/imconfig.h
+        ${IMGUI_DIR}/imgui.cpp
+        ${IMGUI_DIR}/imgui_widgets.cpp
+        ${IMGUI_DIR}/imgui_tables.cpp
+        ${IMGUI_DIR}/imgui.h
+        ${IMGUI_DIR}/imgui_draw.cpp
+        ${IMGUI_DIR}/imgui_demo.cpp
+        ${IMGUI_DIR}/imgui_impl_vulkan.cpp
+        ${IMGUI_DIR}/imgui_impl_vulkan.h
+        ${IMGUI_DIR}/imgui_internal.h
+        ${IMGUI_DIR}/imstb_rectpack.h
+        ${IMGUI_DIR}/imstb_textedit.h
+        ${IMGUI_DIR}/imstb_truetype.h)
 
-include_directories(${SRC})
-include_directories(${SRC}/libs)
-include_directories(${SRC}/tools)
-include_directories(${IMGUI_DIR})
+set(SOURCE_FILES_GLFW
+        ${IMGUI_DIR}/imgui_impl_glfw.cpp
+        ${IMGUI_DIR}/imgui_impl_glfw.h
+)
+set(SOURCE_FILES_SDL
+        ${IMGUI_DIR}/imgui_impl_sdl2.cpp
+        ${IMGUI_DIR}/imgui_impl_sdl2.h
+)
+set(COMMONS_UI_FILES "")
 
-#
-#   Compile Shaders
-#
-set(vkSHADERS_DIR ${CMAKE_SOURCE_DIR}/Shaders)
 
-set(vkSHADERS
-    ${vkSHADERS_DIR}/qj.vert
-    ${vkSHADERS_DIR}/qj.frag )
-#set(COMPILED_vkSHADERS
-#    ${vkSHADERS_DIR}/${vkSHADER}.spv
-#    ${vkSHADERS_DIR}/${vkSHADER}.spv )
+file( GLOB APP_SOURCES ${SRC}/vkCube*.cpp )
+foreach( vkCubeSourceFile ${APP_SOURCES} )
+    get_filename_component( vkCubeName ${vkCubeSourceFile} NAME_WE )      # Cut off the file extension and directory path
+    project(${vkCubeName})
 
-set(SHADERS_ADDITIONAL_FLAGS "")
-if(USE_VIRTUALGIZMO)
-    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DAPP_USES_VIRTUALGIZMO")
-endif()
-
-foreach(vkSHADER ${vkSHADERS})
-    # if not debug, optimize!
-    if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-        list(APPEND OPT_vkSHADERS ${vkSHADER}.spv)
-    else()
-        list(APPEND DBG_vkSHADERS ${vkSHADER}.dbg.spv)
+    if(${vkCubeName} MATCHES "Cube_07")
+        set(COMMONS_UI_FILES
+                ${COMMONS_DIR}/uiMainDlg.cpp
+                ${COMMONS_DIR}/uiSettings.cpp
+        )
     endif()
-endforeach()
 
-
-# shaders sources GLSL
-#   glslc -O ==> compile glsl in optimized spv file
-#   glslc -g ==> compile spv file with debug info
-# compiled SPV
-#   spirv-opt ==> optimize previous spv (not optimized)
-#   spirv-remap -s ==> strip (also) debug infos
-foreach(vkSHADER ${vkSHADERS})
-    # if not debug, optimize!
-    if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-        add_custom_command(OUTPUT ${vkSHADER}.spv
-            COMMAND $ENV{VULKAN_SDK}/bin/glslc ${vkSHADER} ${SHADERS_ADDITIONAL_FLAGS} -O -o ${vkSHADER}.spv
-            DEPENDS ${vkSHADER}
-            COMMENT "glslc -O: Building SPIR-V object ${vkSHADER}.spv")
-    else()
-        add_custom_command(OUTPUT ${vkSHADER}.dbg.spv
-            COMMAND $ENV{VULKAN_SDK}/bin/glslc ${vkSHADER} ${SHADERS_ADDITIONAL_FLAGS} -g -o ${vkSHADER}.dbg.spv
-            DEPENDS ${vkSHADER}
-            COMMENT "glslc -g: Building SPIR-V object ${vkSHADER}.dbg.spv")
-    endif()
-    message(STATUS "Generating build commands for ${vkSHADER}.spv")
-endforeach()
-
-    set(SOURCE_FILES
-        ${SOURCE_FILES}
-        ${vkSHADERS})
-
-    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DGLFW_INCLUDE_NONE")
-    if(USE_SDL2)
-        find_package(SDL2 REQUIRED)
-        set(SOURCE_FILES
-            ${SOURCE_FILES}
-            ${SRC}/${IMGUI_DIR}/imgui_impl_sdl2.cpp
-            ${SRC}/${IMGUI_DIR}/imgui_impl_sdl2.h)
-        set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DAPP_USES_SDL2")
+    if(${vkCubeName} MATCHES "SDL")
+        find_package(SDL2)
+        add_executable( ${PROJECT_NAME} ${vkCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_SDL} ${COMMONS_UI_FILES})
         include_directories(${SDL2_INCLUDE_DIRS})
-        set(MORE_LIBS ${SDL2_LIBRARIES})
-    elseif(USE_SDL3)
-            find_package(SDL3 REQUIRED)
-            set(SOURCE_FILES
-                ${SOURCE_FILES}
-                ${SRC}/${IMGUI_DIR}/imgui_impl_sdl3.cpp
-                ${SRC}/${IMGUI_DIR}/imgui_impl_sdl3.h)
-            set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DAPP_USES_SDL3")
-            include_directories(${SDL3_INCLUDE_DIRS})
-            set(MORE_LIBS ${SDL3_LIBRARIES})
-        else()
-            find_package(glfw3 REQUIRED)
-            set(SOURCE_FILES
-                ${SOURCE_FILES}
-                ${SRC}/${IMGUI_DIR}/imgui_impl_glfw.cpp
-                ${SRC}/${IMGUI_DIR}/imgui_impl_glfw.h)
-                set(MORE_LIBS -lglfw)
-#      endif(USE_SDL3)
-    endif(USE_SDL2)
-
-    if(${CMAKE_BUILD_TYPE} MATCHES "Debug" OR FORCE_VALIDATION_LAYER)
-        set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DENABLE_VALIDATION_LAYER")
+        set(TARGET_LIBS ${CMAKE_DL_LIBS} ${SDL2_LIBRARIES})
+    else()
+        add_executable( ${PROJECT_NAME} ${vkCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_GLFW} ${COMMONS_UI_FILES})
+        target_link_libraries(${PROJECT_NAME} glfw)
+        set(TARGET_LIBS ${CMAKE_DL_LIBS} )
     endif()
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${vkSHADERS} ${DBG_vkSHADERS} ${OPT_vkSHADERS})
+    target_link_libraries(${vkCubeName} ${OPENGL_LIBRARY} ${TARGET_LIBS})
+endforeach( vkCubeSourceFile ${APP_SOURCES} )
+
 
 
 target_include_directories(${PROJECT_NAME} PUBLIC .)
-target_link_libraries(${PROJECT_NAME} ${MORE_LIBS} ${TARGET_LIBS})
 
 find_package(Vulkan REQUIRED)
 
@@ -186,6 +138,7 @@ addVulkanLibs(glslang-default-resource-limits)
 # it's necessary only to compile shaders from code
 
 
+set(M_GLOBAL_FLAGS, ${M_GLOBAL_FLAGS} -DIMGUIZMO_AXIS_MOD_Y=- -DIMGUIZMO_AXIS_MOD_Z=-)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${M_GLOBAL_FLAGS}")
 target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations -fpermissive)
 
