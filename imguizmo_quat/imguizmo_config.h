@@ -11,6 +11,16 @@
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
 #pragma once
+
+//------------------------------------------------------------------------------
+// imguizmo_quat configuration file
+//
+// Obviously all #define can be passed directly to compiler with -D option
+//
+//------------------------------------------------------------------------------
+
+
+
 //------------------------------------------------------------------------------
 // v3.0 and later
 //
@@ -81,6 +91,44 @@
 //------------------------------------------------------------------------------
 
 // #define IMGUIZMO_IMGUI_FOLDER ImGui/
+
+//------------------------------------------------------------------------------
+// v3.1 and later
+//
+// Changes for:
+// gizmo3D(const char* label, quat& axes, vec3& spot, float size, const int mode)
+//
+// Axes + spot-light with 3D vector now uses CORRECT light position:
+//      NO MORE NEGATIVE POSITION
+//
+// If you have used it and want to maintain same behavior add follow define:
+//
+//      IMGUIZMO_HAS_NEGATIVE_VEC3_LIGHT
+//
+//------------------------------------------------------------------------------
+
+// #define IMGUIZMO_HAS_NEGATIVE_VEC3_LIGHT
+
+
+//------------------------------------------------------------------------------
+// v3.1 and later
+//
+// Show a different representation of one or more axes (only VISUAL representation)
+//
+//  IMGUIZMO_VMOD_AXIS_X +  ==> X grows from left  to right
+//  IMGUIZMO_VMOD_AXIS_X -  ==> X grows from right to left
+//  IMGUIZMO_VMOD_AXIS_Y +  ==> Y grows from down  to up
+//  IMGUIZMO_VMOD_AXIS_Y -  ==> Y grows from up    to down
+//  IMGUIZMO_VMOD_AXIS_Z +  ==> Z grows from far   to near  
+//  IMGUIZMO_VMOD_AXIS_Z -  ==> Z grows from near  to far
+//
+//  Now you can also show (visually) a RIGHT_HAND system
+//------------------------------------------------------------------------------
+
+//#define IMGUIZMO_VMOD_AXIS_X +
+//#define IMGUIZMO_VMOD_AXIS_Y +
+//#define IMGUIZMO_VMOD_AXIS_Z +
+
 
 // TODO for v.3.2?
 //------------------------------------------------------------------------------

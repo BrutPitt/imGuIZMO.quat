@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2024 Michele Morrone
+//  Copyright (c) 2018-2025 Michele Morrone
 //  All rights reserved.
 //
 //  https://michelemorrone.eu - https://brutpitt.com
@@ -24,6 +24,8 @@
     #define T VG_T_TYPE
 #endif
 
+
+
 typedef int vgButtons;
 typedef int vgModifiers;
 
@@ -33,11 +35,23 @@ namespace vg {
 //      but they are loose from any platform library: simply initialize
 //      the virtualGizmo with your values: 
 //          look at "onInit" in glWindow.cpp example.
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
     enum {
         evLeftButton  ,
         evRightButton ,
         evMiddleButton
+    };
+
+    enum {
+        evButton1 ,
+        evButton2 ,
+        evButton3 ,
+        evButton4 ,
+        evButton5 ,
+        evButton6 ,
+        evButton7 ,
+        evButton8 ,
+        evButton9 
     };
 
     enum {
@@ -48,23 +62,16 @@ namespace vg {
         evSuperModifier   =  1<<3  
     };
 
-
-
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
 //
 //  Base manipulator class
 //
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
 TEMPLATE_TYPENAME_T class virtualGizmoBaseClass {
 
 public:
-    mat4x4 clip = mat4x4( 1.0f,  0.0f, 0.0f, 0.0f,
-                          0.0f,  1.0f, 0.0f, 0.0f,
-                          0.0f,  0.0f, 0.5f, 0.0f,
-                          0.0f,  0.0f, 0.5f, 1.0f );  // vulkan clip space has inverted y and half z !
-
     virtualGizmoBaseClass() : tbActive(false), pos(0), delta(0),
                            tbControlButton(evLeftButton), tbControlModifiers(evNoModifier),
                            tbRotationButton(evRightButton), xRotationModifier(evShiftModifier),
@@ -75,9 +82,17 @@ public:
     virtual ~virtualGizmoBaseClass() {}
 
     //    Call to initialize and on reshape
-    ////////////////////////////////////////////////////////////////////////////
-    void viewportSize(int w, int h) { viewportSize(T(w), T(h)); }
-    void viewportSize(T w, T h) { 
+    //--------------------------------------------------------------------------
+/// Adjoust mouse sensitivity in base to viewport dimensions
+///@param[in]  w T : current WIDTH  of window/viewport/screen
+///@param[in]  h T : current HEIGHT of window/viewport/screen
+///@code
+///    vg::vGizmo3D track;
+///
+///    // call on initialization and on window/viewport resize
+///    track.viewportSize(width, height);
+///@endcode
+    void viewportSize(T w, T h) {
         width = w; height = h; 
         minVal = T(width < height ? width*T(0.5) : height*T(0.5));
         offset = tVec3(T(.5 * width), T(.5 * height), T(0));
@@ -94,12 +109,18 @@ public:
     }
     void inline testRotModifier(int x, int y, vgModifiers mod) { }
     
-    //    Call on mouse button event
-    //      button:  your mouse button
-    //      mod:     your modifier key -> CTRL, SHIFT, ALT, SUPER
-    //      pressed: if Button is pressed (TRUE) or released (FALSE)
-    //      x, y:    mouse coordinates
-    ////////////////////////////////////////////////////////////////////////////
+/// Start/End mouse capture: call on mouse BUTTON event or on state change
+///@param[in]  b enum vgButtons : button pressed/released (BUTTON ID)
+///@param[in]  m enum vgModifiers : current KEY modifier ID (if active) or evNoModifier = 0
+///@param[in]  pressed bool : mouse button pressed = true, released = false
+///@param[in]  x T : current X screen coord of mouse cursor
+///@param[in]  y T : current Y screen coord of mouse cursor
+///@code
+///    vg::vGizmo3D track;
+///
+///    // call on mouse BUTTON event or check in main render loop
+///    track.mouse((vgButtons) button, (vgModifiers) modifier, pressed, x, y);
+///@endcode
     virtual void mouse( vgButtons button, vgModifiers mod, bool pressed, T x, T y)
     {
         if ( (button == tbControlButton) && pressed && (tbControlModifiers ? tbControlModifiers & mod : tbControlModifiers == mod) ) {
@@ -121,26 +142,43 @@ public:
     
     }
 
-    //    Call on Mouse motion
-    ////////////////////////////////////////////////////////////////////////////
+/// Update rotations/positions in base to mouse movements: call on mouse MOTION event
+///@param[in]  x T : current X screen coord of mouse cursor
+///@param[in]  y T : current Y screen coord of mouse cursor
+///@code
+///    vg::vGizmo3D track;
+///
+///    // call on mouse MOTION event or check in main render loop
+///    if((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)  == GLFW_PRESS) ||
+///       (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) )
+///        track.motion((int)x, (int)y);
+///@endcode
     virtual void motion( T x, T y) {
         delta.x = x - pos.x;   delta.y = pos.y - y;
         pos.x = x;   pos.y = y;
         update();
     }
     //    Call on Pinching
-    ////////////////////////////////////////////////////////////////////////////
+    //--------------------------------------------------------------------------
     void pinching(T d, T z = T(0)) {
         delta.y = d * z;
         update();
     }
 
-    //    Call every rendering to implement continue spin rotation 
-    ////////////////////////////////////////////////////////////////////////////
-    void idle() { qtV = qtIdle*qtV;  }
+/// <b>Call in main render loop to implement a continue slow rotation </b><br>
+/// <br>
+/// This rotation depends on speed of last mouse movements and maintains same spin <br>
+/// The speed can be adjusted from <b>setIdleRotSpeed(1.0)</b>
+/// It can be stopped by click on screen (without mouse movement)
+///@code
+///     while (!glfwWindowShouldClose(glfwWindow)) {
+///         ...
+///         track.idle();       // set continuous rotation on Idle
+///@endcode
+    void idle() { qtRot = qtIdle*qtRot;  }
 
     //    Call after changed settings
-    ////////////////////////////////////////////////////////////////////////////
+    //--------------------------------------------------------------------------
     virtual void update() = 0;
     void updateGizmo()
     {
@@ -171,12 +209,12 @@ public:
 
         qtStep = normalize(angleAxis(angle * tbScale * fpsRatio                  , axis * rotationVector));
         qtIdle = normalize(angleAxis(angle * tbScale * fpsRatio * qIdleSpeedRatio, axis * rotationVector));
-        qtV = qtStep*qtV;
+        qtRot = qtStep*qtRot;
 
     }
 
-    //  Set the sensitivity for the virtualGizmo.
-    //////////////////////////////////////////////////////////////////
+///  Set the mouse sensitivity for vGizmo3D
+///@param[in]  scale float : values > 1.0 more, values < 1.0 less
     void setGizmoFeeling( T scale) { tbScale = scale; }
     //  Call with current fps (every rendering) to adjust "auto" sensitivity
     //////////////////////////////////////////////////////////////////
@@ -184,67 +222,137 @@ public:
 
     //  Apply rotation
     //////////////////////////////////////////////////////////////////
-    inline void applyRotation(tMat4 &m) { m = m * mat4_cast(qtV); }                                     
+    inline void applyRotation(tMat4 &m) { m = m * mat4_cast(qtRot); }                                     
 
     //  Set the point around which the virtualGizmo will rotate.
     //////////////////////////////////////////////////////////////////
     void setRotationCenter( const tVec3& c) { rotationCenter = c; }
     tVec3& getRotationCenter() { return rotationCenter; }
 
-    //  Set the mouse button and modifier for rotation 
-    //////////////////////////////////////////////////////////////////
+///  Set mouse BUTTON and KEY modifier for main rotation
+///@param[in]  b enum vgButtons : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 mouse BUTTON ID
+///@param[in]  m enum vgModifiers : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 KEY modifier ID : CTRL / ALT / SUPER / SHIFT
+///@code
+/// static vg::vGizmo3D track;
+/// ...
+///   // Initialize main rotation
+///   track.setGizmoRotControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) 0 /* evNoModifier */ );
+///
+///   // Rotations around specific axis: mouse button and key modifier
+///   t.setGizmoRotXControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT,  (vgModifiers) GLFW_MOD_SHIFT);
+///   t.setGizmoRotYControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT,  (vgModifiers) GLFW_MOD_CONTROL);
+///   t.setGizmoRotZControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT,  (vgModifiers) GLFW_MOD_ALT);
+///
+///   // Pan and Dolly/Zoom: mouse button and key modifier
+///   t.setDollyControl((vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) 0 /* evNoModifier */);
+///   t.setPanControl((vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) GLFW_MOD_ALT | GLFW_MOD_SHIFT);
+///@endcode
     void setGizmoRotControl( vgButtons b, vgModifiers m = evNoModifier) {
         tbControlButton = b;
         tbControlModifiers = m;
     }
-    //  Set the mouse button and modifier for rotation around X axis
-    //////////////////////////////////////////////////////////////////
+///  Set mouse BUTTON and KEY modifier to enable rotation around X axis
+///@param[in]  b enum vgButtons : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 mouse BUTTON ID
+///@param[in]  m enum vgModifiers : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 KEY modifier ID : CTRL / ALT / SUPER / SHIFT
+///@code
+/// static vg::vGizmo3D track;
+/// ...
+///  track.setGizmoRotXControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SHIFT);
+///  track.setGizmoRotYControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_CONTROL);
+///  track.setGizmoRotZControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SUPER);
+///@endcode
     void setGizmoRotXControl( vgButtons b, vgModifiers m = evNoModifier) {
         tbRotationButton = b;
         xRotationModifier = m;
     }
-    //  Set the mouse button and modifier for rotation around Y axis
+///  Set mouse BUTTON and KEY modifier to enable rotation around Y axis
+///@param[in]  b enum vgButtons : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 mouse BUTTON ID
+///@param[in]  m enum vgModifiers : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 KEY modifier ID : CTRL / ALT / SUPER / SHIFT
+///@code
+/// static vg::vGizmo3D track;
+/// ...
+///  track.setGizmoRotXControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SHIFT);
+///  track.setGizmoRotYControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_CONTROL);
+///  track.setGizmoRotZControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SUPER);
+///@endcode
     //////////////////////////////////////////////////////////////////
     void setGizmoRotYControl( vgButtons b, vgModifiers m = evNoModifier) {
         tbRotationButton = b;
         yRotationModifier = m;
     }
-    //  Set the mouse button and modifier for rotation around Z axis
-    //////////////////////////////////////////////////////////////////
+///  Set mouse BUTTON and KEY modifier to enable rotation around Z axis
+///@param[in]  b enum vgButtons : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 mouse BUTTON ID
+///@param[in]  m enum vgModifiers : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 KEY modifier ID : CTRL / ALT / SUPER / SHIFT
+///@code
+/// static vg::vGizmo3D track;
+/// ...
+///  track.setGizmoRotXControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SHIFT);
+///  track.setGizmoRotYControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_CONTROL);
+///  track.setGizmoRotZControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SUPER);
+///@endcode
     void setGizmoRotZControl( vgButtons b, vgModifiers m = evNoModifier) {
         tbRotationButton = b;
         zRotationModifier = m;
     }
 
-    //  get the rotation quaternion
-    //////////////////////////////////////////////////////////////////
-    virtual tQuat &getRotation() { return qtV; }
+/// Returns the quaternion containing current vGizmo3D rotation
+///@retval quat : quaternion contain actual rotation
+    virtual tQuat getRotation() { return qtRot; }
+
+/// Returns the reference to quaternion containing current vGizmo3D rotation
+/// @retval quat& : reference to vGizmo3D quaternion containing actual rotation
+/// to acquire and modify, very useful to use directly in ImGuUIZMO_quat
+    virtual tQuat &getRotationRef() { return qtRot; }
+
+/// Returns the quaternion containing current vGizmo3D secondary
+/// rotation (usually used to rotate light)
+/// @retval quat : quaternion contain actual rotation */
+    virtual tQuat getSecondRot() { return qtSecondaryRot; }
+
+/// Returns the reference to quaternion containing current vGizmo3D secondary
+/// rotation (usually used to rotate light)
+/// @retval quat& : reference to vGizmo3D quaternion containing actual rotation
+/// to acquire and modify, very useful to use directly in ImGuUIZMO_quat  */
+    virtual tQuat &getSecondRotRef() { return qtSecondaryRot; }
+
 
     //  get the rotation increment
     //////////////////////////////////////////////////////////////////
-    tQuat &getStepRotation() { return qtStep; }
+    tQuat getStepRotation() { return qtStep; }
 
-    //  get the rotation quaternion
-    //////////////////////////////////////////////////////////////////
-    void setRotation(const tQuat &q) { qtV = q; }
+/// Set current rotation of vGizmo3D
+///@param[in] q quat& : reference quaternion containing rotation to set
+    void setRotation(const tQuat &q) { qtRot = q; }
+
+/// Set current rotation of vGizmo3D
+///@param[in] q quat& : reference quaternion containing rotation to set
+    void setSecondRot(const tQuat &q) { qtSecondaryRot = q; }
 
     //  get the rotation increment
     //////////////////////////////////////////////////////////////////
     void setStepRotation(const tQuat &q) { qtStep = q; }
 
     // attenuation<1.0 / increment>1.0 of rotation speed in idle
-    ////////////////////////////////////////////////////////////////////////////
+    //--------------------------------------------------------------------------
     void setIdleRotSpeed(T f) { qIdleSpeedRatio = f;    }
     T    getIdleRotSpeed()    { return qIdleSpeedRatio; }
 
     //  return current transformations as 4x4 matrix.
-    ////////////////////////////////////////////////////////////////////////////
+    //--------------------------------------------------------------------------
     virtual tMat4 getTransform() = 0;
-    ////////////////////////////////////////////////////////////////////////////
+    //--------------------------------------------------------------------------
     virtual void applyTransform(tMat4 &model) = 0;
 
 // Immediate mode helpers
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
 
     // for imGuIZMO or immediate mode control
     //////////////////////////////////////////////////////////////////
@@ -265,8 +373,6 @@ public:
         else if (zRotationModifier & mod) { rotationVector = tVec3(T(0), T(0), T(1)); }
         update();
     }
-
-    tVec3& getRotationMod() { return rotVecModifier; }
 protected:
 
     tVec2 pos, delta;
@@ -277,17 +383,18 @@ protected:
 
     //tVec3 rotationVector = tVec3(T(1));
 
-    tQuat qtV    = tQuat(T(1), T(0), T(0), T(0));
-    tQuat qtStep = tQuat(T(1), T(0), T(0), T(0));
-    tQuat qtIdle = tQuat(T(1), T(0), T(0), T(0));
+    tQuat qtRot          = tQuat(T(1), T(0), T(0), T(0));
+    tQuat qtSecondaryRot = tQuat(T(1), T(0), T(0), T(0));
+    tQuat qtStep         = tQuat(T(1), T(0), T(0), T(0));
+    tQuat qtIdle         = tQuat(T(1), T(0), T(0), T(0));
 
 #ifdef BACKEND_IS_VULKAN
-    tVec3 rotVecModifier = tVec3(1.0, 1.0, 1.0);
+
 #else // OPEGL / WEBGL
     tVec3 rotVecModifier = tVec3(1.0);
 #endif
 
-    tVec3 rotationVector = rotVecModifier;
+    tVec3 rotationVector = tVec3(T(1));
     tVec3 rotationCenter = tVec3(T(0));
 
     //  settings for the sensitivity
@@ -304,14 +411,14 @@ protected:
     T width, height;
 };
 
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
 //
 // virtualGizmoClass
 //  trackball: simple mouse rotation control 
 //
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
 TEMPLATE_TYPENAME_T class virtualGizmoClass : public VGIZMO_BASE_CLASS {
 
 public:
@@ -334,7 +441,7 @@ public:
     //////////////////////////////////////////////////////////////////
     tMat4 getTransform() {
         tMat4 trans, invTrans, rotation;
-        rotation = mat4_cast(this->qtV);
+        rotation = mat4_cast(this->qtRot);
 
         trans = translate(tMat4(T(1)),this->rotationCenter);
         invTrans = translate(tMat4(T(1)),-this->rotationCenter);
@@ -347,29 +454,52 @@ public:
     //void setGizmoScale( T scale) { scale = scale; }
 
     // get the rotation quaternion
-    tQuat &getRotation() { return this->qtV; }
+    tQuat &getRotationRef() { return this->qtRot; }
 };
 
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
 //
 // virtualGizmo3DClass
 //  3D trackball: rotation interface with pan and dolly operations
 //
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
 TEMPLATE_TYPENAME_T class virtualGizmo3DClass : public VGIZMO_BASE_CLASS {
 
 using VGIZMO_BASE_CLASS::delta;
-using VGIZMO_BASE_CLASS::qtV; 
+using VGIZMO_BASE_CLASS::qtRot; 
 
 public:
     //////////////////////////////////////////////////////////////////
     virtualGizmo3DClass() : dollyControlButton(evRightButton),   panControlButton(evMiddleButton),  dollyActive(false),
                          dollyControlModifiers(evNoModifier), panControlModifiers(evNoModifier), panActive(false) { }
 
-    //////////////////////////////////////////////////////////////////
+/// Start/End mouse capture: call on mouse BUTTON event or on state change
+///@param[in]  b enum vgButtons : button pressed/released (BUTTON ID)
+///@param[in]  m enum vgModifiers : current KEY modifier ID (if active) or evNoModifier = 0
+///@param[in]  pressed bool : mouse button pressed => true, released => false
+///@param[in]  x int : current X screen coord of mouse cursor
+///@param[in]  y int : current Y screen coord of mouse cursor
+///@code
+///    vg::vGizmo3D track;
+///
+///     // call on mouse BUTTON event or check BUTTON state change in main render loop
+///    track.mouse((vgButtons) button, (vgModifiers) modifier, pressed, x, y);
+///@endcode
     void mouse( vgButtons button, vgModifiers mod, bool pressed, int x, int y) { mouse(button, mod, pressed, T(x), T(y)); }
+/// Start/End mouse capture: call on mouse BUTTON event or on state change
+///@param[in]  b enum vgButtons : button pressed/released (BUTTON ID)
+///@param[in]  m enum vgModifiers : current KEY modifier ID (if active) or evNoModifier = 0
+///@param[in]  pressed bool : mouse button pressed => true, released => false
+///@param[in]  x T : current X screen coord of mouse cursor
+///@param[in]  y T : current Y screen coord of mouse cursor
+///@code
+///    vg::vGizmo3D track;
+///
+///     // call on mouse BUTTON event or check BUTTON state change in main render loop
+///    track.mouse((vgButtons) button, (vgModifiers) modifier, pressed, x, y);
+///@endcode
     void mouse( vgButtons button, vgModifiers mod, bool pressed, T x, T y)
     {
         VGIZMO_BASE_CLASS::mouse(button, mod, pressed,  x,  y);
@@ -393,10 +523,10 @@ public:
     }
 
     //    Call on wheel (only for Dolly/Zoom)
-    ////////////////////////////////////////////////////////////////////////////
+    //--------------------------------------------------------------------------
     void wheel( T x, T y, T z=T(0)) {
         povPanDollyFactor = z;
-        dolly.z += y * dollyScale * wheelScale * (povPanDollyFactor>T(0) ? povPanDollyFactor : T(1));
+        vecPanDolly.z += y * dollyScale * wheelScale * (povPanDollyFactor>T(0) ? povPanDollyFactor : T(1));
     }
 
     //////////////////////////////////////////////////////////////////
@@ -408,14 +538,14 @@ public:
 
     //////////////////////////////////////////////////////////////////
     void updatePan() {
-        tVec3 v(delta.x, delta.y, T(0));
-        pan += (v * rotVecModifier) * panScale * (povPanDollyFactor>T(0) ? povPanDollyFactor : T(1));
+        const T pdFactor = (povPanDollyFactor>T(0) ? povPanDollyFactor : T(1));
+        vecPanDolly.x += delta.x * panScale * pdFactor;
+        vecPanDolly.y += delta.y * panScale * pdFactor;
     }
 
     //////////////////////////////////////////////////////////////////
     void updateDolly() {
-        tVec3 v(T(0), T(0), delta.y);
-        dolly -= (v * rotVecModifier) * dollyScale * (povPanDollyFactor>T(0) ? povPanDollyFactor : T(1));
+        vecPanDolly.z -= delta.y * dollyScale * (povPanDollyFactor>T(0) ? povPanDollyFactor : T(1));
     }
 
     //////////////////////////////////////////////////////////////////
@@ -427,8 +557,7 @@ public:
 
     //////////////////////////////////////////////////////////////////
     void applyTransform(tMat4 &m) {
-        m = translate(m, pan);
-        m = translate(m, dolly);
+        m = translate(m, vecPanDolly);
         m = translate(m, -this->rotationCenter);
         VGIZMO_BASE_CLASS::applyRotation(m);
         m = translate(m, this->rotationCenter);
@@ -437,31 +566,49 @@ public:
     //////////////////////////////////////////////////////////////////
     tMat4 getTransform() {
         tMat4 trans, invTrans, rotation;
-        tMat4 panMat, dollyMat;
+        tMat4 panDollyMat;
 
         //create pan and dolly translations
-        panMat   = translate(tMat4(T(1)),pan  );
-        dollyMat = translate(tMat4(T(1)),dolly);
+        panDollyMat   = translate(tMat4(T(1)),vecPanDolly);
 
         //create the virtualGizmo rotation
-        rotation = mat4_cast(qtV);
+        rotation = mat4_cast(qtRot);
 
         //create the translations to move the center of rotation to the origin and back
         trans    = translate(tMat4(T(1)), this->rotationCenter);
         invTrans = translate(tMat4(T(1)),-this->rotationCenter);
 
         //concatenate all the tranforms
-        return panMat * dollyMat * invTrans * rotation * trans;
+        return panDollyMat * invTrans * rotation * trans;
     }
-
-    //  Set the mouse button and mods for dolly operation.
-    //////////////////////////////////////////////////////////////////
+///  Set mouse BUTTON and KEY modifier to control Dolly movements
+///@param[in]  b enum vgButtons : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 mouse BUTTON ID
+///@param[in]  m enum vgModifiers : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 KEY modifier ID : CTRL / ALT / SUPER / SHIFT
+///@code
+/// static vg::vGizmo3D track;
+/// ...
+///   // Pan and Dolly/Zoom: mouse button and key modifier
+///   t.setDollyControl((vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) 0 /* evNoModifier */);
+///   t.setPanControl((vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) GLFW_MOD_ALT | GLFW_MOD_SHIFT);
+///@endcode
     void setDollyControl( vgButtons b, vgModifiers m = evNoModifier) {
         dollyControlButton = b;
         dollyControlModifiers = m;
     }
-    //  Set the mouse button and optional mods for pan
-    //////////////////////////////////////////////////////////////////
+///  Set mouse BUTTON and KEY modifier to control Pan movements
+///@param[in]  b enum vgButtons : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 mouse BUTTON ID
+///@param[in]  m enum vgModifiers : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 KEY modifier ID : CTRL / ALT / SUPER / SHIFT
+///@code
+/// static vg::vGizmo3D track;
+/// ...
+///   // Pan and Dolly/Zoom: mouse button and key modifier
+///   t.setDollyControl((vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) 0 /* evNoModifier */);
+///   t.setPanControl((vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) GLFW_MOD_ALT | GLFW_MOD_SHIFT);
+///@endcode
     void setPanControl( vgButtons b, vgModifiers m = evNoModifier) {
         panControlButton = b;
         panControlModifiers = m;
@@ -469,52 +616,92 @@ public:
     int getPanControlButton() { return panControlButton; }
     int getPanControlModifier() { return panControlModifiers; }
 
-    // Sensitivity for Wheel movements -> Normalized: less < 1 < more
-    //////////////////////////////////////////////////////////////////
+
+
+    /// Set mouse wheel sensitivity (in %) for Dolly movements
+    /// @param[in]  T scale : sensitivity ==> less < 100 < more
+    /// @deprecated will removed on next version: use <b>setPanScale(T scale)</b>
+    [[deprecated("Use setWheelScale(T scale) instead.")]]
     void setNormalizedWheelScale( T scale) { wheelScale = scale*constWheelScale;  }
-    void setWheelScale( T scale)           { wheelScale = scale;  }
+
+    /// Get current mouse wheel sensitivity (in %) for Dolly movements
+    /// @retval  T scale : sensitivity ==> less < 100 < more
+    /// @deprecated will removed on next version: use <b>getPanScale()</b>
+    [[deprecated("Use getWheelScale() instead.")]]
     T getNormalizedWheelScale() { return wheelScale/constWheelScale;  }
-    T getWheelScale()           { return wheelScale;  }
-    // Sensitivity for Dolly movements -> Normalized: less < 1 < more
-    //////////////////////////////////////////////////////////////////
-    void setNormalizedDollyScale( T scale) { dollyScale = scale*constDollyScale;  }
-    void setDollyScale( T scale)           { dollyScale = scale;  }
+
+    /// Set mouse sensitivity (in %) for Dolly movements
+    /// @param[in]  T scale : sensitivity ==> less < 100 < more
+    /// @deprecated will removed on next version: use <b>setPanScale(T scale)</b>
+    [[deprecated("Use setDollyScale(T scale) instead.")]]
+    void setNormalizedDollyScale(T scale) { dollyScale = scale*constDollyScale;  }
+
+    /// Get current mouse sensitivity (in %) for Dolly movements
+    /// @retval  T scale : sensitivity ==> less < 100 < more
+    /// @deprecated will removed on next version: use <b>getPanScale()>/b>
+    [[deprecated("Use getDollyScale() instead.")]]
     T getNormalizedDollyScale() { return dollyScale/constDollyScale;  }
-    T getDollyScale()           { return dollyScale;  }
-    // Sensitivity for Pan movements -> Normalized: less < 1 < more
-    //////////////////////////////////////////////////////////////////
-    void setNormalizedPanScale( T scale) { panScale = scale*constPanScale; }
-    void setPanScale( T scale)           { panScale = scale; }
+
+
+    /// Set mouse sensitivity (in %) for Pan movements
+    /// @param[in]  T scale : sensitivity ==> less < 100 < more
+    /// @deprecated will removed on next version: use <b>setPanScale(T scale)</b>
+    [[deprecated("Use setPanScale(T scale) instead.")]]
+    void setNormalizedPanScale(T scale) { panScale = scale*constPanScale; }
+
+    /// Get current mouse sensitivity (in %) for Pan movements
+    /// @retval  T scale : sensitivity ==> less < 100 < more
+    /// @deprecated will removed on next version: use <b>getPanScale()</b>
+    [[deprecated("Use getPanScale() instead.")]]
     T getNormalizedPanScale() { return panScale/constPanScale; }
+
+    /// Set mouse wheel sensitivity for Dolly movements
+    /// @param[in]  T scale : sensitivity ==> less < 1.0 < more
+    void setWheelScale( T scale)           { wheelScale = scale;  }
+
+    /// Get current mouse sensitivity for Dolly movements
+    /// @retval  T scale : sensitivity ==> less < 1.0 < more
+    T getWheelScale()           { return wheelScale;  }
+
+    /// Set mouse sensitivity for Dolly movements
+    /// @param[in]  T scale : sensitivity ==> less < 1.0 < more
+    void setDollyScale( T scale)           { dollyScale = scale;  }
+
+    /// Get current mouse sensitivity for Dolly movements
+    /// @retval  T scale : sensitivity ==> less < 1.0 < more
+    T getDollyScale()           { return dollyScale;  }
+
+    /// Set mouse sensitivity for Pan movements
+    /// @param[in]  T scale : sensitivity ==> less < 1.0 < more
+    void setPanScale( T scale)           { panScale = scale; }
+
+    /// Get current mouse sensitivity for Pan movements
+    /// @retval  T scale : sensitivity ==> less < 1.0 < more
     T getPanScale()           { return panScale; }
-    // Sensitivity for pan/dolly by distance -> Normalized: less < 1 < more
-    //////////////////////////////////////////////////////////////////
-    void setNormalizedDistScale( T scale) { distScale = scale*constDistScale; }
-    void setDistScale( T scale)           { distScale = scale; }
-    T getNormalizedDistScale() { return distScale/constDistScale; }
-    T getDistScale()           { return distScale; }
+
 
     //  Set the Dolly to a specified distance.
     //////////////////////////////////////////////////////////////////
-    void setDollyPosition(T pos)             { dolly.z = pos; }
-    void setDollyPosition(const tVec3 &pos) { dolly.z = pos.z; }
+    void setDollyPosition(T pos)            { vecPanDolly.z = pos;   }
+    void setDollyPosition(const tVec3 &pos) { vecPanDolly.z = pos.z; }
 
     //  Set the Dolly to a specified distance.
     //////////////////////////////////////////////////////////////////
-    void setPanPosition(const tVec3 &pos) { pan.x = pos.x; pan.y = pos.y;}
+    void setPanPosition(const tVec3 &pos) { vecPanDolly.x = pos.x; vecPanDolly.y = pos.y;}
 
     //  Get dolly pos... use as Zoom factor
     //////////////////////////////////////////////////////////////////
-    tVec3 &getDollyPosition() { return dolly; }
+    tVec3 getDollyPosition() const { return tVec3 {0, 0, vecPanDolly.z}; }
 
     //  Get Pan pos... use as Zoom factor
     //////////////////////////////////////////////////////////////////
-    tVec3 &getPanPosition() { return pan; }
+    tVec3 getPanPosition() const { return tVec3 {vecPanDolly.x, vecPanDolly.y, 0}; }
 
     //  Get Pan (xy) & Dolly (z) position
     //////////////////////////////////////////////////////////////////
-    tVec3 getPosition() const { return tVec3(pan.x, pan.y, dolly.z); }
-    void  setPosition(const tVec3 &p) { pan.x = p.x; pan.y = p.y; dolly.z = p.z; }
+    tVec3 getPosition() { return vecPanDolly; }
+    tVec3 &getPositionRef() { return vecPanDolly; }
+    void  setPosition(const tVec3 &pos) { vecPanDolly = pos; }
 
     bool isDollyActive() { return dollyActive; }
     bool isPanActive() { return panActive; }
@@ -537,18 +724,15 @@ private:
     bool dollyActive;
     bool panActive;      
 
-    tVec3 pan   = tVec3(T(0));
-    tVec3 dolly = tVec3(T(0));
+    tVec3 vecPanDolly = tVec3(T(0));
 
     const T constDollyScale = T(.01);
     const T constPanScale   = T(.01);  //pan scale
     const T constWheelScale = T(7.5);  //dolly multiply for wheel step
-    const T constDistScale  = T( .1);  //speed by distance sensibility
 
     T dollyScale = constDollyScale;  //dolly scale
     T panScale   = constPanScale  ;  //pan scale
     T wheelScale = constWheelScale;  //dolly multiply for wheel step
-    T distScale  = constDistScale ;  //speed by distance sensibility
 
     T povPanDollyFactor = T(0); // internal use, maintain memory of current distance (pan/zoom speed by distance)
 };

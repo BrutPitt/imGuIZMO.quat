@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2024 Michele Morrone
+//  Copyright (c) 2018-2025 Michele Morrone
 //  All rights reserved.
 //
 //  https://michelemorrone.eu - https://brutpitt.com
@@ -96,7 +96,7 @@ ImU32 imguiGizmo::savedSphereColors[2]  = { 0xff401010, 0xffc0a0a0 };
 float imguiGizmo::gizmoFeelingRot = 1.f; // >1 more mouse sensibility, <1 less mouse sensibility
 
 #ifndef IMGUIZMO_USE_ONLY_ROT
-float imguiGizmo::dollyScale = 1.f, imguiGizmo::panScale = 1.f;
+float imguiGizmo::dollyScale = 1.f, imguiGizmo::panScale = 1.f, imguiGizmo::dollyWheelScale = 2.f;
 vgModifiers imguiGizmo::panMod = vg::evControlModifier, imguiGizmo::dollyMod = vg::evShiftModifier;
 #endif
 
@@ -369,7 +369,7 @@ inline ImU32 addLightEffect(ImU32 color, float light,  float atten)
     return addLightEffect(c, light, atten);
 }
 
-//  inline helper drawing functions
+//  inline helper drawing functions passed as (*ptrFn)()
 ////////////////////////////////////////////////////////////////////////////
 typedef vec3 & (*ptrFunc)(vec3 &);
 
@@ -404,9 +404,9 @@ inline vec3 &adjustSpotCone(vec3 &coord)
 
 inline vec3 fastRotate (int axis, vec3 &v)
 {
-    return ((axis == imguiGizmo::axisIsY) ? vec3(-v.y, v.x, v.z) : // rotation Z 90'
-           ((axis == imguiGizmo::axisIsZ) ? vec3(-v.z, v.y, v.x) : // rotation Y 90'
-                                          v));
+    return ((axis == imguiGizmo::axisIsY) ? IMGUIZMO_VMOD_AXIS_Y vec3(-v.y, v.x, v.z) : // rotation Z 90'
+           ((axis == imguiGizmo::axisIsZ) ? IMGUIZMO_VMOD_AXIS_Z vec3(-v.z, v.y, v.x) : // rotation Y 90'
+                                            IMGUIZMO_VMOD_AXIS_X v));
 }
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -480,7 +480,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
             track.setPanControl(buttonPanDolly, panMod);
             track.setPanScale(screenFactor*panScale);
             track.setDollyScale(screenFactor*dollyScale);
-            track.wheel(0.f, io.MouseWheel);
+            track.wheel(0.f, dollyWheelScale*io.MouseWheel);
             track.motionImmediateMode(mouse.x, mouse.y, io.MouseDelta.x, io.MouseDelta.y, vgMods);
             // get new rotation only if !Pan && ! Dolly
             if((!track.isDollyActive() && !track.isPanActive() && io.MouseWheel==0)) q = track.getRotation();
@@ -560,7 +560,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         auto itTess = sphereTess.begin();
         for(auto itVtx = sphereVtx.begin(); itVtx != sphereVtx.end(); )  {
             for(int h=0; h<3; h++, itTess++) {
-                vec3 coord = _q  * (*itVtx++ * solidResizeFactor) * track.getRotationMod();        //Rotate
+                vec3 coord = _q  * (*itVtx++ * solidResizeFactor);        //Rotate
 
                 uv[h] = normalizeToControlSize(coord.x,coord.y);
                 const float drawSize = sphereRadius * solidResizeFactor;
@@ -577,9 +577,9 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         draw_list->PrimReserve(cubeNorm.size()*6, cubeNorm.size()*4); // num vert/indices 
         for(vec3* itNorm = cubeNorm.begin(), *itVtx  = cubeVtx.begin() ; itNorm != cubeNorm.end();) {
             vec3 coord;
-            vec3 norm = _q * *itNorm * track.getRotationMod();
+            vec3 norm = _q * *itNorm;
             for(int i = 0; i<4; ) {
-                coord = _q  * (*itVtx++ * solidResizeFactor)  * track.getRotationMod();
+                coord = _q  * (*itVtx++ * solidResizeFactor);
                 uv[i++] = normalizeToControlSize(coord.x,coord.y);
             }                    
             addQuad(addLightEffect(vec4(abs(*itNorm++),1.0f), norm.z, coord.z));
@@ -592,9 +592,9 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         draw_list->PrimReserve(planeNorm.size()*6, planeNorm.size()*4); // num vert/indices 
         for(auto itNorm = planeNorm.begin(), itVtx  = planeVtx.begin() ; itNorm != planeNorm.end();) {
             vec3 coord;
-            vec3 norm = _q * *itNorm   * track.getRotationMod();
+            vec3 norm = _q * *itNorm;
             for(int i = 0; i<4; ) {
-                coord = _q  * (*itVtx++ * solidResizeFactor)   * track.getRotationMod();
+                coord = _q  * (*itVtx++ * solidResizeFactor);
                 uv[i++] = normalizeToControlSize(coord.x,coord.y);
             }                    
             itNorm++;
@@ -608,13 +608,15 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         for(int n = 0; n < 4; n++) { //Arrow: 2 Cone -> (Surface + cap) + 2 Cyl -> (Surface + cap)
             for(int arrowAxis = 0; arrowAxis < 3; arrowAxis++) { // draw 3 axes
                 vec3 arrowCoord(0.0f, 0.0f, 0.0f); arrowCoord[arrowAxis] = 1.0f; // rotate on 3 axis (arrow -> X, Y, Z ) in base to current arrowAxis
-                const float arrowCoordZ = vec3(_q*arrowCoord*track.getRotationMod()).z; //.Rotate
+                if(arrowAxis == 2) arrowCoord[arrowAxis] = 1.0f;
+                const float arrowCoordZ = vec3(_q*arrowCoord).z; //.Rotate
 
                 const int i = (arrowCoordZ > 0) ? 3 - n : n; //painter algorithm: before farthest
 
                 bool skipCone =true;
 
-                if((side == backSide  && arrowCoordZ > 0) || (side == frontSide && arrowCoordZ <= 0)) {
+                int realSide = viewVecModifier[arrowAxis] > 0 ? side : (side == backSide ? frontSide : backSide);
+                if((realSide == backSide  && arrowCoordZ > 0) || (realSide == frontSide && arrowCoordZ <= 0)) {
                     if (!showFullAxes && (i == CYL_CAP)) continue; // skip if cylCap is hidden
                     if (i <= CONE_CAP) continue;  // do not draw cone
                     else skipCone = false;
@@ -634,10 +636,10 @@ bool imguiGizmo::drawFunc(const char* label, float size)
                         if((skipCone && coord.x <= 0) || 
                            (!showFullAxes && (coord.x < arrowStartingPoint)) ) coord.x =  arrowStartingPoint;
                     //transform
-                        coord = _q * fastRotate(arrowAxis, coord) * track.getRotationMod();
+                        coord = _q * fastRotate(arrowAxis, coord);
                         uv[h] = normalizeToControlSize(coord.x,coord.y);
 #ifdef imguiGizmo_INTERPOLATE_NORMALS
-                        vec3 norm( _q * fastRotate(arrowAxis, *itNorm++) * track.getRotationMod());
+                        vec3 norm( _q * fastRotate(arrowAxis, *itNorm++));
 #endif
                         //col[h] = addLightEffect(ImU32(0xFF) << arrowAxis*8, float(0xa0)*norm.z+.5f);
                         col[h] = addLightEffect(vec4(float(arrowAxis==axisIsX),float(arrowAxis==axisIsY),float(arrowAxis==axisIsZ), 1.0), norm.z, coord.z);
@@ -655,14 +657,14 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         draw_list->PrimReserve(ptrVtx->size(), ptrVtx->size()); // reserve vtx
         for(auto itVtx = ptrVtx->begin(), itNorm = (arrowNorm+idx)->begin(); itVtx != ptrVtx->end(); ) { 
 #if !defined(imguiGizmo_INTERPOLATE_NORMALS)
-            vec3 norm = _q * *itNorm++ * track.getRotationMod();
+            vec3 norm = _q * *itNorm++;
 #endif
             for(int h=0; h<3; h++) {
                 vec3 coord = *itVtx++;
 #ifdef imguiGizmo_INTERPOLATE_NORMALS
-                vec3 norm = q * *itNorm++ * track.getRotationMod();
+                vec3 norm = q * *itNorm++;
 #endif
-                coord = q * (func(coord) * resizeAxes) * track.getRotationMod(); // remodelling Directional Arrow (func) and transforms;
+                coord = q * (func(coord) * resizeAxes); // remodelling Directional Arrow (func) and transforms;
 
                 uv[h] = normalizeToControlSize(coord.x,coord.y);
                 //col[h] = addLightEffect(color, float(0xa0)*norm.z+.5f);
@@ -711,7 +713,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         const ImVec2 center(normalizeToControlSize(CENTER_HELPER_X, CENTER_HELPER_Y));
         const float radius = returnSizeFromRatio(.05);
         const int nSegments = 12;
-        const ImU32 color = (vgMods & vg::evShiftModifier)   ? 0xff0000ff : 
+        const ImU32 color = (vgMods & vg::evShiftModifier)   ? 0xff0000ff :
                             (vgMods & vg::evControlModifier) ? 0xff00ff00 : 0xffff0000;
 
         if(squareSize<100) { // if too small filled circle
@@ -787,8 +789,14 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     if(drawMode & (modeDirection | modeDirPlane)) dirArrow(_q, drawMode);
     else { // draw arrows & solid
         if(drawMode & modeDual) {
-            vec3 spot(qtV2 * vec3(-1.0f, 0.0f, .0f) * track.getRotationMod()); // versus opposite
-            if(spot.z>0) { draw3DSystem(); spotArrow(normalize(qtV2),spot.z); }
+#ifdef IMGUIZMO_HAS_NEGATIVE_VEC3_LIGHT
+            vec3 spot(qtV2 * vec3(-1.0f, 0.0f, .0f));
+            if(spot.z>0) // versus opposite
+#else
+            vec3 spot(qtV2 * vec3( 1.0f, 0.0f, .0f));
+            if(spot.z<0)
+#endif
+                         { draw3DSystem(); spotArrow(normalize(qtV2),spot.z); }
             else         { spotArrow(normalize(qtV2),spot.z); draw3DSystem(); }
         } else draw3DSystem();
     }
