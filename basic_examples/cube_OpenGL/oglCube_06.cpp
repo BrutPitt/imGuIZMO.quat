@@ -310,15 +310,15 @@ int main()
             if(glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) != leftPress) {   // check if leftButton state is changed
                 leftPress = leftPress == GLFW_PRESS ? GLFW_RELEASE : GLFW_PRESS;        // set new (different!) state
                 track.mouse(vg::evLeftButton, getModifier(glfwWindow),                  // send communication to vGizmo3D...
-                            leftPress, (int)x, (int)y);                                 // ... checking if a key modifier currently is pressed
+                                              leftPress, x, y);                         // ... checking if a key modifier currently is pressed
             }
             if(glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT) != rightPress) { // same thing for rightButton
                 rightPress = rightPress == GLFW_PRESS ? GLFW_RELEASE : GLFW_PRESS;
                 track.mouse(vg::evRightButton, getModifier(glfwWindow),
-                            rightPress, (int)x, (int)y);
+                                               rightPress, x, y);
             }
             if(leftPress == GLFW_PRESS || rightPress == GLFW_PRESS)
-                track.motion((float)x,(float)y);                                                // if one button is pressed vGizmo3D catch the motion
+                track.motion(x,y);                                                       // if one button is pressed vGizmo3D catch the motion
         }
     // vGizmo3D: call it every rendering loop if you want a continue rotation until you do not click on screen
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

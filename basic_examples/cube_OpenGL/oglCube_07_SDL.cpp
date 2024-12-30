@@ -331,15 +331,15 @@ int main()
             if(leftPress != isLPressed) {                                   // check if leftButton state is changed
                 leftPress = isLPressed ;                                    // set new (different!) state
                 track.mouse(vg::evLeftButton, getModifier(sdlWindow),       // send communication to vGizmo3D...
-                             leftPress, (int)x, (int)y);                    // ... checking if a key modifier currently is pressed
+                                              leftPress,  x, y);            // ... checking if a key modifier currently is pressed
             }
             if(rightPress != isRPressed) {                                  // check if rightButton state is changed
                 rightPress = isRPressed;                                    // set new (different!) state
                 track.mouse(vg::evRightButton, getModifier(sdlWindow),      // send communication to vGizmo3D...
-                         rightPress, (int)x, (int)y);                       // ... checking if a key modifier currently is pressed
+                                              rightPress, x, y);            // ... checking if a key modifier currently is pressed
             }
             if(leftPress || rightPress)                                     // if one button is pressed vGizmo3D catch the motion
-                track.motion((float)x,(float)y);
+                track.motion(x,y);
         }
 
     // vGizmo3D: call it every rendering loop if you want a continue rotation until you do not click on screen
@@ -363,7 +363,7 @@ int main()
         
     // build MVPs matrices to pass to shader
         mvpMatrix   = projMatrix * viewMatrix * compensateView * translationMatrix * cubeObj * static_cast<mat4>(track.getRotation());
-        lightMatrix = projMatrix * viewMatrix * compensateView * translationMatrix * (static_cast<mat4>(track.getSecondRot())) * lightObj;
+        lightMatrix = projMatrix * viewMatrix * compensateView * translationMatrix * translate(mat4(1), lightPos) * scale(mat4(1), vec3(.1));
 
     // draw the cube, passing matrices to the vtx shader
         draw();
