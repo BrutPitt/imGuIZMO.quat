@@ -11,7 +11,6 @@
 #  This software is distributed under the terms of the BSD 2-Clause license
 #------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.16)
-project(vkCube)
 
 # Debug Validation Layer is enabled in ONLY Debug mode
 #       cmake -DFORCE_VALIDATION_LAYER:BOOL=TRUE
@@ -28,8 +27,7 @@ if(IMGUIZMO_USES_GLM)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVGIZMO_USES_GLM")
 endif(IMGUIZMO_USES_GLM)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIMGUIZMO_VMOD_AXIS_Y=- -DIMGUIZMO_VMOD_AXIS_Z=-")
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIMGUIZMO_VMOD_AXIS_Y=-")
 
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -43,9 +41,10 @@ if(${CMAKE_BUILD_TYPE} MATCHES "Debug" OR FORCE_VALIDATION_LAYER)
 endif()
 
 
-find_package(glfw3 REQUIRED)
+find_package(glfw3 CONFIG)
 
 set(SRC          ${CMAKE_SOURCE_DIR})
+set(COMMONS_DIR  ${SRC}/../commons)
 set(TOOLS_DIR    ${CMAKE_SOURCE_DIR}/../../libs)
 set(IMGUI_DIR    ${TOOLS_DIR}/imgui)
 set(IMGUIZMO_DIR ${CMAKE_SOURCE_DIR}/../../imguizmo_quat)
@@ -53,12 +52,28 @@ set(IMGUIZMO_DIR ${CMAKE_SOURCE_DIR}/../../imguizmo_quat)
 include_directories(${SRC})
 include_directories(${TOOLS_DIR})
 include_directories(${IMGUIZMO_DIR})
+include_directories(${SRC}/../commons)
+
+
+find_package(Vulkan REQUIRED)
+
+set(VK_ADD_LIBS "")
+macro(addVulkanLibs ARG)
+    message("ARG ${ARG}")
+    find_library(${ARG}_LIB NAMES ${ARG} PATHS $ENV{VULKAN_SDK}/lib)
+    message(STATUS "${ARG} found in: ${${ARG}_LIB}\n")
+    set(VK_ADD_LIBS ${VK_ADD_LIBS} ${${ARG}_LIB})
+endmacro()
+
+addVulkanLibs(shaderc_combined)
+addVulkanLibs(glslang-default-resource-limits)
+
 
     set(SOURCE_FILES
-        ${SRC}/vkCube_06.cpp
         ${SRC}/utils/math.cpp
         ${SRC}/utils/shaders.cpp
         ${SRC}/utils/utils.cpp
+        ${COMMONS_DIR}/shadersAndModel.h
         ${IMGUIZMO_DIR}/imguizmo_quat.h
         ${IMGUIZMO_DIR}/imguizmo_quat.cpp
         ${IMGUI_DIR}/imconfig.h
@@ -109,25 +124,20 @@ foreach( vkCubeSourceFile ${APP_SOURCES} )
         set(TARGET_LIBS ${CMAKE_DL_LIBS} )
     endif()
 
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations -fpermissive)
+
+    if(VULKAN_FOUND)
+        target_include_directories(${PROJECT_NAME} PUBLIC $ENV{VULKAN_SDK}/include)
+        target_link_libraries (${PROJECT_NAME} ${Vulkan_LIBRARIES} -lpthread -lX11 -lrt ${VK_ADD_LIBS})
+    endif (VULKAN_FOUND)
+    
     target_link_libraries(${vkCubeName} ${OPENGL_LIBRARY} ${TARGET_LIBS})
 endforeach( vkCubeSourceFile ${APP_SOURCES} )
 
 
 
-target_include_directories(${PROJECT_NAME} PUBLIC .)
+# target_include_directories(${PROJECT_NAME} PUBLIC .)
 
-find_package(Vulkan REQUIRED)
-
-set(VK_ADD_LIBS "")
-macro(addVulkanLibs ARG)
-    message("ARG ${ARG}")
-    find_library(${ARG}_LIB NAMES ${ARG} PATHS $ENV{VULKAN_SDK}/lib)
-    message(STATUS "${ARG} found in: ${${ARG}_LIB}\n")
-    set(VK_ADD_LIBS ${VK_ADD_LIBS} ${${ARG}_LIB})
-endmacro()
-
-addVulkanLibs(shaderc_combined)
-addVulkanLibs(glslang-default-resource-limits)
 #addVulkanLibs(VkLayer_khronos_validation)
 #addVulkanLibs(glslang)
 #addVulkanLibs(MachineIndependent)
@@ -138,27 +148,5 @@ addVulkanLibs(glslang-default-resource-limits)
 # it's necessary only to compile shaders from code
 
 
-set(M_GLOBAL_FLAGS, ${M_GLOBAL_FLAGS} -DIMGUIZMO_AXIS_MOD_Y=- -DIMGUIZMO_AXIS_MOD_Z=-)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${M_GLOBAL_FLAGS}")
-target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations -fpermissive)
 
-if( WIN32 )
-    target_compile_definitions( ${PROJECT_NAME} PUBLIC VK_USE_PLATFORM_WIN32_KHR )
-elseif( APPLE )
-    target_compile_definitions( ${PROJECT_NAME} PUBLIC VK_USE_PLATFORM_METAL_EXT )
-elseif( UNIX )
-    target_compile_definitions( ${PROJECT_NAME} PUBLIC VK_USE_PLATFORM_XCB_KHR )
-else()
-    message( FATAL_ERROR, "Vulkan-Hpp: unhandled platform!" )
-endif()
 
-if(EXISTS $ENV{RAMDISK}) #my RAMDISK env
-    set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY $ENV{RAMDISK}/${PROJECT_NAME})
-else()
-    set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-endif()
-
-if(VULKAN_FOUND)
-    target_include_directories(${PROJECT_NAME} PUBLIC $ENV{VULKAN_SDK}/include)
-    target_link_libraries (${PROJECT_NAME} ${Vulkan_LIBRARIES} -lpthread -lX11 -lrt ${VK_ADD_LIBS})
-endif (VULKAN_FOUND)

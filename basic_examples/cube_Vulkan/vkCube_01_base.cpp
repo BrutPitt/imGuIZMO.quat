@@ -15,16 +15,11 @@
 // VulkanHpp Samples : 15_DrawCube
 //                     Draw a cube
 
-#include "utils/geometries.hpp"
 #include "utils/math.hpp"
 #include "utils/shaders.hpp"
 #include "utils/utils.hpp"
 #include <glslang/SPIRV/GlslangToSpv.h>
 #include <glslang/Public/ShaderLang.h>
-
-#include <glm/gtx/euler_angles.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 #include <iostream>
 #include <thread>
@@ -35,34 +30,73 @@
 #include <GLFW/glfw3.h>
 #include "imgui/imgui_impl_glfw.h"
 
-static char const * AppName    = "15_DrawCube";
-static char const * EngineName = "Vulkan.hpp";
-static uint32_t appWidth = 1280, appHeight = 800;
+static char const * AppName    = "vkCube";
+static char const * EngineName = "ImGuIZMO";
+int width = 1280, height = 800;
 
 #include "dbgValidationLayer.h"
+#include "../commons/shadersAndModel.h"
+
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
 #include <imGuIZMOquat.h> // now also imguizmo_quat.h
 
-glm::mat4 mvpMatrix;
+mat4 mvpMatrix, viewMatrix, projMatrix;
+mat4 cubeObj;
+
+
+mat4 clipMatrix = mat4(1.0f,  0.0f, 0.0f, 0.0f,
+                       0.0f, -1.0f, 0.0f, 0.0f,
+                       0.0f,  0.0f, 0.5f, 0.0f,
+                       0.0f,  0.0f, 0.5f, 1.0f );  // vulkan clip space has inverted y and half z !
+void setPerspective()
+{
+    float aspectRatio = float(height) / float(width);       // Set "camera" position and perspective
+    float fov = radians( 45.0f ) * aspectRatio;
+    projMatrix = perspective( fov, 1/aspectRatio, 0.1f, 100.0f );
+}
+
+void setScene()
+{
+    viewMatrix = lookAt( vec3(  0.0f,  0.0f, 10.0f ),   // From / EyePos
+                         vec3(  0.0f,  0.0f,  0.0f ),   // To   /
+                         vec3(  0.0f,  1.0f,   .0f));   // Up
+
+    setPerspective();
+}
+
+std::vector<const char*> extensions;
+
+void getReqExtensions() {
+    uint32_t extensionCount = 0;
+    const char** ptrExtensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+    extensions = std::vector(ptrExtensions, ptrExtensions + extensionCount);
+#ifndef NDEBUG
+    extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+}
 
 int main( int /*argc*/, char ** /*argv*/ )
 {
   try
   {
-    // original example select surface extensions @ CMake time (no via GLFW): only systems UNIX (XCB_KHR), WIN32 (WIN32_KHR), APPLE (METAL_EXT) are recognised
-    // To force a particular extension look getInstanceExtensions() in utils.cpp file
-    vk::Instance instance = vk::su::createInstance( AppName, EngineName, {}, vk::su::getInstanceExtensions() );
+    // original example select surface extensions @ CMake time (no via GLFW/SDL): UNIX (XCB_KHR), WIN32 (WIN32_KHR), APPLE (METAL_EXT)
+    // so I have forced framework Initialization @ startup (and just some little changes in NVIDIA "utils.*" files")
+    vk::su::WindowData window = vk::su::createWindow( AppName, vk::Extent2D( width, height ) );
+
+    getReqExtensions();
+
+    vk::Instance instance = vk::su::createInstance( AppName, EngineName, {}, extensions );
     debugMessengersLayers debug; // debug messenger obj
 
-    // just use my Validation Layer Code
+    // and use my Validation Layer Code
     CHECK_VALIDATION_LAYER_SUPPORT()
     BUILD_DEBUG_MESSENGER(instance)
 
     vk::PhysicalDevice physicalDevice = instance.enumeratePhysicalDevices().front();
     // just modified window size
-    vk::su::SurfaceData surfaceData( instance, AppName, vk::Extent2D( appWidth, appHeight ) );
+    vk::su::SurfaceData surfaceData( instance, AppName, vk::Extent2D( width, height ), window );
 
     std::pair<uint32_t, uint32_t> graphicsAndPresentQueueFamilyIndex = vk::su::findGraphicsAndPresentQueueFamilyIndex( physicalDevice, surfaceData.surface );
     vk::Device                    device = vk::su::createDevice( physicalDevice, graphicsAndPresentQueueFamilyIndex.first, vk::su::getDeviceExtensions() );
@@ -85,20 +119,12 @@ int main( int /*argc*/, char ** /*argv*/ )
 
     vk::su::DepthBufferData depthBufferData( physicalDevice, device, vk::Format::eD32Sfloat, surfaceData.extent );
 
-    vk::su::BufferData uniformBufferData( physicalDevice, device, sizeof( glm::mat4x4 ), vk::BufferUsageFlagBits::eUniformBuffer );
+    vk::su::BufferData uniformBufferData( physicalDevice, device, sizeof( mat4x4 ), vk::BufferUsageFlagBits::eUniformBuffer );
 
-        //glm::mat4x4        mvpcMatrix = vk::su::createModelViewProjectionClipMatrix( surfaceData.extent );
+        //mat4x4        mvpcMatrix = vk::su::createModelViewProjectionClipMatrix( surfaceData.extent );
     // Expand createModelViewProjectionClipMatrix function...
         float aspectRatio = float(surfaceData.extent.height) / float(surfaceData.extent.width);
-        float fov = glm::radians( 45.0f ) * aspectRatio;
-    // to use to apply rotation to "model" matrix before create ModelView and ModelViewProjection Matrices ==> mvpcMatrix
-        //glm::mat4x4 model      = glm::mat4x4( 1.0f );
-        glm::mat4x4 viewMatrix = glm::lookAt( glm::vec3( 0.0f, 0.0f, 10.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3( 0.f, -1.f, 0.f ) );
-        glm::mat4x4 projMatrix = glm::perspective( fov, 1/aspectRatio, 0.1f, 100.0f );
-        glm::mat4x4 clip = glm::mat4x4(1.0f,  0.0f, 0.0f, 0.0f,
-                                       0.0f, -1.0f, 0.0f, 0.0f,
-                                       0.0f,  0.0f, 0.5f, 0.0f,    // vulkan clip space has inverted y and half z !
-                                       0.0f,  0.0f, 0.5f, 1.0f );  // I add: because this vk-hpp example is a port of OpenGL example
+        float fov = radians( 45.0f ) * aspectRatio;
 
         //vk::su::copyToDevice( device, uniformBufferData.deviceMemory, mvpcMatrix ); // move this inside render loop to update vertex buffer every frame
 
@@ -110,8 +136,8 @@ int main( int /*argc*/, char ** /*argv*/ )
       device, vk::su::pickSurfaceFormat( physicalDevice.getSurfaceFormatsKHR( surfaceData.surface ) ).format, depthBufferData.format );
 
     glslang::InitializeProcess();
-    vk::ShaderModule vertexShaderModule   = vk::su::createShaderModule( device, vk::ShaderStageFlagBits::eVertex, vertexShaderText_PC_C );
-    vk::ShaderModule fragmentShaderModule = vk::su::createShaderModule( device, vk::ShaderStageFlagBits::eFragment, fragmentShaderText_C_C );
+    vk::ShaderModule vertexShaderModule   = vk::su::createShaderModule( device, vk::ShaderStageFlagBits::eVertex, vk_vertex_code );
+    vk::ShaderModule fragmentShaderModule = vk::su::createShaderModule( device, vk::ShaderStageFlagBits::eFragment, fragment_code );
     glslang::FinalizeProcess();
 
     std::vector<vk::Framebuffer> framebuffers =
@@ -146,8 +172,12 @@ int main( int /*argc*/, char ** /*argv*/ )
     vk::SurfaceCapabilitiesKHR surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR( surfaceData.surface );
     uint32_t minImageCount = vk::su::clampSurfaceImageCount( 3u, surfaceCapabilities.minImageCount, surfaceCapabilities.maxImageCount );
 
-    /////////////////////////////////////////
+    // v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Start ImGui & ImGuIZMO.quad code
+
+    // scene initialization
+        setScene();
 
     // Just get a simplest reference
         GLFWwindow *glfwWindow = surfaceData.window.handle;
@@ -164,19 +194,9 @@ int main( int /*argc*/, char ** /*argv*/ )
         ImGuiIO& io = ImGui::GetIO(); (void)io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-        //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-        //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
-        //io.ConfigViewportsNoAutoMerge = true;
-        //io.ConfigViewportsNoTaskBarIcon = true;
 
         ImGui::StyleColorsDark(); // ImGui style: or ImGui::StyleColorsLight();
 
-        // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-        ImGuiStyle& style = ImGui::GetStyle();
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            style.WindowRounding = 0.0f;
-            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-        }
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForVulkan(glfwWindow, true);  // callback ImGui active: you don't even need to handle mouse events
         ImGui_ImplVulkan_InitInfo init_info = {};
@@ -203,7 +223,6 @@ int main( int /*argc*/, char ** /*argv*/ )
         while(!glfwWindowShouldClose(surfaceData.window.handle)) {
             glfwPollEvents();
 
-            int width, height;
             glfwGetFramebufferSize(glfwWindow, &width, &height);
 
     // ImGUI: prepare ImGUI new frame
@@ -234,7 +253,7 @@ int main( int /*argc*/, char ** /*argv*/ )
             modelMatrix = mat4_cast(rotation);                      // existing matrix assignation
             modelMatrix = mat4(rotation);                           //    "        "       "
     // build MVP matrix to pass to shader
-            mvpMatrix = clip * projMatrix * viewMatrix * static_cast<mat4>(rotation);   // or use a cast: watch vgMath for all overload operators: quat ==> mat4 / mat3
+            mvpMatrix = clipMatrix * projMatrix * viewMatrix * static_cast<mat4>(rotation);   // or use a cast: watch vgMath for all overload operators: quat ==> mat4 / mat3
     // update uniformBuffer: 4x4 matrix ==> vertex shader
             vk::su::copyToDevice( device, uniformBufferData.deviceMemory, mvpMatrix );
 
@@ -252,7 +271,7 @@ int main( int /*argc*/, char ** /*argv*/ )
             commandBuffer.begin( vk::CommandBufferBeginInfo( vk::CommandBufferUsageFlags() ) );
 
             std::array<vk::ClearValue, 2> clearValues;
-            clearValues[0].color        = vk::ClearColorValue( 0.2f, 0.2f, 0.2f, 0.2f );
+            clearValues[0].color        = vk::ClearColorValue( 0.07f, 0.07f, 0.07f, 0.07f );
             clearValues[1].depthStencil = vk::ClearDepthStencilValue( 1.0f, 0 );
             vk::RenderPassBeginInfo renderPassBeginInfo(
               renderPass, framebuffers[currentBuffer.value], vk::Rect2D( vk::Offset2D( 0, 0 ), surfaceData.extent ), clearValues );
@@ -277,12 +296,6 @@ int main( int /*argc*/, char ** /*argv*/ )
             vk::SubmitInfo         submitInfo( imageAcquiredSemaphore, waitDestinationStageMask, commandBuffer );
             graphicsQueue.submit( submitInfo, drawFence );
 
-    // ImGui: This is NECESSARY! only if use ImGui Viewports feature: uncomment to Update and Render additional Platform Windows
-            //if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)  {
-            //    ImGui::UpdatePlatformWindows();
-            //    ImGui::RenderPlatformWindowsDefault();
-            //}
-
             while ( vk::Result::eTimeout == device.waitForFences( drawFence, VK_TRUE, vk::su::FenceTimeout ) ) ;
     // is necessary reset fences before submit it again (now there we are in a loop)
             vk::detail::resultCheck(device.resetFences(1, &drawFence), "resetFences...");
@@ -303,7 +316,8 @@ int main( int /*argc*/, char ** /*argv*/ )
         device.destroyDescriptorPool( imguiPool );  // destroy ImGui DescriptorPool
 
     // End ImGui & ImGuIZMO.quad code
-    /////////////////////////////////////////
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
 
     // not more necessary
     //std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );

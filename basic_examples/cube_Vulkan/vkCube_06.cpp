@@ -15,10 +15,7 @@
 // https://github.com/KhronosGroup/Vulkan-Hpp/tree/main/samples/15_DrawCube
 //
 // Copyright(c) 2019, NVIDIA CORPORATION. All rights reserved.
-// Licensed under the Apache License, Version 2.0;
-//
-// VulkanHpp Samples : 15_DrawCube
-//                     Draw a cube
+// Licensed under the Apache License, Version 2.0
 
 #include "utils/math.hpp"
 #include "utils/shaders.hpp"
@@ -35,8 +32,8 @@
 #include <GLFW/glfw3.h>
 #include "imgui/imgui_impl_glfw.h"
 
-static char const * AppName    = "15_DrawCube";
-static char const * EngineName = "Vulkan.hpp";
+static char const * AppName    = "vkCube";
+static char const * EngineName = "ImGuIZMO";
 
 #include "dbgValidationLayer.h"
 #include "../commons/shadersAndModel.h"
@@ -47,8 +44,8 @@ static char const * EngineName = "Vulkan.hpp";
 #include <imGuIZMOquat.h> // now also imguizmo_quat.h
 
 struct _uboMat {
-    glm::mat4 mvpMatrix;
-    glm::mat4 lightMatrix;
+    mat4 mvpMatrix;
+    mat4 lightMatrix;
 } uboMat;
 
 int width = 1280, height = 800;
@@ -60,10 +57,12 @@ int nElemVtx = 4;
 mat4 mvpMatrix, viewMatrix, projMatrix;
 mat4 lightObj, lightMatrix, cubeObj;
 
+vec3 lightPos(2, 1.5, 2.5);        // Light Position
+
 mat4 clipMatrix = mat4(1.0f,  0.0f, 0.0f, 0.0f,
                        0.0f, -1.0f, 0.0f, 0.0f,
-                       0.0f,  0.0f,  .5f, 0.0f,    // vulkan clip space has inverted y and half z !
-                       0.0f,  0.0f,  .5f, 1.0f );  // I add: because this vk-hpp example is a port of OpenGL example
+                       0.0f,  0.0f, 0.5f, 0.0f,
+                       0.0f,  0.0f, 0.5f, 1.0f );  // vulkan clip space has inverted y and half z !
 
 /// imGuIZMO / vGizmo3D : declare global/static/member/..
 ///////////////////////////////////
@@ -149,7 +148,6 @@ void setScene()
 
 
     // light model
-    vec3 lightPos(2, 1.5, 2.5);        // Light Position
 
     // acquiring rotation for the light pos
     const float len = length(lightPos);
@@ -166,22 +164,37 @@ void setScene()
     setPerspective();
 }
 
+std::vector<const char*> extensions;
+
+void getReqExtensions() {
+    uint32_t extensionCount = 0;
+    const char** ptrExtensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+    extensions = std::vector(ptrExtensions, ptrExtensions + extensionCount);
+#ifndef NDEBUG
+    extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+}
+
 int main( int /*argc*/, char ** /*argv*/ )
 {
   try
   {
-    // original example select surface extensions @ CMake time (no via GLFW): only systems UNIX (XCB_KHR), WIN32 (WIN32_KHR), APPLE (METAL_EXT) are recognised
-    // To force a particular extension look getInstanceExtensions() in utils.cpp file
-    vk::Instance instance = vk::su::createInstance( AppName, EngineName, {}, vk::su::getInstanceExtensions() );
+    // original example select surface extensions @ CMake time (no via GLFW/SDL): UNIX (XCB_KHR), WIN32 (WIN32_KHR), APPLE (METAL_EXT)
+    // so I have forced framework Initialization @ startup (and just some little changes in NVIDIA "utils.*" files")
+    vk::su::WindowData window = vk::su::createWindow( AppName, vk::Extent2D( width, height ) );
+
+    getReqExtensions();
+
+    vk::Instance instance = vk::su::createInstance( AppName, EngineName, {}, extensions );
     debugMessengersLayers debug; // debug messenger obj
 
-    // just use my Validation Layer Code
+    // and use my Validation Layer Code
     CHECK_VALIDATION_LAYER_SUPPORT()
     BUILD_DEBUG_MESSENGER(instance)
 
     vk::PhysicalDevice physicalDevice = instance.enumeratePhysicalDevices().front();
     // just modified window size
-    vk::su::SurfaceData surfaceData( instance, AppName, vk::Extent2D( width, height ) );
+    vk::su::SurfaceData surfaceData( instance, AppName, vk::Extent2D( width, height ), window );
 
     std::pair<uint32_t, uint32_t> graphicsAndPresentQueueFamilyIndex = vk::su::findGraphicsAndPresentQueueFamilyIndex( physicalDevice, surfaceData.surface );
     vk::Device                    device = vk::su::createDevice( physicalDevice, graphicsAndPresentQueueFamilyIndex.first, vk::su::getDeviceExtensions() );
@@ -206,8 +219,6 @@ int main( int /*argc*/, char ** /*argv*/ )
 
     vk::su::BufferData uniformBufferData( physicalDevice, device, sizeof( _uboMat ), vk::BufferUsageFlagBits::eUniformBuffer );
 
-    // scene initialization
-        setScene();
         //vk::su::copyToDevice( device, uniformBufferData.deviceMemory, mvpcMatrix ); // move this statement inside render loop to update vertex buffer every frame
 
     vk::DescriptorSetLayout descriptorSetLayout =
@@ -254,8 +265,12 @@ int main( int /*argc*/, char ** /*argv*/ )
     vk::SurfaceCapabilitiesKHR surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR( surfaceData.surface );
     uint32_t minImageCount = vk::su::clampSurfaceImageCount( 3u, surfaceCapabilities.minImageCount, surfaceCapabilities.maxImageCount );
 
-    /////////////////////////////////////////
+    // v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Start ImGui & ImGuIZMO.quad code
+
+    // scene initialization
+        setScene();
 
     // vGizmo3D: initialize
     ///////////////////////////////////
@@ -263,7 +278,9 @@ int main( int /*argc*/, char ** /*argv*/ )
 
     // Just get a simplest reference
         GLFWwindow *glfwWindow = surfaceData.window.handle;
-    // Initialize ImGui
+
+    //***********************************************
+    // ImGui start VULKAN-HPP initialization
         const std::array pool_sizes { vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 1) } ; // array declaration C++ 17
         vk::DescriptorPoolCreateInfo pool_info(vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, //flags
                                                1 /* .maxSets */, pool_sizes.size(), pool_sizes.data() /*, .pNext = nullptr  */ );
@@ -279,12 +296,7 @@ int main( int /*argc*/, char ** /*argv*/ )
 
         ImGui::StyleColorsDark(); // ImGui style: or ImGui::StyleColorsLight();
 
-        // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
         ImGuiStyle& style = ImGui::GetStyle();
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            style.WindowRounding = 0.0f;
-            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-        }
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForVulkan(glfwWindow, true);  // callback ImGui active: you don't even need to handle mouse events
         ImGui_ImplVulkan_InitInfo init_info = {};
@@ -306,6 +318,8 @@ int main( int /*argc*/, char ** /*argv*/ )
         ImGui_ImplVulkan_Init(&init_info);
 
         ImGui_ImplVulkan_SetMinImageCount(minImageCount);
+    // ImGui end VULKAN-HPP initialization
+    //***********************************************
 
     // imGuIZMO: set mouse feeling and mods
     ///////////////////////////////////
@@ -329,25 +343,24 @@ int main( int /*argc*/, char ** /*argv*/ )
             static int leftPress = 0, rightPress = 0;
             double x, y;
             glfwGetCursorPos(glfwWindow, &x, &y);
-            if(glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) != leftPress) {           // check if leftButton state is changed
-                leftPress = leftPress == GLFW_PRESS ? GLFW_RELEASE : GLFW_PRESS;                // set new (different!) state
-                track.mouse((vgButtons)GLFW_MOUSE_BUTTON_LEFT,                                  // send communication to vGizmo3D...
-                            (vgModifiers) getModifier(glfwWindow), leftPress, (int)x, (int)y);  // ... checking if a key modifier currently is pressed
+            if(glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) != leftPress) {   // check if leftButton state is changed
+                leftPress = leftPress == GLFW_PRESS ? GLFW_RELEASE : GLFW_PRESS;        // set new (different!) state
+                track.mouse(vg::evLeftButton, getModifier(glfwWindow),                  // send communication to vGizmo3D...
+                                              leftPress, x, y);                         // ... checking if a key modifier currently is pressed
             }
-            if(glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT) != rightPress) {         // same thing for rightButton
+            if(glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT) != rightPress) { // same thing for rightButton
                 rightPress = rightPress == GLFW_PRESS ? GLFW_RELEASE : GLFW_PRESS;
-                track.mouse((vgButtons)GLFW_MOUSE_BUTTON_RIGHT,
-                            (vgModifiers) getModifier(glfwWindow), rightPress, (int)x, (int)y);
+                track.mouse(vg::evRightButton, getModifier(glfwWindow),
+                                               rightPress, x, y);
             }
             if(leftPress == GLFW_PRESS || rightPress == GLFW_PRESS)
-                track.motion((float)x,(float)y);                                                // if one button is pressed vGizmo3D catch the motion
+                track.motion(x,y);                                                       // if one button is pressed vGizmo3D catch the motion
         }
     // vGizmo3D: call it every rendering loop if you want a continue rotation until you do not click on screen
     ///////////////////////////////////
         track.idle();   // set continuous rotation on Idle: the smooth rotation depends on speed of last mouse movements
                         // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                         // It can be stopped by click on screen (without mouse movement)
-
 
     // ImGUI: prepare ImGUI new frame
             ImGui_ImplVulkan_NewFrame();
@@ -389,8 +402,6 @@ int main( int /*argc*/, char ** /*argv*/ )
     ///////////////////////////////////
         ImGui::gizmo3D("##a01", track.getPositionRef(), track.getRotationRef(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
 
-
-
     // End Imgui window (container) block
         ImGui::End();
         style.WindowBorderSize = prevWindowBorderSize;              // restore border size
@@ -420,7 +431,7 @@ int main( int /*argc*/, char ** /*argv*/ )
             commandBuffer.begin( vk::CommandBufferBeginInfo( vk::CommandBufferUsageFlags() ) );
 
             std::array<vk::ClearValue, 2> clearValues;
-            clearValues[0].color        = vk::ClearColorValue( 0.2f, 0.2f, 0.2f, 0.2f );
+            clearValues[0].color        = vk::ClearColorValue( 0.07f, 0.07f, 0.07f, 0.07f );
             clearValues[1].depthStencil = vk::ClearDepthStencilValue( 1.0f, 0 );
             vk::RenderPassBeginInfo renderPassBeginInfo(
               renderPass, framebuffers[currentBuffer.value], vk::Rect2D( vk::Offset2D( 0, 0 ), surfaceData.extent ), clearValues );
@@ -445,12 +456,6 @@ int main( int /*argc*/, char ** /*argv*/ )
             vk::SubmitInfo         submitInfo( imageAcquiredSemaphore, waitDestinationStageMask, commandBuffer );
             graphicsQueue.submit( submitInfo, drawFence );
 
-    // ImGui: This is NECESSARY! only if use ImGui Viewports feature: uncomment to Update and Render additional Platform Windows
-            //if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)  {
-            //    ImGui::UpdatePlatformWindows();
-            //    ImGui::RenderPlatformWindowsDefault();
-            //}
-
             while ( vk::Result::eTimeout == device.waitForFences( drawFence, VK_TRUE, vk::su::FenceTimeout ) ) ;
     // is necessary reset fences before submit it again (now there we are in a loop)
             vk::detail::resultCheck(device.resetFences(1, &drawFence), "resetFences...");
@@ -471,7 +476,9 @@ int main( int /*argc*/, char ** /*argv*/ )
         device.destroyDescriptorPool( imguiPool );  // destroy ImGui DescriptorPool
 
     // End ImGui & ImGuIZMO.quad code
-    /////////////////////////////////////////
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
+
 
     // not more necessary
     //std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
@@ -504,6 +511,10 @@ int main( int /*argc*/, char ** /*argv*/ )
     instance.destroySurfaceKHR( surfaceData.surface );
     DESTROY_DEBUG_MESSENGER(instance)
     instance.destroy();
+
+    // Cleanup Framework
+    glfwDestroyWindow( window.handle );
+    glfwTerminate();
   }
   catch ( vk::SystemError & err )
   {
