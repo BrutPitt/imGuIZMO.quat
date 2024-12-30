@@ -113,11 +113,69 @@ const char* fragment_code = GLSL_VERSION R"(
 layout (location = 0) in vec4 color;
 layout (location = 0) out vec4 outColor;
 
+
 void main()
 {
     outColor = color;
 }
 )";
+
+const char* vk_vert_inv_z = R"(
+#version 400
+
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_shading_language_420pack : enable
+
+layout (std140, binding = 0) uniform buffer
+{
+  mat4 mvp;
+  mat4 light;
+} uniformBuffer;
+
+layout (location = 0) in vec4 pos;
+layout (location = 1) in vec4 inColor;
+
+layout (location = 0) out vec4 outColor;
+layout (location = 1) out vec4 vPos;
+
+void main()
+{
+    if(gl_InstanceIndex==1) {
+        outColor = inColor;
+        gl_Position = uniformBuffer.mvp * pos;
+    }
+    else {
+        outColor = vec4(1.0, 1.0, 0.5, 1.0);
+        gl_Position = uniformBuffer.light * pos;
+    }
+    vPos = gl_Position;
+}
+)";
+
+const char* vk_frag_inv_z = GLSL_VERSION R"(
+layout (location = 0) in vec4 color;
+layout (location = 1) in vec4 vPos;
+
+layout (location = 0) out vec4 outColor;
+
+// far & near values are the same of perspective() call and can be passed to shader
+float far = 100.0;  // copied here for simplicity
+float near = .1;
+
+float linearizeDepth(float d) // draw in zNDC [0, 1]
+{
+    return near * far / (far + d * (near - far));
+}
+
+void main()
+{
+    outColor = color;
+    // invert depth value
+    gl_FragDepth = 1.0 - linearizeDepth(vPos.z);
+
+}
+)";
+
 
 struct VertexPC
 {
