@@ -1,19 +1,22 @@
+//------------------------------------------------------------------------------
+//  Copyright (c) 2018-2025 Michele Morrone
+//  All rights reserved.
+//
+//  https://michelemorrone.eu - https://brutpitt.com
+//
+//  X: https://x.com/BrutPitt - GitHub: https://github.com/BrutPitt
+//
+//  direct mail: brutpitt(at)gmail.com - me(at)michelemorrone.eu
+//
+//  This software is distributed under the terms of the BSD 2-Clause license
+//------------------------------------------------------------------------------
+//
+// Modified from original vulkanHpp sample:
+// https://github.com/KhronosGroup/Vulkan-Hpp/tree/main/samples/15_DrawCube
+//
 // Copyright(c) 2019, NVIDIA CORPORATION. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// VulkanHpp Samples : 15_DrawCube
-//                     Draw a cube
+// Licensed under the Apache License, Version 2.0
+
 
 #include "utils/math.hpp"
 #include "utils/shaders.hpp"
