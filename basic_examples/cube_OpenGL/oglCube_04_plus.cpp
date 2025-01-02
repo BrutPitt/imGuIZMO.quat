@@ -241,7 +241,6 @@ int main()
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         static quat rotation(1,0,0,0);       // quat default constructor initialize @ quat(1,0,0,0) ==> w(1) x(0) y(0) z(0), w is left/first value
         static vec3 position;                // default initialization vec3(0)
-        vec3 tmpLight = -lightPos;              // Light Vector have inverse direction (toward origin) so using a tmp vect
 
     // colored text for display quat(w,x,y,z) components
         ImGui::SetCursorPos(ImVec2(0,0));
@@ -254,8 +253,7 @@ int main()
 
     // ImGuIZMO.quat widget
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        if(ImGui::gizmo3D("##aaa", rotation, tmpLight, widgetSize)) // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
-            lightPos = -tmpLight;                                      // restore sign from acquired rotation
+        ImGui::gizmo3D("##aaa", rotation, lightPos, widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
 
         widgetSize *= .5; // now we use half size
 
@@ -291,8 +289,7 @@ int main()
 
     // ImGuIZMO.quat with also pan and Dolly/zoom
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        if(ImGui::gizmo3D("##a02", tmpLight, widgetSize))           // Directional Widget
-            lightPos = -tmpLight;                                      // restore sign from acquired rotation
+        ImGui::gizmo3D("##a02", lightPos, widgetSize);           // Directional Widget
 
     // End Imgui window (container) block
         ImGui::End();

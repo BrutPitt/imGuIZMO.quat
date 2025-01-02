@@ -62,9 +62,9 @@ void setPerspective()
 
 void setScene()
 {
-    viewMatrix = lookAt( vec3( 10.0f, 10.0f, 10.0f ),   // From / EyePos
+    viewMatrix = lookAt( vec3(  0.0f,  0.0f, 10.0f ),   // From / EyePos
                          vec3(  0.0f,  0.0f,  0.0f ),   // To   /
-                         vec3(  3.0f,  1.0f,   .0f));   // Up
+                         vec3(  0.0f,  1.0f,   .0f));   // Up
 
     setPerspective();
 }
