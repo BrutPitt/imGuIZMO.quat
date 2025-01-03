@@ -58,14 +58,44 @@
 //#define VGIZMO_USES_GLM
 
 //------------------------------------------------------------------------------
-// uncomment to use LeftHanded 
+// uncomment to use Left Handed system default call for specific functions:
 //
-// This is used only in: lookAt / perspective / ortho / frustrum - functions
-//      DX is LeftHanded, OpenGL is RightHanded
+//      lookAt
+//      perspective
+//      ortho
+//      frustrum
 //
-// Default ==> RightHanded
+//  They have ALSO independent direct calls adding:
+//   RH /  LH ==> Right Hand / Left Hand
+//  _ZO / _NO ==> Z-Buffer / depth-Buffer type range [0, 1] / [-1, 1]
+//
+//  Example: perspectiveRH_ZO ==> call "perspective" for Right Handed system and
+//              using z-Buffer in range [0, 1]
+//
+//  N.B. lookAt have only lookAtRH and lookAtLH direct calls (obviously)
+//
+// Default ==> Right Handed
 //------------------------------------------------------------------------------
 //#define VGM_USES_LEFT_HAND_AXES
+
+//------------------------------------------------------------------------------
+// uncomment to use Z-Buffer / depth-Buffer range [0, 1] default call for
+//              specific functions:
+//
+//      perspective
+//      ortho
+//      frustrum
+//
+//  They have ALSO independent direct calls adding:
+//   RH /  LH ==> Right Hand / Left Hand
+//  _ZO / _NO ==> Z-Buffer / depth-Buffer type range [0, 1] / [-1, 1]
+//
+//  Example: orthoLH_NO ==> call "ortho" for Left Handed system and using
+//              z-Buffer in range [-1, 1]
+//
+// Default ==> Z-Buffer / depth-Buffer range [-1, 1]
+//------------------------------------------------------------------------------
+//#define VGM_USES_ZERO_ONE_ZBUFFER
 
 //------------------------------------------------------------------------------
 // uncomment to avoid vgMath.h add folow line code:

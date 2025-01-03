@@ -229,10 +229,10 @@ struct imguiGizmo
 
     bool drawFunc(const char* label, float size);
 
-    void modeSettings(int mode) {
-        drawMode = int(mode & modeMask); axesOriginType = int(mode & axesModeMask); showFullAxes = bool(modeFullAxes & mode); }
+    void modeSettings(uint32_t mode) {
+        drawMode = uint32_t(mode & modeMask); axesOriginType = uint32_t(mode & axesModeMask); showFullAxes = bool(modeFullAxes & mode); }
 
-    void setDualMode(const int mode) { modeSettings((imguiGizmo::modeDual | imguiGizmo::axesModeMask) & (mode | imguiGizmo::modeDual)); }
+    void setDualMode(const uint32_t mode) { modeSettings((imguiGizmo::modeDual | imguiGizmo::axesModeMask) & (mode | imguiGizmo::modeDual)); }
 
     // vec3 -> quat -> trackbalTransforms -> quat -> vec3
     //--------------------------------------------------------------------------
@@ -362,12 +362,13 @@ struct imguiGizmo
 
 namespace ImGui
 {
-/// Builds a ImGuIZMO_quat 3 axes from/with a "q" (quaternion) rotation
+/// <b>Widget 3 axes</b><br>
+/// <b>quat</b> (quaternion) axes rotation<br>
 ///
-/// @param[in]     t     widget text: put "##" before the text to hide it
-/// @param[in,out] q     quaternion with rotation
-/// @param[in]     sz    widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag  set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] q     <b> quat &      </b> - quaternion with axes rotation
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -377,14 +378,15 @@ namespace ImGui
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", rotation, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, quat& q, float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* t, quat& q, float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
 
-/// Builds a ImGuIZMO_quat 3 axes from/with a "v" vec4 (xyz axis, w angle in radians)
+/// <b>Widget 3 axes</b><br>
+/// <b>vec4</b> p(xyz), w angle in radians for the spot<br>
 ///
-/// @param[in]     t    widget text: put "##" before the text to hide it
-/// @param[in,out] v    vec4: xyz axis, w angle in radians
-/// @param[in]     sz   widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] v     <b> vec4 &      </b> - vec4 p(xyz), w angle in radians
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -394,14 +396,15 @@ IMGUI_API bool gizmo3D(const char* t, quat& q, float sz=IMGUIZMO_DEF_SIZE, int f
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", direction, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, vec4& v, float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* t, vec4& v, float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
 
-/// Builds a ImGuIZMO_quat directional arrow
+/// <b>Widget directional arrow</b><br>
+/// <b>vec3</b> vec3 p(xyz) (center oriented)  
 ///
-/// @param[in]     t    widget text: put "##" before the text to hide it
-/// @param[in,out] v    vec3 with position/direction (center oriented)
-/// @param[in]     sz   widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] v     <b> vec3 &      </b> - p(xyz) position/direction (center oriented)
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -411,15 +414,17 @@ IMGUI_API bool gizmo3D(const char* t, vec4& v, float sz=IMGUIZMO_DEF_SIZE, int f
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", direction, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, vec3& v, float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::modeDirection);
+IMGUI_API bool gizmo3D(const char* t, vec3& v, float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::modeDirection);
 
-/// Builds a ImGuIZMO_quat 3 axes + spot light from/with a "q" and "ql" (quaternion) rotations
+/// <b>Widget 3 axes + spot light</b><br>
+/// <b>quat</b> (quaternion) axes rotation<br>
+/// <b>quat</b> rotation for the spot<br>
 ///
-/// @param[in]     t     widget text: put "##" before the text to hide it
-/// @param[in,out] q     quaternion with rotation
-/// @param[in,out] ql    quaternion with rotation for spot
-/// @param[in]     sz    widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag  set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] q     <b> quat &      </b> - quaternion with axes rotation
+/// @param[in,out] ql    <b> vec4 &      </b> - quaternion with spot rotation
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -430,15 +435,17 @@ IMGUI_API bool gizmo3D(const char* t, vec3& v, float sz=IMGUIZMO_DEF_SIZE, int f
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", rotation, lightRot, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, quat& q, quat& ql, float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* t, quat& q, quat& ql, float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 
-/// Builds a ImGuIZMO_quat 3 axes + spot light from/with a "q" (quaternion) rotations of axes and a vec4 (xyz axis, w angle in radians) direction for the spot
+/// <b>Widget 3 axes + spot light</b><br>
+/// <b>quat</b> (quaternion) axes rotation<br>
+/// <b>vec4</b> p(xyz), w angle in radians for the spot<br>
 ///
-/// @param[in]     t     widget text: put "##" before the text to hide it
-/// @param[in,out] q     quaternion with rotation
-/// @param[in,out] v     vec4 for the spot: xyz axis, w angle in radians
-/// @param[in]     sz    widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag  set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] q     <b> quat &      </b> - quaternion with axes rotation
+/// @param[in,out] v     <b> vec4 &      </b> - vec4 for the spot: p(xyz), w angle in radians
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -449,15 +456,17 @@ IMGUI_API bool gizmo3D(const char* t, quat& q, quat& ql, float sz=IMGUIZMO_DEF_S
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", rotation, lightDir, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, quat& q, vec4& v , float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* t, quat& q, vec4& v , float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 
-/// Builds a ImGuIZMO_quat 3 axes + spot light from/with a "q" (quaternion) rotations of axes and a vec3 direction for the spot
+/// <b>Widget 3 axes + spot light</b><br>
+/// <b>quat</b> (quaternion) axes rotation<br>
+/// <b>vec3</b> vec3 p(xyz) for the spot 
 ///
-/// @param[in]     t     widget text: put "##" before the text to hide it
-/// @param[in,out] q     quaternion with rotation
-/// @param[in,out] v     vec3 direction (center oriented)
-/// @param[in]     sz    widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag  set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] q     <b> quat &      </b> - quaternion with axes rotation
+/// @param[in,out] v     <b> vec3 &      </b> - vec3 for the spot: p(xyz)
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -468,18 +477,20 @@ IMGUI_API bool gizmo3D(const char* t, quat& q, vec4& v , float sz=IMGUIZMO_DEF_S
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", rotation, lightDir, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, quat& q, vec3& v , float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* t, quat& q, vec3& v , float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 
 #ifndef IMGUIZMO_USE_ONLY_ROT
 
 //with Pan & Dolly feature
-/// Builds a ImGuIZMO_quat 3 axes from/with a "q" (quaternion) rotation and Pan & Dolly/Zoom capability
+/// <b>Widget 3 axes + Pan & Dolly/Zoom capability</b><br>
+/// <b>vec3</b> Pan/Dolly: (x, y) Pan position, (z) Dolly/Zoom position<br>
+/// <b>quat</b> (quaternion) axes rotation<br>
 ///
-/// @param[in]     t     widget text: put "##" before the text to hide it
-/// @param[in,out] vm    Pan/Dolly vec3 position: (x, y) Pan position, (z) Dolly/Zoom position
-/// @param[in,out] q     quaternion with rotation
-/// @param[in]     sz    widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag  set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] vm    <b> vec3 &      </b> - Pan/Dolly position: (x, y) Pan position, (z) Dolly/Zoom position
+/// @param[in,out] q     <b> quat &      </b> - quaternion with axes rotation
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -490,15 +501,17 @@ IMGUI_API bool gizmo3D(const char* t, quat& q, vec3& v , float sz=IMGUIZMO_DEF_S
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", position, rotation, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
 
-/// Builds a ImGuIZMO_quat 3 axes from/with a "v" vec4 (xyz axis, w angle in radians)
+/// <b>Widget 3 axes + Pan & Dolly/Zoom capability</b><br>
+/// <b>vec3</b> Pan/Dolly: (x, y) Pan position, (z) Dolly/Zoom position<br>
+/// <b>vec4</b> p(xyz), w angle in radians for the spot<br>
 ///
-/// @param[in]     t    widget text: put "##" before the text to hide it
-/// @param[in,out] vm   Pan/Dolly vec3 position: (x, y) Pan position, (z) Dolly/Zoom position
-/// @param[in,out] v    vec4 with direction (prefer quaternion version: more precise, no continuous conversions)
-/// @param[in]     sz   widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] vm    <b> vec3 &      </b> - Pan/Dolly position: (x, y) Pan position, (z) Dolly/Zoom position
+/// @param[in,out] v     <b> vec4 &      </b> - vec4 for direction: p(xyz), w angle in radians
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -509,15 +522,17 @@ IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, float sz=IMGUIZMO_DEF_S
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", position, direction, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, vec3& vm, vec4& v, float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* t, vec3& vm, vec4& v, float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
 
-/// Builds a ImGuIZMO_quat directional arrow
+/// <b>Widget directional arrow + Pan & Dolly/Zoom capability</b><br>
+/// <b>vec3</b> Pan/Dolly: (x, y) Pan position, (z) Dolly/Zoom position<br>
+/// <b>vec3</b> vec3 p(xyz) (center oriented)  
 ///
-/// @param[in]     t    widget text: put "##" before the text to hide it
-/// @param[in,out] vm   Pan/Dolly vec3 position: (x, y) Pan position, (z) Dolly/Zoom position
-/// @param[in,out] v    vec3 with position/direction (center oriented)
-/// @param[in]     sz   widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] vm    <b> vec3 &      </b> - Pan/Dolly position: (x, y) Pan position, (z) Dolly/Zoom position
+/// @param[in,out] v     <b> vec3 &      </b> - p(xyz) position/direction (center oriented)
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -528,16 +543,19 @@ IMGUI_API bool gizmo3D(const char* t, vec3& vm, vec4& v, float sz=IMGUIZMO_DEF_S
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", position, direction, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, vec3& vm, vec3& v, float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::modeDirection);
+IMGUI_API bool gizmo3D(const char* t, vec3& vm, vec3& v, float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::modeDirection);
 
-/// Builds a ImGuIZMO_quat 3 axes + spot light with a "q" and "ql" (quaternion) rotations + Pan & Dolly/Zoom capability
+/// <b>Widget 3 axes + spot light + Pan & Dolly/Zoom capability</b><br>
+/// <b>vec3</b> Pan/Dolly: (x, y) Pan position, (z) Dolly/Zoom position<br>
+/// <b>quat</b> (quaternion) axes rotation<br>
+/// <b>quat</b> rotation for the spot<br>
 ///
-/// @param[in]     t     widget text: put "##" before the text to hide it
-/// @param[in,out] vm    Pan/Dolly vec3 position: (x, y) Pan position, (z) Dolly/Zoom position
-/// @param[in,out] q     quaternion with rotation
-/// @param[in,out] ql    quaternion with rotation for spot
-/// @param[in]     sz    widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag  set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] vm    <b> vec3 &      </b> - Pan/Dolly position: (x, y) Pan position, (z) Dolly/Zoom position
+/// @param[in,out] q     <b> quat &      </b> - quaternion with axes rotation
+/// @param[in,out] ql    <b> quat &      </b> - quaternion with spot rotation
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -549,16 +567,21 @@ IMGUI_API bool gizmo3D(const char* t, vec3& vm, vec3& v, float sz=IMGUIZMO_DEF_S
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", position, rotation, lightRot, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, quat& ql, float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, quat& ql, float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 
+/// <b>Widget 3 axes + spot light + Pan & Dolly/Zoom capability</b><br>
+/// <b>vec3</b> Pan/Dolly: (x, y) Pan position, (z) Dolly/Zoom position<br>
+/// <b>quat</b> (quaternion) axes rotation<br>
+/// <b>vec4</b> p(xyz), w angle in radians for the spot<br>
+///
 /// Builds a ImGuIZMO_quat 3 axes + spot light from/with a "q" (quaternion) rotations of axes and a vec4 (xyz axis, w angle in radians) for the spot + Pan & Dolly/Zoom capability
 ///
-/// @param[in]     t     widget text: put "##" before the text to hide it
-/// @param[in,out] vm    Pan/Dolly vec3 position: (x, y) Pan position, (z) Dolly/Zoom position
-/// @param[in,out] q     quaternion with rotation
-/// @param[in,out] v     vec4 direction for spot
-/// @param[in]     sz    widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag  set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] vm    <b> vec3 &      </b> - Pan/Dolly position: (x, y) Pan position, (z) Dolly/Zoom position
+/// @param[in,out] q     <b> quat &      </b> - quaternion with axes rotation
+/// @param[in,out] v     <b> vec4 &      </b> - vec4 for the spot: p(xyz), w angle in radians
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -570,16 +593,19 @@ IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, quat& ql, float sz=IMGU
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", position, rotation, lightDir, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, vec4& v , float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, vec4& v , float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 
-/// Builds a ImGuIZMO_quat 3 axes + spot light from/with a "q" (quaternion) rotations of axes and a vec3 direction for the spot  + Pan & Dolly/Zoom capability
+/// <b>Widget 3 axes + spot light + Pan & Dolly/Zoom capability</b><br>
+/// <b>vec3</b> Pan/Dolly: (x, y) Pan position, (z) Dolly/Zoom position<br>
+/// <b>quat</b> (quaternion) axes rotation<br>
+/// <b>vec3</b> vec3 p(xyz) for the spot 
 ///
-/// @param[in]     t     widget text: put "##" before the text to hide it
-/// @param[in,out] vm    Pan/Dolly vec3 position: (x, y) Pan position, (z) Dolly/Zoom position
-/// @param[in,out] q     quaternion with rotation
-/// @param[in,out] v     vec3 direction (center oriented) for spot
-/// @param[in]     sz    widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
-/// @param[in]     flag  set modes and aspect
+/// @param[in]     t     <b> const char *</b> - widget text: put "##" before the text to hide it
+/// @param[in,out] vm    <b> vec3 &      </b> - Pan/Dolly position: (x, y) Pan position, (z) Dolly/Zoom position
+/// @param[in,out] q     <b> quat &      </b> - quaternion with axes rotation
+/// @param[in,out] v     <b> vec3 &      </b> - vec3 for the spot: p(xyz)
+/// @param[in]     sz    <b> float       </b> - widget size: default size = FrameHeightWithSpacing*4 - ItemSpacing.y*2
+/// @param[in]     flag  <b> uint32_t    </b> - masked flags to set modes (lower 16bit) and aspect (higher 16bit)
 ///
 /// @code
 /// #include <imguizmo_quat.h>
@@ -591,7 +617,7 @@ IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, vec4& v , float sz=IMGU
 /// // inside ImGui a frame
 /// ImGui::gizmo3D("##widget", position, rotation, lightDir, /* size */ 240);
 /// @endcode
-IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, vec3& v , float sz=IMGUIZMO_DEF_SIZE, int flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
+IMGUI_API bool gizmo3D(const char* t, vec3& vm, quat& q, vec3& v , float sz=IMGUIZMO_DEF_SIZE, uint32_t flag=imguiGizmo::modeDual|imguiGizmo::cubeAtOrigin);
 
 #endif
 }

@@ -124,7 +124,7 @@ namespace ImGui
 //      in/out:  
 //          - quat (quaternion) rotation
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, quat& q, float size, const int mode)
+bool gizmo3D(const char* label, quat& q, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.modeSettings(mode & ~g.modeDual);
@@ -140,7 +140,7 @@ bool gizmo3D(const char* label, quat& q, float size, const int mode)
 //      in/out: 
 //          - vec4 - X Y Z vector/axes components - W angle of rotation
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, vec4& axis_angle, float size, const int mode)
+bool gizmo3D(const char* label, vec4& axis_angle, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.modeSettings(mode & ~g.modeDual);
@@ -151,7 +151,7 @@ bool gizmo3D(const char* label, vec4& axis_angle, float size, const int mode)
 //      in/out: 
 //          - vec3 - X Y Z vector/axes components
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, vec3& dir, float size, const int mode)
+bool gizmo3D(const char* label, vec3& dir, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.modeSettings(mode & (imguiGizmo::modeDirection | imguiGizmo::modeDirPlane) ? mode : imguiGizmo::modeDirection); 
@@ -167,7 +167,7 @@ bool gizmo3D(const char* label, vec3& dir, float size, const int mode)
 //                ctrl-Shift-Alt mods, for X-Y-Z rotations (respectivally)
 //                are abilitated on both ... also together!
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, quat& axes, quat& spot, float size, const int mode)
+bool gizmo3D(const char* label, quat& axes, quat& spot, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -184,7 +184,7 @@ bool gizmo3D(const char* label, quat& axes, quat& spot, float size, const int mo
 //          - axes (quaternion) for full control - LeftClick 
 //          - spot (vec3)       for full control - RightClick
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, quat& axes, vec3& spotDir, float size, const int mode)
+bool gizmo3D(const char* label, quat& axes, vec3& spotDir, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -200,7 +200,7 @@ bool gizmo3D(const char* label, quat& axes, vec3& spotDir, float size, const int
 //          - axes (quaternion) for full control - LeftClick 
 //          - spot (vec4)       for full control - RightClick
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, quat& axes, vec4& axesAngle, float size, const int mode)
+bool gizmo3D(const char* label, quat& axes, vec4& axesAngle, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -218,7 +218,7 @@ bool gizmo3D(const char* label, quat& axes, vec4& axesAngle, float size, const i
 //          - vec3 Pan(x,y) Dolly(z)
 //          - quat (quaternion) rotation
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, vec3& vPanDolly, quat& q, float size, const int mode)
+bool gizmo3D(const char* label, vec3& vPanDolly, quat& q, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.modeSettings((mode | g.modePanDolly) & ~g.modeDual );
@@ -239,7 +239,7 @@ bool gizmo3D(const char* label, vec3& vPanDolly, quat& q, float size, const int 
 //          - vec3 Pan(x,y) Dolly(z)
 //          - vec4 - X Y Z vector/axes components - W angle of rotation
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, vec3& vPanDolly, vec4& axis_angle, float size, const int mode)
+bool gizmo3D(const char* label, vec3& vPanDolly, vec4& axis_angle, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.modeSettings(mode & ~g.modeDual | g.modePanDolly);
@@ -255,7 +255,7 @@ bool gizmo3D(const char* label, vec3& vPanDolly, vec4& axis_angle, float size, c
 //          - vec3 Pan(x,y) Dolly(z)
 //          - vec3 - X Y Z vector/axes components
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, vec3& vPanDolly, vec3& dir, float size, const int mode)
+bool gizmo3D(const char* label, vec3& vPanDolly, vec3& dir, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.modeSettings(mode & ((imguiGizmo::modeDirection | imguiGizmo::modeDirPlane) ? mode : imguiGizmo::modeDirection)  | g.modePanDolly); 
@@ -277,7 +277,7 @@ bool gizmo3D(const char* label, vec3& vPanDolly, vec3& dir, float size, const in
 //                ctrl-Shift-Alt mods, for X-Y-Z rotations (respectivally)
 //                are abilitated on both ... also together!
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, vec3& vPanDolly, quat& axes, quat& spot, float size, const int mode)
+bool gizmo3D(const char* label, vec3& vPanDolly, quat& axes, quat& spot, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -296,7 +296,7 @@ bool gizmo3D(const char* label, vec3& vPanDolly, quat& axes, quat& spot, float s
 //          - axes (quaternion) for full control - LeftClick 
 //          - spot (vec3)       for full control - RightClick
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, vec3& vPanDolly, quat& axes, vec3& spotDir, float size, const int mode)
+bool gizmo3D(const char* label, vec3& vPanDolly, quat& axes, vec3& spotDir, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);
@@ -314,7 +314,7 @@ bool gizmo3D(const char* label, vec3& vPanDolly, quat& axes, vec3& spotDir, floa
 //          - axes (quaternion) for full control - LeftClick 
 //          - spot (vec4)       for full control - RightClick
 ////////////////////////////////////////////////////////////////////////////
-bool gizmo3D(const char* label, vec3& vPanDolly, quat& axes, vec4& axesAngle, float size, const int mode)
+bool gizmo3D(const char* label, vec3& vPanDolly, quat& axes, vec4& axesAngle, float size, const uint32_t mode)
 {
     imguiGizmo g;
     g.setDualMode(mode);

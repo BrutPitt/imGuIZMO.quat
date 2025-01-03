@@ -479,19 +479,6 @@ public:
 ///@param[in]  b enum vgButtons : button pressed/released (BUTTON ID)
 ///@param[in]  m enum vgModifiers : current KEY modifier ID (if active) or evNoModifier = 0
 ///@param[in]  pressed bool : mouse button pressed => true, released => false
-///@param[in]  x int : current X screen coord of mouse cursor
-///@param[in]  y int : current Y screen coord of mouse cursor
-///@code
-///    vg::vGizmo3D track;
-///
-///     // call on mouse BUTTON event or check BUTTON state change in main render loop
-///    track.mouse((vgButtons) button, (vgModifiers) modifier, pressed, x, y);
-///@endcode
-    void mouse( vgButtons button, vgModifiers mod, bool pressed, int x, int y) { mouse(button, mod, pressed, T(x), T(y)); }
-/// Start/End mouse capture: call on mouse BUTTON event or on state change
-///@param[in]  b enum vgButtons : button pressed/released (BUTTON ID)
-///@param[in]  m enum vgModifiers : current KEY modifier ID (if active) or evNoModifier = 0
-///@param[in]  pressed bool : mouse button pressed => true, released => false
 ///@param[in]  x T : current X screen coord of mouse cursor
 ///@param[in]  y T : current Y screen coord of mouse cursor
 ///@code
@@ -530,7 +517,7 @@ public:
     }
 
     //////////////////////////////////////////////////////////////////
-    void motion( int x, int y, T z=T(0)) { motion( T(x), T(y), z); }
+    //void motion( int x, int y, T z=T(0)) { motion( T(x), T(y), z); }
     void motion( T x, T y, T z=T(0)) {
         povPanDollyFactor = z;
         if( this->tbActive || dollyActive || panActive) VGIZMO_BASE_CLASS::motion(x,y);

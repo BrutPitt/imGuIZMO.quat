@@ -50,9 +50,9 @@
 
 #else // use vGizmoMath
 
-    #include <math.h>
     #include <cmath>
-    #include <stdint.h>
+    #include <cstdint>
+    #include <assert.h>
     #define VGM_NAMESPACE vgm
 
     #ifdef VGM_USES_TEMPLATE
@@ -452,9 +452,9 @@ TEMPLATE_TYPENAME_T inline VEC3_T mix(const VEC3_T& x, const VEC3_T& y, const T 
 TEMPLATE_TYPENAME_T inline VEC4_T mix(const VEC4_T& x, const VEC4_T& y, const T a)   { return x + (y-x) * a; }
 // pow
 //////////////////////////
-TEMPLATE_TYPENAME_T inline VEC2_T pow(const VEC2_T& b, const VEC2_T& e) { return { ::pow(b.x,e.x), ::pow(b.y,e.y) }; }
-TEMPLATE_TYPENAME_T inline VEC3_T pow(const VEC3_T& b, const VEC3_T& e) { return { ::pow(b.x,e.x), ::pow(b.y,e.y), ::pow(b.z,e.z) }; }
-TEMPLATE_TYPENAME_T inline VEC4_T pow(const VEC4_T& b, const VEC4_T& e) { return { ::pow(b.x,e.x), ::pow(b.y,e.y), ::pow(b.z,e.z), ::pow(b.w,e.w) }; }
+TEMPLATE_TYPENAME_T inline VEC2_T pow(const VEC2_T& b, const VEC2_T& e) { return { std::pow(b.x,e.x), std::pow(b.y,e.y) }; }
+TEMPLATE_TYPENAME_T inline VEC3_T pow(const VEC3_T& b, const VEC3_T& e) { return { std::pow(b.x,e.x), std::pow(b.y,e.y), std::pow(b.z,e.z) }; }
+TEMPLATE_TYPENAME_T inline VEC4_T pow(const VEC4_T& b, const VEC4_T& e) { return { std::pow(b.x,e.x), std::pow(b.y,e.y), std::pow(b.z,e.z), std::pow(b.w,e.w) }; }
 // value_ptr
 //////////////////////////
 TEMPLATE_TYPENAME_T inline T *value_ptr(const VEC2_T &v) { return const_cast<T *>(&v.x); }
@@ -575,60 +575,123 @@ TEMPLATE_TYPENAME_T inline T one_over_pi() { return T(0.318309886183790671537767
 
 // lookAt
 //////////////////////////
-TEMPLATE_TYPENAME_T inline MAT4_T lookAt(const VEC3_T& pov, const VEC3_T& tgt, const VEC3_T& up)
+TEMPLATE_TYPENAME_T inline MAT4_T lookAtLH(const VEC3_T& pov, const VEC3_T& tgt, const VEC3_T& up)
 {
-#ifdef VGM_USES_LEFT_HAND_AXES
     VEC3_T k = normalize(tgt - pov), i = normalize(cross(up, k)), j = cross(k, i);
-#else
-    VEC3_T k = normalize(tgt - pov), i = normalize(cross(k, up)), j = cross(i, k);   k = -k;
-#endif
     return {     i.x,          j.x,          k.x,     T(0),
                  i.y,          j.y,          k.y,     T(0),
                  i.z,          j.z,          k.z,     T(0),
             -dot(i, pov), -dot(j, pov), -dot(k, pov), T(1)}; }
+
+TEMPLATE_TYPENAME_T inline MAT4_T lookAtRH(const VEC3_T& pov, const VEC3_T& tgt, const VEC3_T& up)
+{
+    VEC3_T k = normalize(tgt - pov), i = normalize(cross(k, up)), j = cross(i, k);   k = -k;
+    return {     i.x,          j.x,          k.x,     T(0),
+                 i.y,          j.y,          k.y,     T(0),
+                 i.z,          j.z,          k.z,     T(0),
+            -dot(i, pov), -dot(j, pov), -dot(k, pov), T(1)}; }
+
+TEMPLATE_TYPENAME_T inline MAT4_T lookAt(const VEC3_T& pov, const VEC3_T& tgt, const VEC3_T& up)
+{
+#ifdef VGM_USES_LEFT_HAND_AXES
+    return lookAtLH(pov, tgt, up);
+#else
+    return lookAtRH(pov, tgt, up);
+#endif
+}
+#undef cT
+#define cT const T
 // ortho
 //////////////////////////
-TEMPLATE_TYPENAME_T inline MAT4_T ortho(T l, T r, T b, T t, T n, T f)
+TEMPLATE_TYPENAME_T inline MAT4_T ortho_call(cT l, cT r, cT b, cT t, cT n, cT f, cT K, cT f_n)
 {
-#ifdef VGM_USES_LEFT_HAND_AXES
-    const T v = T(2);
-#else
-    const T v = T(-2);
-#endif
+
     return {  T(2)/(r-l),     T(0),         T(0),     T(0),
                 T(0),       T(2)/(t-b),     T(0),     T(0),
-                T(0),         T(0),        v/(f-n),   T(0),
-            -(r+l)/(r-l), -(t+b)/(t-b), -(f+n)/(f-n), T(1)}; }
+                T(0),         T(0),        K/(f-n),   T(0),
+            -(r+l)/(r-l), -(t+b)/(t-b),      f_n,     T(1)}; }
+
+TEMPLATE_TYPENAME_T inline MAT4_T orthoLH_NO(cT l, cT r, cT b, cT t, cT n, cT f) { return ortho_call( l, r, b, t, n, f,  T(2), -(f+n)/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T orthoLH_ZO(cT l, cT r, cT b, cT t, cT n, cT f) { return ortho_call( l, r, b, t, n, f,  T(1), -    n/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T orthoRH_NO(cT l, cT r, cT b, cT t, cT n, cT f) { return ortho_call( l, r, b, t, n, f, -T(2), -(f+n)/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T orthoRH_ZO(cT l, cT r, cT b, cT t, cT n, cT f) { return ortho_call( l, r, b, t, n, f, -T(1), -    n/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T ortho     (cT l, cT r, cT b, cT t, cT n, cT f) {
+#ifdef VGM_USES_LEFT_HAND_AXES
+    #ifdef VGM_USES_ZERO_ONE_ZBUFFER
+        return orthoLH_ZO( l, r, b, t, n, f);
+    #else
+        return orthoLH_NO( l, r, b, t, n, f);
+    #endif
+#else
+    #ifdef VGM_USES_ZERO_ONE_ZBUFFER
+        return orthoRH_ZO( l, r, b, t, n, f);
+    #else
+        return orthoRH_NO( l, r, b, t, n, f);
+    #endif
+#endif
+}
 // perspective
 //////////////////////////
-TEMPLATE_TYPENAME_T inline MAT4_T perspective(T fovy, T a, T n, T f)
+TEMPLATE_TYPENAME_T inline MAT4_T perspective_call(cT fov, cT a, cT K, cT f_n, cT fn_fMn)
 {
+    assert(std::abs(a - std::numeric_limits<T>::epsilon()) > T(0));
+
+    const T hFov = tan(fov * T(.5));
+    return { T(1)/(a*hFov),  T(0),           T(0),      T(0),
+               T(0),        T(1)/(hFov),     T(0),      T(0),
+               T(0),          T(0),           f_n,        K ,
+               T(0),          T(0),          fn_fMn,    T(0)}; }
+
+TEMPLATE_TYPENAME_T inline MAT4_T perspectiveLH_ZO(cT fov, cT a, cT n, cT f) { return perspective_call(fov, a,  T(1),      f/(f-n), -     (f*n)/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T perspectiveLH_NO(cT fov, cT a, cT n, cT f) { return perspective_call(fov, a,  T(1),  (f+n)/(f-n), -(T(2)*f*n)/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T perspectiveRH_ZO(cT fov, cT a, cT n, cT f) { return perspective_call(fov, a, -T(1),      f/(n-f), -     (f*n)/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T perspectiveRH_NO(cT fov, cT a, cT n, cT f) { return perspective_call(fov, a, -T(1), -(f+n)/(f-n), -(T(2)*f*n)/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T perspective     (cT fov, cT a, cT n, cT f) {
 #ifdef VGM_USES_LEFT_HAND_AXES
-    const T v = T(1), f_n = (f+n)/(f-n);
+    #ifdef VGM_USES_ZERO_ONE_ZBUFFER
+        return perspectiveLH_ZO(fov, a, n, f);
+    #else
+        return perspectiveLH_NO(fov, a, n, f);
+    #endif
 #else
-    const T v = T(-1), f_n = -(f+n)/(f-n);
+    #ifdef VGM_USES_ZERO_ONE_ZBUFFER
+        return perspectiveRH_ZO(fov, a, n, f);
+    #else
+        return perspectiveRH_NO(fov, a, n, f);
+    #endif
 #endif
-    const T hFovy = tan(fovy / T(2));
-    return { T(1)/(a*hFovy),  T(0),           T(0),      T(0),
-               T(0),        T(1)/(hFovy),     T(0),      T(0),
-               T(0),          T(0),            f_n,        v ,
-               T(0),          T(0),   -(T(2)*f*n)/(f-n), T(0)}; }
+}
 // perspectiveFov
 //////////////////////////
-TEMPLATE_TYPENAME_T inline MAT4_T perspectiveFov(T fovy, T w, T h, T n, T f) { return perspective(fovy, w/h, n, f); }
+TEMPLATE_TYPENAME_T inline MAT4_T perspectiveFov(cT fov, cT w, cT h, cT n, cT f) { return perspective(fov, w/h, n, f); }
 // frustrum
 //////////////////////////
-TEMPLATE_TYPENAME_T inline MAT4_T frustum(T l, T r, T b, T t, T n, T f)
-{
-#ifdef VGM_USES_LEFT_HAND_AXES
-    const T v = T(1),  f_n =  (f+n)/(f-n);
-#else
-    const T v = T(-1), f_n = -(f+n)/(f-n);
-#endif
+TEMPLATE_TYPENAME_T inline MAT4_T frustum_call(cT l, cT r, cT b, cT t, cT n, cT K, cT f_n, cT fn_fMn) {
     return { (T(2)*n)/(r-l),       T(0),         T(0),         T(0),
                    T(0),     (T(2)*n)/(t-b),     T(0),         T(0),
-                (r+l)/(r-l),    (t+b)/(t-b),      f_n,           v ,
-                   T(0),           T(0),    -(T(2)*f*n)/(f-n), T(0)}; }
+                (r+l)/(r-l),    (t+b)/(t-b),      f_n,           K ,
+                   T(0),           T(0),         fn_fMn,       T(0)}; }
+
+TEMPLATE_TYPENAME_T inline MAT4_T frustumLH_ZO(cT l, cT r, cT b, cT t, cT n, cT f) { return frustum_call(l, r, b, t, n,  T(1),      f/(f-n), -     (f*n)/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T frustumLH_NO(cT l, cT r, cT b, cT t, cT n, cT f) { return frustum_call(l, r, b, t, n,  T(1),  (f+n)/(f-n), -(T(2)*f*n)/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T frustumRH_ZO(cT l, cT r, cT b, cT t, cT n, cT f) { return frustum_call(l, r, b, t, n, -T(1),      f/(n-f), -     (f*n)/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T frustumRH_NO(cT l, cT r, cT b, cT t, cT n, cT f) { return frustum_call(l, r, b, t, n, -T(1), -(f+n)/(f-n), -(T(2)*f*n)/(f-n)); }
+TEMPLATE_TYPENAME_T inline MAT4_T frustum     (cT l, cT r, cT b, cT t, cT n, cT f) {
+#ifdef VGM_USES_LEFT_HAND_AXES
+    #ifdef VGM_USES_ZERO_ONE_ZBUFFER
+        return frustumLH_ZO(l, r, b, t, n, f);
+    #else
+        return frustumLH_NO(l, r, b, t, n, f);
+    #endif
+#else
+    #ifdef VGM_USES_ZERO_ONE_ZBUFFER
+        return frustumRH_ZO(l, r, b, t, n, f);
+    #else
+        return frustumRH_NO(l, r, b, t, n, f);
+    #endif
+#endif
+}
+#undef cT
 
 } // end namespace vgm
 
