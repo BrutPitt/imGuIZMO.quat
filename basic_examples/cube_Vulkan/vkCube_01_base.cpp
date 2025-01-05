@@ -182,7 +182,7 @@ int main( int /*argc*/, char ** /*argv*/ )
     // scene initialization
         setScene();
 
-    // Just get a simplest reference
+    // Just get a simpler reference
         GLFWwindow *glfwWindow = surfaceData.window.handle;
     // Initialize ImGui
         const std::array pool_sizes { vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 1) } ; // array declaration C++ 17

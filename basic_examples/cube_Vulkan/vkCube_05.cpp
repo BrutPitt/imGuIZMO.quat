@@ -227,7 +227,7 @@ int main( int /*argc*/, char ** /*argv*/ )
     // scene initialization
         setScene();
 
-    // Just get a simplest reference
+    // Just get a simpler reference
         GLFWwindow *glfwWindow = surfaceData.window.handle;
 
     //***********************************************
