@@ -13,7 +13,7 @@
 #include <sstream>
 
 
-#include <imguizmo_quat.h>
+#include <imguizmo_quat/imguizmo_quat.h>
 
 bool show_test_window = true;
 bool show_another_window = false;

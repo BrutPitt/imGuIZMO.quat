@@ -24,7 +24,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
+#include <imguizmo_quat/imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
 
 int width = 1280, height = 800;
 GLFWwindow *glfwWindow;
@@ -162,7 +162,7 @@ void initImGui()
 }
 
 
-int main()
+int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Windows
 {
     initFramework();         // initialize GLFW framework
     initGL();           // init OpenGL building vaoBuffer and shader program (compile and link vtx/frag shaders)
@@ -263,4 +263,6 @@ int main()
     // Cleanup Framework
     glfwDestroyWindow(glfwWindow);
     glfwTerminate();
+
+    return EXIT_SUCCESS;
 }

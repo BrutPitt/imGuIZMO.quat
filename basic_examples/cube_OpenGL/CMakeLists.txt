@@ -35,14 +35,18 @@ endif(OPENGL_FOUND)
 
 find_package(glfw3 CONFIG)
 
+find_package(SDL2 CONFIG)
+include_directories(${SDL2_INCLUDE_DIRS})
+
 set(SRC          ${CMAKE_SOURCE_DIR})
 set(COMMONS_DIR  ${SRC}/../commons)
 set(TOOLS_DIR    ${CMAKE_SOURCE_DIR}/../../libs)
 set(IMGUI_DIR    ${TOOLS_DIR}/imgui)
-set(IMGUIZMO_DIR ${CMAKE_SOURCE_DIR}/../../imguizmo_quat)
+set(IMGUIZMO_PARENT_DIR ${CMAKE_SOURCE_DIR}/../..)
+set(IMGUIZMO_DIR ${IMGUIZMO_PARENT_DIR}/imguizmo_quat)
 
 include_directories(${TOOLS_DIR})
-include_directories(${IMGUIZMO_DIR})
+include_directories(${IMGUIZMO_PARENT_DIR})
 include_directories(${SRC}/../commons)
 
 set(SOURCE_FILES
@@ -66,18 +70,14 @@ set(SOURCE_FILES
         ${IMGUI_DIR}/imstb_textedit.h
         ${IMGUI_DIR}/imstb_truetype.h
         ${TOOLS_DIR}/glad/glad.cpp
-        ${TOOLS_DIR}/glad/glad.h
-)
+        ${TOOLS_DIR}/glad/glad.h)
 
 set(SOURCE_FILES_GLFW
         ${IMGUI_DIR}/imgui_impl_glfw.cpp
-        ${IMGUI_DIR}/imgui_impl_glfw.h
-)
+        ${IMGUI_DIR}/imgui_impl_glfw.h)
 set(SOURCE_FILES_SDL
         ${IMGUI_DIR}/imgui_impl_sdl2.cpp
-        ${IMGUI_DIR}/imgui_impl_sdl2.h
-)
-set(COMMONS_UI_FILES "")
+        ${IMGUI_DIR}/imgui_impl_sdl2.h)
 
 file( GLOB APP_SOURCES ${SRC}/oglCube*.cpp )
 foreach( oglCubeSourceFile ${APP_SOURCES} )
@@ -87,21 +87,19 @@ foreach( oglCubeSourceFile ${APP_SOURCES} )
     if(${oglCubeName} MATCHES "Cube_07")
         set(COMMONS_UI_FILES
                 ${COMMONS_DIR}/uiMainDlg.cpp
-                ${COMMONS_DIR}/uiSettings.cpp
-        )
+                ${COMMONS_DIR}/uiSettings.cpp)
+    else()
+        set(COMMONS_UI_FILES "")
     endif()
 
     if(${oglCubeName} MATCHES "SDL")
-        find_package(SDL2)
         add_executable( ${PROJECT_NAME} ${oglCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_SDL} ${COMMONS_UI_FILES})
-        include_directories(${SDL2_INCLUDE_DIRS})
         set(TARGET_LIBS ${CMAKE_DL_LIBS} ${SDL2_LIBRARIES})
     else()
         add_executable( ${PROJECT_NAME} ${oglCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_GLFW} ${COMMONS_UI_FILES})
         target_link_libraries(${PROJECT_NAME} glfw)
-        set(TARGET_LIBS ${CMAKE_DL_LIBS} )
     endif()
     
-    target_link_libraries(${oglCubeName} ${OPENGL_LIBRARY} ${TARGET_LIBS})
+    target_link_libraries(${oglCubeName} ${CMAKE_DL_LIBS} ${OPENGL_LIBRARY})
 endforeach( oglCubeSourceFile ${APP_SOURCES} )
 

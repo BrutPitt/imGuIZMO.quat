@@ -24,7 +24,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
+#include <imguizmo_quat/imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
 
 int width = 1280, height = 800;
 GLFWwindow *glfwWindow;
@@ -161,7 +161,7 @@ void initImGui()
 }
 
 
-int main()
+int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Windows
 {
     initFramework();         // initialize GLFW framework
     initGL();           // init OpenGL building vaoBuffer and shader program (compile and link vtx/frag shaders)
@@ -209,7 +209,7 @@ int main()
 
     // imGuIZMO: declare global/static/member/..
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        static quat rotation(1,0,0,0);          // quat default constructor initialize @ quat(1,0,0,0) ==> w(1) x(0) y(0) z(0), w is left/first value
+        static quat rotation(1,0,0,0);          // quat constructor initialize @ quat(1,0,0,0) ==> w(1) x(0) y(0) z(0), w is left/first value
         static vec3 position;
 
     // colored text for display quat(w,x,y,z) components
@@ -236,16 +236,14 @@ int main()
         ImGui::PopStyleColor();                                                 // frame color (pushed)
         ImGui::PopStyleColor();                                                 // Background (pushed)
 
-    // now we can transfer the rotation in a matrix... with alternative modes: all new from v3.1 except math_cast()
-        mat4 modelMatrix(rotation);                             // constructor
-        modelMatrix = mat4_cast(rotation);                      // existing matrix assignation
-        modelMatrix = mat4(rotation);                           //    "        "       "
+    // transferring the rotation in a matrix...
+        mat4 modelMatrix(rotation);
 
-    // Build a "translation" matrix
+    // Building a "translation" matrix
         mat4 translationMatrix = translate(mat4(1), position);      // add translations (pan/dolly) to an identity matrix
 
-    // build MVP matrix to pass to shader ==> view oglCube_05 and higher for better / more correct implementation
-        mvpMatrix = projMatrix * viewMatrix * translationMatrix * static_cast<mat4>(rotation);
+    // build MVP matrix to pass to shader ==> view oglCube_05 and higher for better implementation to render independent Pan/Dolly from viewMatrix
+        mvpMatrix = projMatrix * viewMatrix * translationMatrix * modelMatrix;
 
     // draw the cube, passing MVP matrix to the vtx shader
         draw();
@@ -270,4 +268,6 @@ int main()
     // Cleanup Framework
     glfwDestroyWindow(glfwWindow);
     glfwTerminate();
+
+    return EXIT_SUCCESS;
 }

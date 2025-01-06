@@ -25,7 +25,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imGuIZMOquat.h> // now also imguizmo_quat.h
+#include <imguizmo_quat/imguizmo_quat.h> // now also imguizmo_quat.h
 
 
 
@@ -172,7 +172,7 @@ void initImGui()
 }
 
 
-int main()
+int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Windows
 {
     initFramework();         // initialize GLFW framework
     initGL();           // init OpenGL building vaoBuffer and shader program (compile and link vtx/frag shaders)
@@ -208,22 +208,24 @@ int main()
 
     // imGuIZMO: declare global/static/member/..
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        static quat rotation(1,0,0,0);         // vgMath quat: default constructor initialize @ w(1) x(0) y(0) z(0) ==> w is left/first value
-                                               // for GLM compatibility (if you want switch in future) is necessary an explicit initialization
+        static quat rotation(1,0,0,0);         // glm/vgMath quat: constructor initialize @ w(1) x(0) y(0) z(0) ==> w is left/first value: quat(w, x, y, z)
     // ImGuIZMO.quat widget
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         ImGui::gizmo3D("##aaa", rotation,/* size */ 240 ); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
                                                                // it returns "only" a rotation (net of transformations) in base to mouse(x,y) movement
                                                                // and add new rotation, obtained from new "delta.xy" mouse motion, to previous one (saved in your global/static/member var)
+
     // End Imgui window (container) block
         ImGui::End();
 
-    // now we can transfer the rotation in a matrix... with alternative modes
+    // now we can transfer the rotation in a matrix... with some alternative modes
         mat4 modelMatrix(rotation);                             // constructor
         modelMatrix = mat4_cast(rotation);                      // existing matrix assignation
         modelMatrix = mat4(rotation);                           //    "        "       "
+        modelMatrix = static_cast<mat4>(rotation);              // use a cast
+
     // build MVP matrix to pass to shader
-        mvpMatrix = projMatrix * viewMatrix * static_cast<mat4>(rotation);   // or use a cast: watch vgMath for all overload operators: quat ==> mat4 / mat3
+        mvpMatrix = projMatrix * viewMatrix * modelMatrix;
 
     // draw the cube, passing MVP matrix to the vtx shader
         draw();
@@ -248,4 +250,6 @@ int main()
     // Cleanup Framework
     glfwDestroyWindow(glfwWindow);
     glfwTerminate();
+
+    return EXIT_SUCCESS;
 }
