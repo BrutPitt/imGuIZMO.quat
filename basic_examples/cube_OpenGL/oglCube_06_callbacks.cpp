@@ -134,16 +134,33 @@ void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mod
 
     double x,y;
     glfwGetCursorPos(window, &x, &y);
-    track.mouse((vgButtons) button, (vgModifiers) getModifier(glfwWindow), action == GLFW_PRESS, (int)x, (int)y);
+
+    int myButton;
+
+    switch(button) {
+        case GLFW_MOUSE_BUTTON_1    : // GLFW_MOUSE_BUTTON_LEFT
+            myButton = vg::evButton1; // vg::evButtonLeft
+            break;
+        case GLFW_MOUSE_BUTTON_2    : // GLFW_MOUSE_BUTTON_RIGHT
+            myButton = vg::evButton2; // || vg::evButtonRight
+            break;
+        case GLFW_MOUSE_BUTTON_3    : // GLFW_MOUSE_BUTTON_MIDDLE
+            myButton = vg::evButton3; // || vg::evButtonMiddle
+            break;
+        default :
+            myButton = -1;
+    }
+    // in GLFW "CURRENTLY" button ID & vg::enums coincide, so all the switch/case statement can be also omitted and pass directly "button"
+    // in "mouse" call, but is good rule always to check framework IDs (in case of future changes) and select preferred vg::enum
+    if(myButton>=0)
+        track.mouse((vgButtons) myButton, (vgModifiers) getModifier(glfwWindow), action == GLFW_PRESS, (int)x, (int)y);
 }
 
 static void glfwMousePosCallback(GLFWwindow* window, double x, double y)
 {
     if(ImGui::GetIO().WantCaptureMouse) return;
 
-    if((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)  == GLFW_PRESS) ||
-       (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) )
-        track.motion((int)x, (int)y);
+    track.motion(x, y);
 }
 
 void initGL()
@@ -252,16 +269,19 @@ void initImGui()
 void initVGizmo3D()     // Settings to control vGizmo3D
 {
     // Initialization are necessary to associate your preferences to vGizmo3D
-    // These are also the DEFAULT values, so if you want to maintain these combinations you can omit it
+    // These are also the DEFAULT values, so if you want to maintain these combinations you can omit they
     // and to override only the associations that you want modify
-        track.setGizmoRotControl (vg::evLeftButton  /* or vg::evButton1 */, 0 /* vg::evNoModifier */ );
+        track.setGizmoRotControl         (vg::evButton1  /* or vg::evLeftButton */, 0 /* vg::evNoModifier */ );
     // Rotations around specific axis: mouse button and key modifier
-        track.setGizmoRotXControl(vg::evLeftButton  /* or vg::evButton1 */, vg::evShiftModifier);
-        track.setGizmoRotYControl(vg::evLeftButton  /* or vg::evButton1 */, vg::evControlModifier);
-        track.setGizmoRotZControl(vg::evLeftButton  /* or vg::evButton1 */, vg::evAltModifier | vg::evSuperModifier);
+        track.setGizmoRotXControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evShiftModifier);
+        track.setGizmoRotYControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
+        track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
+    // Set vGizmo3D control for secondary rotation
+        track.setGizmoSecondaryRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
     // Pan and Dolly/Zoom: mouse button and key modifier
-        track.setDollyControl    (vg::evRightButton /* or vg::evButton2 */, 0 /* vg::evNoModifier */);
-        track.setPanControl      (vg::evRightButton /* or vg::evButton2 */, vg::evControlModifier | vg::evShiftModifier);
+        track.setDollyControl            (vg::evButton2 /* or vg::evRightButton */, vg::evControlModifier);
+        track.setPanControl              (vg::evButton2 /* or vg::evRightButton */, vg::evShiftModifier);
+    // N.B. vg::enums are ONLY mnemonic: select and pass specific vg::enum to framework (that can have also different IDs)
 
     // passing the screen sizes auto-set the mouse sensitivity
         track.viewportSize(width, height);      // but if you need to more feeling with the mouse use:

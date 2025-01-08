@@ -226,16 +226,19 @@ void initImGui()
 void initVGizmo3D()     // Settings to control vGizmo3D
 {
     // Initialization are necessary to associate your preferences to vGizmo3D
-    // These are also the DEFAULT values, so if you want to maintain these combinations you can omit it
+    // These are also the DEFAULT values, so if you want to maintain these combinations you can omit they
     // and to override only the associations that you want modify
-        track.setGizmoRotControl (vg::evLeftButton  /* or vg::evButton1 */, 0 /* vg::evNoModifier */ );
+        track.setGizmoRotControl         (vg::evButton1  /* or vg::evLeftButton */, 0 /* vg::evNoModifier */ );
     // Rotations around specific axis: mouse button and key modifier
-        track.setGizmoRotXControl(vg::evLeftButton  /* or vg::evButton1 */, vg::evShiftModifier);
-        track.setGizmoRotYControl(vg::evLeftButton  /* or vg::evButton1 */, vg::evControlModifier);
-        track.setGizmoRotZControl(vg::evLeftButton  /* or vg::evButton1 */, vg::evAltModifier | vg::evSuperModifier);
+        track.setGizmoRotXControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evShiftModifier);
+        track.setGizmoRotYControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
+        track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
+    // Set vGizmo3D control for secondary rotation
+        track.setGizmoSecondaryRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
     // Pan and Dolly/Zoom: mouse button and key modifier
-        track.setDollyControl    (vg::evRightButton /* or vg::evButton2 */, 0 /* vg::evNoModifier */);
-        track.setPanControl      (vg::evRightButton /* or vg::evButton2 */, vg::evControlModifier | vg::evShiftModifier);
+        track.setDollyControl            (vg::evButton2 /* or vg::evRightButton */, vg::evControlModifier);
+        track.setPanControl              (vg::evButton2 /* or vg::evRightButton */, vg::evShiftModifier);
+    // N.B. vg::enums are ONLY mnemonic: select and pass specific vg::enum to framework (that can have also different IDs)
 
     // passing the screen sizes auto-set the mouse sensitivity
         track.viewportSize(width, height);      // but if you need to more feeling with the mouse use:
@@ -317,12 +320,11 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
                 track.mouse(vg::evRightButton, getModifier(glfwWindow),
                                                rightPress, x, y);
             }
-            if(leftPress == GLFW_PRESS || rightPress == GLFW_PRESS)
-                track.motion(x,y);                                                       // if one button is pressed vGizmo3D catch the motion
+            track.motion(x,y);                                                          // if one button is pressed vGizmo3D catch the motion
         }
     // vGizmo3D: call it every rendering loop if you want a continue rotation until you do not click on screen
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        track.idle();   // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movements
+        track.idle();   // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movement
                         // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                         // It can be stopped by click on screen (without mouse movement)
 

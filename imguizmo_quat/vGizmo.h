@@ -51,7 +51,8 @@ namespace vg {
         evButton6 ,
         evButton7 ,
         evButton8 ,
-        evButton9 
+        evButton9 ,
+        evButton10
     };
 
     enum {
@@ -72,10 +73,12 @@ namespace vg {
 TEMPLATE_TYPENAME_T class virtualGizmoBaseClass {
 
 public:
-    virtualGizmoBaseClass() : tbActive(false), pos(0), delta(0),
-                           tbControlButton(evLeftButton), tbControlModifiers(evNoModifier),
-                           tbRotationButton(evRightButton), xRotationModifier(evShiftModifier),
-                           yRotationModifier(evControlModifier),  zRotationModifier(evAltModifier|evSuperModifier)
+    virtualGizmoBaseClass() :  tbControlButton(evLeftButton), tbControlModifiers(evNoModifier),
+                               tbSecControlButton(evRightButton), tbSecControlModifiers(evNoModifier),
+                               tbRotationButton(evLeftButton),
+                               xRotationModifier(evShiftModifier),
+                               yRotationModifier(evControlModifier),
+                               zRotationModifier(evAltModifier|evSuperModifier)
     { 
         viewportSize(T(256), T(256));  //initial dummy value
     }
@@ -127,9 +130,14 @@ public:
             tbActive = true;
             activateMouse(x,y);
         }
-        else if ( button == tbControlButton && !pressed) {
+        else if((button == tbSecControlButton) && pressed && (tbControlModifiers ? tbControlModifiers & mod : tbControlModifiers == mod) ) {
+            tbSecActive = true;
+            activateMouse(x,y);
+        }
+        else if ( (button == tbSecControlButton || button == tbControlButton) && !pressed) {
             deactivateMouse();
-            tbActive = false;
+            tbActive    = false;
+            tbSecActive = false;
         }
 
         if((button == tbRotationButton) && pressed) {
@@ -139,7 +147,6 @@ public:
         } else if((button == tbRotationButton) && !pressed) { 
             deactivateMouse(); rotationVector = tVec3(T(1)); tbActive = false;
         }
-    
     }
 
 /// Update rotations/positions in base to mouse movements: call on mouse MOTION event
@@ -207,10 +214,14 @@ public:
         T AdotB = dot(a, b);
         T angle = acos( AdotB>T(1) ? T(1) : (AdotB<-T(1) ? -T(1) : AdotB)); // clamp need!!! corss float is approximate to FLT_EPSILON
 
-        qtStep = normalize(angleAxis(angle * tbScale * fpsRatio                  , axis * rotationVector));
-        qtIdle = normalize(angleAxis(angle * tbScale * fpsRatio * qIdleSpeedRatio, axis * rotationVector));
-        qtRot = qtStep*qtRot;
+        qtStep = normalize(angleAxis(angle * tbScale * fpsRatio , axis * rotationVector));
 
+        if(tbActive) {
+            qtIdle = normalize(angleAxis(angle * tbScale * fpsRatio * qIdleSpeedRatio, axis * rotationVector));
+            qtRot = qtStep*qtRot;
+        }
+        if(tbSecActive)
+            qtSecondaryRot = qtStep*qtSecondaryRot;
     }
 
 ///  Set the mouse sensitivity for vGizmo3D
@@ -238,20 +249,52 @@ public:
 /// static vg::vGizmo3D track;
 /// ...
 ///   // Initialize main rotation
-///   track.setGizmoRotControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) 0 /* evNoModifier */ );
+///    track.setGizmoRotControl         (vg::evButton1  /* or vg::evLeftButton */, 0 /* vg::evNoModifier */ );
 ///
-///   // Rotations around specific axis: mouse button and key modifier
-///   t.setGizmoRotXControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT,  (vgModifiers) GLFW_MOD_SHIFT);
-///   t.setGizmoRotYControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT,  (vgModifiers) GLFW_MOD_CONTROL);
-///   t.setGizmoRotZControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT,  (vgModifiers) GLFW_MOD_ALT);
+///    // Rotations around specific axis: mouse button and key modifier
+///    track.setGizmoRotXControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evShiftModifier);
+///    track.setGizmoRotYControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
+///    track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
 ///
-///   // Pan and Dolly/Zoom: mouse button and key modifier
-///   t.setDollyControl((vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) 0 /* evNoModifier */);
-///   t.setPanControl((vgButtons) GLFW_MOUSE_BUTTON_RIGHT, (vgModifiers) GLFW_MOD_ALT | GLFW_MOD_SHIFT);
+///    // Set vGizmo3D control for secondary rotation
+///    track.setGizmoSecondaryRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
+///
+///    // Pan and Dolly/Zoom: mouse button and key modifier
+///    track.setDollyControl            (vg::evButton2 /* or vg::evRightButton */, vg::evControlModifier);
+///    track.setPanControl              (vg::evButton2 /* or vg::evRightButton */, vg::evShiftModifier);
 ///@endcode
+///@note the example values are also DEFAULT values: you can omit to set they and to override only the associations that you want modify
     void setGizmoRotControl( vgButtons b, vgModifiers m = evNoModifier) {
         tbControlButton = b;
         tbControlModifiers = m;
+    }
+///  Set mouse BUTTON and KEY modifier for a secondary rotation
+///@param[in]  b enum vgButtons : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 mouse BUTTON ID
+///@param[in]  m enum vgModifiers : associate your / framework (GLFW/SDL/WIN32/etc)
+///                 KEY modifier ID : CTRL / ALT / SUPER / SHIFT
+///@code
+/// static vg::vGizmo3D track;
+/// ...
+///   // Initialize main rotation
+///    track.setGizmoRotControl         (vg::evButton1  /* or vg::evLeftButton */, 0 /* vg::evNoModifier */ );
+///
+///    // Rotations around specific axis: mouse button and key modifier
+///    track.setGizmoRotXControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evShiftModifier);
+///    track.setGizmoRotYControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
+///    track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
+///
+///    // Set vGizmo3D control for secondary rotation
+///    track.setGizmoSecondaryRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
+///
+///    // Pan and Dolly/Zoom: mouse button and key modifier
+///    track.setDollyControl            (vg::evButton2 /* or vg::evRightButton */, vg::evControlModifier);
+///    track.setPanControl              (vg::evButton2 /* or vg::evRightButton */, vg::evShiftModifier);
+///@endcode
+///@note the example values are also DEFAULT values: you can omit to set they and to override only the associations that you want modify
+    void setGizmoSecondaryRotControl( vgButtons b, vgModifiers m = evNoModifier) {
+        tbSecControlButton = b;
+        tbSecControlModifiers = m;
     }
 ///  Set mouse BUTTON and KEY modifier to enable rotation around X axis
 ///@param[in]  b enum vgButtons : associate your / framework (GLFW/SDL/WIN32/etc)
@@ -261,10 +304,12 @@ public:
 ///@code
 /// static vg::vGizmo3D track;
 /// ...
-///  track.setGizmoRotXControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SHIFT);
-///  track.setGizmoRotYControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_CONTROL);
-///  track.setGizmoRotZControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SUPER);
+///    // Rotations around specific axis: mouse button and key modifier
+///    track.setGizmoRotXControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evShiftModifier);
+///    track.setGizmoRotYControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
+///    track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
 ///@endcode
+///@note the example values are also DEFAULT values: you can omit to set they and to override only the associations that you want modify
     void setGizmoRotXControl( vgButtons b, vgModifiers m = evNoModifier) {
         tbRotationButton = b;
         xRotationModifier = m;
@@ -277,11 +322,12 @@ public:
 ///@code
 /// static vg::vGizmo3D track;
 /// ...
-///  track.setGizmoRotXControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SHIFT);
-///  track.setGizmoRotYControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_CONTROL);
-///  track.setGizmoRotZControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SUPER);
+///    // Rotations around specific axis: mouse button and key modifier
+///    track.setGizmoRotXControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evShiftModifier);
+///    track.setGizmoRotYControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
+///    track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
 ///@endcode
-    //////////////////////////////////////////////////////////////////
+///@note the example values are also DEFAULT values: you can omit to set they and to override only the associations that you want modify
     void setGizmoRotYControl( vgButtons b, vgModifiers m = evNoModifier) {
         tbRotationButton = b;
         yRotationModifier = m;
@@ -294,10 +340,12 @@ public:
 ///@code
 /// static vg::vGizmo3D track;
 /// ...
-///  track.setGizmoRotXControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SHIFT);
-///  track.setGizmoRotYControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_CONTROL);
-///  track.setGizmoRotZControl((vgButtons) GLFW_MOUSE_BUTTON_LEFT, (vgModifiers) GLFW_MOD_SUPER);
+///    // Rotations around specific axis: mouse button and key modifier
+///    track.setGizmoRotXControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evShiftModifier);
+///    track.setGizmoRotYControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
+///    track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
 ///@endcode
+///@note the example values are also DEFAULT values: you can omit to set they and to override only the associations that you want modify
     void setGizmoRotZControl( vgButtons b, vgModifiers m = evNoModifier) {
         tbRotationButton = b;
         zRotationModifier = m;
@@ -324,10 +372,6 @@ public:
     virtual tQuat &getSecondRotRef() { return qtSecondaryRot; }
 
 
-    //  get the rotation increment
-    //////////////////////////////////////////////////////////////////
-    tQuat getStepRotation() { return qtStep; }
-
 /// Set current rotation of vGizmo3D
 ///@param[in] q quat& : reference quaternion containing rotation to set
     void setRotation(const tQuat &q) { qtRot = q; }
@@ -335,10 +379,6 @@ public:
 /// Set current rotation of vGizmo3D
 ///@param[in] q quat& : reference quaternion containing rotation to set
     void setSecondRot(const tQuat &q) { qtSecondaryRot = q; }
-
-    //  get the rotation increment
-    //////////////////////////////////////////////////////////////////
-    void setStepRotation(const tQuat &q) { qtStep = q; }
 
     // attenuation<1.0 / increment>1.0 of rotation speed in idle
     //--------------------------------------------------------------------------
@@ -374,11 +414,19 @@ public:
         update();
     }
 protected:
+    //  get the rotation increment
+    //////////////////////////////////////////////////////////////////
+    void setStepRotation(const tQuat &q) { qtStep = q; }
+    //  get the rotation increment
+    //////////////////////////////////////////////////////////////////
+    tQuat getStepRotation() { return qtStep; }
 
-    tVec2 pos, delta;
+
+    tVec2 pos {0} , delta {0};
 
     // UI commands that this virtualGizmo responds to (defaults to left mouse button with no modifier key)
-    vgButtons   tbControlButton, tbRotationButton;   
+    vgButtons   tbControlButton, tbRotationButton;
+    vgButtons   tbSecControlButton, tbSecControlModifiers;
     vgModifiers tbControlModifiers, xRotationModifier, yRotationModifier, zRotationModifier;
 
     //tVec3 rotationVector = tVec3(T(1));
@@ -387,6 +435,7 @@ protected:
     tQuat qtSecondaryRot = tQuat(T(1), T(0), T(0), T(0));
     tQuat qtStep         = tQuat(T(1), T(0), T(0), T(0));
     tQuat qtIdle         = tQuat(T(1), T(0), T(0), T(0));
+
 
 #ifdef BACKEND_IS_VULKAN
 
@@ -406,24 +455,19 @@ protected:
     T minVal;
     tVec3 offset;
 
-    bool tbActive;  // trackbal activated via mouse
+    bool tbActive    = false;  // trackbal activated via mouse
+    bool tbSecActive = false;
 
     T width, height;
 };
 
-//--------------------------------------------------------------------
-//--------------------------------------------------------------------
-//
-// virtualGizmoClass
-//  trackball: simple mouse rotation control 
-//
-//--------------------------------------------------------------------
-//--------------------------------------------------------------------
+/// vGizmo / virtualGizmo 2D class
+///
+/// @deprecated will removed on next version: use <b>vGizmo3D</b>
 TEMPLATE_TYPENAME_T class virtualGizmoClass : public VGIZMO_BASE_CLASS {
-
 public:
 
-    virtualGizmoClass()  { }
+    [[deprecated("Use virtualGizmo3D / vGizmo3D instead.")]] virtualGizmoClass()  { }
 
     //////////////////////////////////////////////////////////////////
     void motion( T x, T y) { if(this->tbActive) VGIZMO_BASE_CLASS::motion(x,y); }
@@ -472,8 +516,8 @@ using VGIZMO_BASE_CLASS::qtRot;
 
 public:
     //////////////////////////////////////////////////////////////////
-    virtualGizmo3DClass() : dollyControlButton(evRightButton),   panControlButton(evMiddleButton),  dollyActive(false),
-                         dollyControlModifiers(evNoModifier), panControlModifiers(evNoModifier), panActive(false) { }
+    virtualGizmo3DClass() : dollyControlButton(evRightButton),        panControlButton(evRightButton),
+                            dollyControlModifiers(evShiftModifier), panControlModifiers(evControlModifier) { }
 
 /// Start/End mouse capture: call on mouse BUTTON event or on state change
 ///@param[in]  b enum vgButtons : button pressed/released (BUTTON ID)
@@ -520,7 +564,7 @@ public:
     //void motion( int x, int y, T z=T(0)) { motion( T(x), T(y), z); }
     void motion( T x, T y, T z=T(0)) {
         povPanDollyFactor = z;
-        if( this->tbActive || dollyActive || panActive) VGIZMO_BASE_CLASS::motion(x,y);
+        if( this->tbActive || this->tbSecActive || dollyActive || panActive) VGIZMO_BASE_CLASS::motion(x,y);
     }
 
     //////////////////////////////////////////////////////////////////
@@ -537,7 +581,7 @@ public:
 
     //////////////////////////////////////////////////////////////////
     void update() {
-        if (this->tbActive) VGIZMO_BASE_CLASS::updateGizmo();
+        if (this->tbActive  || this->tbSecActive) VGIZMO_BASE_CLASS::updateGizmo();
         if (dollyActive) updateDolly();
         if (panActive)   updatePan();
     }
@@ -708,8 +752,8 @@ private:
     vgModifiers dollyControlModifiers, panControlModifiers;
 
     // Variable used to determine if the manipulator is presently tracking the mouse
-    bool dollyActive;
-    bool panActive;      
+    bool dollyActive = false;
+    bool panActive   = false;
 
     tVec3 vecPanDolly = tVec3(T(0));
 

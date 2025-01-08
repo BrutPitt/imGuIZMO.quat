@@ -11,6 +11,7 @@
 #  This software is distributed under the terms of the BSD 2-Clause license
 #------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.17)
+project(oglCubeExamples)
 
 find_package(glm CONFIG)
 
@@ -34,9 +35,9 @@ else ()
 endif(OPENGL_FOUND)
 
 find_package(glfw3 CONFIG)
-
 find_package(SDL2 CONFIG)
 include_directories(${SDL2_INCLUDE_DIRS})
+
 
 set(SRC          ${CMAKE_SOURCE_DIR})
 set(COMMONS_DIR  ${SRC}/../commons)
@@ -94,7 +95,7 @@ foreach( oglCubeSourceFile ${APP_SOURCES} )
 
     if(${oglCubeName} MATCHES "SDL")
         add_executable( ${PROJECT_NAME} ${oglCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_SDL} ${COMMONS_UI_FILES})
-        set(TARGET_LIBS ${CMAKE_DL_LIBS} ${SDL2_LIBRARIES})
+        target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
     else()
         add_executable( ${PROJECT_NAME} ${oglCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_GLFW} ${COMMONS_UI_FILES})
         target_link_libraries(${PROJECT_NAME} glfw)
