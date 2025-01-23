@@ -14,11 +14,13 @@
 void getCompilerLog(GLuint handle, GLint blen, bool isShader);
 void checkShader(GLuint shader);
 void checkProgram(GLuint program);
-void APIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                                       const GLchar* message, const void* userParam);
-void GetFirstNMessages(GLuint numMsgs);
 int CheckGLError(const char *file, int line);
+
+#ifndef __EMSCRIPTEN__
+void GetFirstNMessages(GLuint numMsgs);
+void APIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 void enableDebugCallback();
+#endif
 
 #if !defined(NDEBUG)
 #define CHECK_GL_ERROR()      CheckGLError(__FILE__, __LINE__);

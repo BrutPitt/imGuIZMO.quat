@@ -25,15 +25,15 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imguizmo_quat/imguizmo_quat.h> // now also imguizmo_quat.h
+#include <imguizmo_quat.h> // now also imguizmo_quat.h
 
 
 
 int width = 1280, height = 800;
 GLFWwindow *glfwWindow;
 
-const int nVertex = sizeof(coloredCubeData)/(sizeof(float)*2);
-GLuint nElemVtx = 4;
+const int nElemVtx = 4;
+const int nVertex = sizeof(coloredCubeData)/(sizeof(float)*2*nElemVtx);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;

@@ -13,19 +13,16 @@
 #include <sstream>
 
 
-#include <imguizmo_quat/imguizmo_quat.h>
+#include <imguizmo_quat.h>
 
 bool show_test_window = true;
 bool show_another_window = false;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-extern int width, height;
-
-
 bool isVisible = true;
 
 
-void renderWidgets(vg::vGizmo3D &track, vec3& vLight)
+void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height)
 {
 
     static bool metricW = false, demosW = false;
@@ -39,13 +36,6 @@ void renderWidgets(vg::vGizmo3D &track, vec3& vLight)
    ImGui::SetNextWindowPos(ImVec2(0,0), ImGuiCond_FirstUseEver);
 
     bool isVisible = true;
-/*
-    if(ImGui::Begin("uuu", &isVisible)) {
-        static quat qt2(1.0f,0,0,0);
-        static quat qt4(1.0f,0,0,0);
-        ImGui::gizmo3D("##tZ", qt2, qt4, 800);
-    } ImGui::End();
-*/        
 
 
 // Right Side Widgets
@@ -387,7 +377,7 @@ Anyhow the static variables can be modified to change the 3d aspect of all solid
 
                 // sizeCylLength = defined in base to control size minus coneLenght
 
-                if(needRebuild)  needRebuild = imguiGizmo::solidAreBuilded = false;
+                if(needRebuild)  needRebuild = imguiGizmo::solidAreBuilt = false;
 
 
             } ImGui::EndGroup();

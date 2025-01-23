@@ -10,7 +10,7 @@
 #
 #  This software is distributed under the terms of the BSD 2-Clause license
 #------------------------------------------------------------------------------
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.27)
 project(oglCubeExamples)
 
 find_package(glm CONFIG)
@@ -18,7 +18,7 @@ find_package(glm CONFIG)
 option(IMGUIZMO_USES_GLM "Use GLM instead of internal vgMath" ON)
 # glm_FOUND OR 
 if(IMGUIZMO_USES_GLM)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVGIZMO_USES_GLM")
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVGIZMO_USES_GLM")
 endif(IMGUIZMO_USES_GLM)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -45,9 +45,10 @@ set(TOOLS_DIR    ${CMAKE_SOURCE_DIR}/../../libs)
 set(IMGUI_DIR    ${TOOLS_DIR}/imgui)
 set(IMGUIZMO_PARENT_DIR ${CMAKE_SOURCE_DIR}/../..)
 set(IMGUIZMO_DIR ${IMGUIZMO_PARENT_DIR}/imguizmo_quat)
+#set(IMGUIZMO_DIR ${IMGUIZMO_PARENT_DIR}/imGuIZMO.quat)
 
 include_directories(${TOOLS_DIR})
-include_directories(${IMGUIZMO_PARENT_DIR})
+include_directories(${IMGUIZMO_DIR})
 include_directories(${SRC}/../commons)
 
 set(SOURCE_FILES
@@ -83,7 +84,7 @@ set(SOURCE_FILES_SDL
 file( GLOB APP_SOURCES ${SRC}/oglCube*.cpp )
 foreach( oglCubeSourceFile ${APP_SOURCES} )
     get_filename_component( oglCubeName ${oglCubeSourceFile} NAME_WE )      # Cut off the file extension and directory path
-    project(${oglCubeName})
+    # project(${oglCubeName})
 
     if(${oglCubeName} MATCHES "Cube_07")
         set(COMMONS_UI_FILES
@@ -94,11 +95,11 @@ foreach( oglCubeSourceFile ${APP_SOURCES} )
     endif()
 
     if(${oglCubeName} MATCHES "SDL")
-        add_executable( ${PROJECT_NAME} ${oglCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_SDL} ${COMMONS_UI_FILES})
-        target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
+        add_executable( ${oglCubeName} ${oglCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_SDL} ${COMMONS_UI_FILES})
+        target_link_libraries(${oglCubeName} ${SDL2_LIBRARIES})
     else()
-        add_executable( ${PROJECT_NAME} ${oglCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_GLFW} ${COMMONS_UI_FILES})
-        target_link_libraries(${PROJECT_NAME} glfw)
+        add_executable( ${oglCubeName} ${oglCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_GLFW} ${COMMONS_UI_FILES})
+        target_link_libraries(${oglCubeName} glfw)
     endif()
     
     target_link_libraries(${oglCubeName} ${CMAKE_DL_LIBS} ${OPENGL_LIBRARY})

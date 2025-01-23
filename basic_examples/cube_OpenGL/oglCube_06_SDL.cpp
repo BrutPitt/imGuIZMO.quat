@@ -24,14 +24,14 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imguizmo_quat/imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
+#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
 
 int width = 1280, height = 800;
 SDL_Window *sdlWindow = nullptr;
 SDL_GLContext gl_context;
 
-const int nVertex = sizeof(coloredCubeData)/(sizeof(float)*2);
-GLuint nElemVtx = 4;
+const int nElemVtx = 4;
+const int nVertex = sizeof(coloredCubeData)/(sizeof(float)*2*nElemVtx);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
@@ -289,14 +289,14 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
     initImGui();
     ImGuiStyle& style = ImGui::GetStyle();
 
-    // imGuIZMO: set mouse feeling and mods
+    // imGuIZMO: set mouse feeling and key mods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    imguiGizmo::setGizmoFeelingRot(2.f);                    // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
-    imguiGizmo::setPanScale(3.5f);                          // default 1.0, >1 more, <1 less
-    imguiGizmo::setDollyScale(3.5f);                        // default 1.0, >1 more, <1 less
-    imguiGizmo::setDollyWheelScale(7.0f);                   // default 2.0, > more, < less ... (from v3.1 separate values)
-    imguiGizmo::setPanModifier(vg::evControlModifier);      // change KEY modifier: CTRL (default)
-    imguiGizmo::setDollyModifier(vg::evShiftModifier);     // change KEY modifier: SHIFT (default)
+    imguiGizmo::setGizmoFeelingRot(1.5f);          // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
+    imguiGizmo::setPanScale(.5f);                  // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyScale(.5f);                // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyWheelScale(.5f);           // default 1.0, > more, < less ... (from v3.1 separate values)
+    imguiGizmo::setPanModifier(vg::evSuperModifier);        // change KEY modifier: CTRL (default) ==> SUPER
+    imguiGizmo::setDollyModifier(vg::evControlModifier);    // change KEY modifier: SHIFT (default) ==> CTRL
 
     SDL_Event event;
     bool done = false;
@@ -323,18 +323,16 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
     // vGizmo3D: is necessary intercept mouse event not destined to ImGui
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if(!ImGui::GetIO().WantCaptureMouse) {
-            static bool leftPress = false, rightPress = false;
+            static int leftPress = 0, rightPress = 0;
             int x, y;
             int mouseState = SDL_GetMouseState(&x, &y);
-            bool isLPressed = mouseState == SDL_BUTTON_LMASK;
-            bool isRPressed = mouseState == SDL_BUTTON_RMASK;
-            if(leftPress != isLPressed) {                                   // check if leftButton state is changed
-                leftPress = isLPressed ;                                    // set new (different!) state
+            if(leftPress != (mouseState & SDL_BUTTON_LMASK)) {                                   // check if leftButton state is changed
+                leftPress = mouseState & SDL_BUTTON_LMASK ;                                    // set new (different!) state
                 track.mouse(vg::evLeftButton, getModifier(sdlWindow),       // send communication to vGizmo3D...
                                               leftPress, x, y);             // ... checking if a key modifier currently is pressed
             }
-            if(rightPress != isRPressed) {                                  // check if rightButton state is changed
-                rightPress = isRPressed;                                    // set new (different!) state
+            if(rightPress != (mouseState & SDL_BUTTON_RMASK)) {                                  // check if rightButton state is changed
+                rightPress = mouseState & SDL_BUTTON_RMASK;                                    // set new (different!) state
                 track.mouse(vg::evRightButton, getModifier(sdlWindow),      // send communication to vGizmo3D...
                                                rightPress, x, y);           // ... checking if a key modifier currently is pressed
             }

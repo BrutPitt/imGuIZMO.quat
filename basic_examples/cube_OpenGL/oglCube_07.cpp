@@ -24,15 +24,15 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imguizmo_quat/imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
+#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
 
-void renderWidgets(vg::vGizmo3D &track, vec3& vLight);
+void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height);
 
 int width = 1280, height = 800;
 GLFWwindow *glfwWindow;
 
-const int nVertex = sizeof(coloredCubeData)/(sizeof(float)*2);
-GLuint nElemVtx = 4;
+const int nElemVtx = 4;
+const int nVertex = sizeof(coloredCubeData)/(sizeof(float)*2*nElemVtx);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
@@ -50,6 +50,12 @@ vg::vGizmo3D track;     // using vGizmo3D global/static/member instead of specif
                         // And it's necessary if you want use also direct-screen manipulator
 
 mat4 compensateView; // compensate rotation of viewMatrix lookAt Matrix
+
+// helper func: vec3 <===> quat  (vec3 is center axes based)
+vec3 getLightPosFromQuat(quat &q, float centerDistance) { return (q * vec3(-1.0f, 0.0f, 0.0f)) * centerDistance ;}
+quat getQuatRotFromVec3(vec3 &lPos) {
+    return normalize(angleAxis(acosf(-lPos.x/length(lPos)), normalize(vec3(FLT_EPSILON, lPos.z, -lPos.y))));
+}
 
 void draw()
 {
@@ -89,6 +95,9 @@ void setScene()
     //                                     radians( 0))));  // vGizmo3D with rotation of 45 degrees on X axis
     track.setRotation(viewMatrix);                          // vGizmo3D with ViewMatrix (lookAt) rotation
 
+    track.idleSecondary(); // set continuous rotation on Idle for secondary rot
+
+
     // for Pan & Dolly always bounded on screen coords (x = left/right, y = up/douw, z = in/out) we remove viewMatrix rotation
     // otherwise Pan & Dolly have as reference the Cartesian axes
     compensateView = inverse(mat4_cast(quat(viewMatrix)));
@@ -97,11 +106,7 @@ void setScene()
     // light model
 
     // acquiring rotation for the light pos
-    const float len = length(lightPos);
-     //if(len<1.0 && len>= FLT_EPSILON) { normalize(lightPos); len = 1.0; }  // controls are not necessary: lightPos is known
-     //else if(len > FLT_EPSILON)
-        quat q = angleAxis(acosf(-lightPos.x/len), normalize(vec3(FLT_EPSILON, lightPos.z, -lightPos.y)));
-    track.setSecondRot(q);          // store secondary rotation for the Light
+    track.setSecondRot(getQuatRotFromVec3(lightPos));          // store secondary rotation for the Light
 
     lightObj = translate(mat4(1), lightPos);
     lightObj = scale(lightObj, vec3(.1));       // using same cube vertex but with 10% size
@@ -124,7 +129,7 @@ void glfwWindowSizeCallback(GLFWwindow* window, int w, int h)
 
 void glfwScrollCallback(GLFWwindow* window, double x, double y)
 {
-    ImGui_ImplGlfw_ScrollCallback(window, x, y);
+    //ImGui_ImplGlfw_ScrollCallback(window, x, y);
     if(ImGui::GetIO().WantCaptureMouse) return;
     track.wheel(x, y);
 }
@@ -292,14 +297,14 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
     initImGui();
     ImGuiStyle& style = ImGui::GetStyle();
 
-    // imGuIZMO: set mouse feeling and mods
+    // imGuIZMO: set mouse feeling and key mods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    imguiGizmo::setGizmoFeelingRot(2.f);                    // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
-    imguiGizmo::setPanScale(3.5f);                          // default 1.0, >1 more, <1 less
-    imguiGizmo::setDollyScale(3.5f);                        // default 1.0, >1 more, <1 less
-    imguiGizmo::setDollyWheelScale(7.0f);                   // default 2.0, > more, < less ... (from v3.1 separate values)
-    imguiGizmo::setPanModifier(vg::evControlModifier);      // change KEY modifier: CTRL (default)
-    imguiGizmo::setDollyModifier(vg::evShiftModifier);     // change KEY modifier: SHIFT (default)
+    imguiGizmo::setGizmoFeelingRot(1.5f);          // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
+    imguiGizmo::setPanScale(.5f);                  // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyScale(.5f);                // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyWheelScale(.5f);           // default 1.0, > more, < less ... (from v3.1 separate values)
+    imguiGizmo::setPanModifier(vg::evSuperModifier);        // change KEY modifier: CTRL (default) ==> SUPER
+    imguiGizmo::setDollyModifier(vg::evControlModifier);    // change KEY modifier: SHIFT (default) ==> CTRL
 
     // main render/draw loop
     while (!glfwWindowShouldClose(glfwWindow)) {
@@ -343,8 +348,14 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
 
     // ImGui: Your windows here
 
+    // using vec3 (lightPos) is necessary sync with vGizmo3D : in next example (08) this will no longer be necessary
+        lightPos = getLightPosFromQuat(track.getSecondRotRef() ,length(lightPos)); //to syncronize trackball & lightPos passed to the Widgets call
+
     // Render ALL ImGuIZMO_quat widgets
-        renderWidgets(track, lightPos);
+        renderWidgets(track, lightPos, width, height); // in next example (08) we will use directly quaternions
+
+    // using vec3 (lightPos) is necessary re-sync with vGizmo3D: in next example (08) this will no longer be necessary
+        track.setSecondRot(getQuatRotFromVec3(lightPos));   //to re-syncronize trackball & lightPos passed to the Widgets call
 
     // transferring the rotation to cube model matrix...
         mat4 modelMatrix = cubeObj * mat4_cast(track.getRotation());

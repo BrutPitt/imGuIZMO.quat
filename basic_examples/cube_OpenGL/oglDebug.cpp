@@ -10,10 +10,16 @@
 //  
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
-#include <cstdlib>
+#ifdef __EMSCRIPTEN__
+    #include <emscripten.h>
+    #include <emscripten/html5.h>
+    #include <GLES3/gl3.h>
+#else
+    #include <cstdlib>
+    #include <glad/glad.h>
+#endif
 #include <iostream>
 #include <vector>
-#include <glad/glad.h>
 #include "oglDebug.h"
 
 using namespace std;
@@ -77,6 +83,8 @@ void checkProgram(GLuint program)
 #endif
 }
 
+#define MAX_ERRORS_TO_SHOW 50
+#ifndef __EMSCRIPTEN__
 void enableDebugCallback() {
     glEnable(GL_DEBUG_OUTPUT);
     if(glDebugMessageCallback) {
@@ -89,7 +97,6 @@ void enableDebugCallback() {
         throw "glDebugMessageCallback not available: need OpenGL ES 3.2+ or OpenGL 4.3+";
 }
 
-#define MAX_ERRORS_TO_SHOW 50
 void APIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
                                        const GLchar* message, const void* userParam)
 {
@@ -173,6 +180,7 @@ void GetFirstNMessages(GLuint numMsgs)
     for(int i=0; i<numMsgs; i++)
         cout << "num: "<< numFound << " - src: " << sources[i] << " - type: " << types[i] << " - id: " << ids[i] << " - sev: " << severities[i] << endl << " ***** " << messages[i] << endl;
 }
+#endif
 
 int CheckGLError(const char *file, int line)
 {

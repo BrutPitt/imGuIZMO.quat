@@ -24,13 +24,13 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imguizmo_quat/imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
+#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
 
 int width = 1280, height = 800;
 GLFWwindow *glfwWindow;
 
-const int nVertex = sizeof(coloredCubeData)/(sizeof(float)*2);
-GLuint nElemVtx = 4;
+const int nElemVtx = 4;
+const int nVertex = sizeof(coloredCubeData)/(sizeof(float)*2*nElemVtx);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
@@ -195,12 +195,12 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
     initImGui();
     ImGuiStyle& style = ImGui::GetStyle();
 
-    // imGuIZMO: set mouse feeling and mods
+    // imGuIZMO: set mouse feeling and key mods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    imguiGizmo::setGizmoFeelingRot(2.f);                    // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
-    imguiGizmo::setPanScale(3.5f);                          // default 1.0, >1 more, <1 less
-    imguiGizmo::setDollyScale(3.5f);                        // default 1.0, >1 more, <1 less
-    imguiGizmo::setDollyWheelScale(7.0f);                   // default 2.0, > more, < less ... (from v3.1 separate values)
+    imguiGizmo::setGizmoFeelingRot(1.5f);          // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
+    imguiGizmo::setPanScale(.5f);                  // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyScale(.5f);                // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyWheelScale(.5f);           // default 1.0, > more, < less ... (from v3.1 separate values)
     imguiGizmo::setPanModifier(vg::evSuperModifier);        // change KEY modifier: CTRL (default) ==> SUPER
     imguiGizmo::setDollyModifier(vg::evControlModifier);    // change KEY modifier: SHIFT (default) ==> CTRL
 
