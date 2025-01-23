@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-#  Copyright (c) 2018-2024 Michele Morrone
+#  Copyright (c) 2025 Michele Morrone
 #  All rights reserved.
 #
 #  https://michelemorrone.eu - https://brutpitt.com
@@ -11,37 +11,31 @@
 #  This software is distributed under the terms of the BSD 2-Clause license
 #------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.16)
+project(vkCube)
+
+# To use SDL2 | SDL3 as backend framework (instead of GLFW) type:
+#       cmake -DUSE_SDL2=ON
+#   or
+#       cmake -DUSE_SDL3=ON
+# obviously is necessary to have SDL2/SDL3 (+devel package) installed
+option(USE_SDL2 "use SDL2 instead of GLFW (default) framework" OFF)
+option(USE_SDL3 "use SDL3 instead of GLFW (default) framework" OFF)
+
 
 # Debug Validation Layer is enabled in ONLY Debug mode
-#       cmake -DFORCE_VALIDATION_LAYER:BOOL=TRUE
-# enable VL anyway
-option(FORCE_VALIDATION_LAYER "Enable Debug Validation Layer also in Release build" OFF )
+#       cmake -DFORCE_VALIDATION_LAYER=ON
+# force dbgVL anyway also in Release build
+option(FORCE_VALIDATION_LAYER "force Debug ValidationLayer also in Release build" OFF)
 
 set(CMAKE_INCLUDE_DIRECTORIES_BEFORE, ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
-option(IMGUIZMO_USES_GLM "Use GLM instead of internal vgMath" ON)
-# glm_FOUND OR
-if(IMGUIZMO_USES_GLM)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVGIZMO_USES_GLM")
-endif(IMGUIZMO_USES_GLM)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIMGUIZMO_VMOD_AXIS_Y=-")
-
-
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Debug")
-  message(STATUS "CMAKE_BUILD_TYPE not specified: use Debug by default...")
+  set(CMAKE_BUILD_TYPE "Release")
+  message(STATUS "CMAKE_BUILD_TYPE not specified: use Release by default...")
 endif(NOT CMAKE_BUILD_TYPE)
 
-
-if(${CMAKE_BUILD_TYPE} MATCHES "Debug" OR FORCE_VALIDATION_LAYER)
-    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DENABLE_VALIDATION_LAYER")
-endif()
-
-
-find_package(glfw3 CONFIG)
 
 set(SRC          ${CMAKE_SOURCE_DIR})
 set(COMMONS_DIR  ${SRC}/../commons)
@@ -55,24 +49,11 @@ include_directories(${IMGUIZMO_DIR})
 include_directories(${SRC}/../commons)
 
 
-find_package(Vulkan REQUIRED)
-
-set(VK_ADD_LIBS "")
-macro(addVulkanLibs ARG)
-    message("ARG ${ARG}")
-    find_library(${ARG}_LIB NAMES ${ARG} PATHS $ENV{VULKAN_SDK}/lib)
-    message(STATUS "${ARG} found in: ${${ARG}_LIB}\n")
-    set(VK_ADD_LIBS ${VK_ADD_LIBS} ${${ARG}_LIB})
-endmacro()
-
-addVulkanLibs(shaderc_combined)
-addVulkanLibs(glslang-default-resource-limits)
-
-
     set(SOURCE_FILES
-        ${SRC}/utils/math.cpp
-        ${SRC}/utils/shaders.cpp
-        ${SRC}/utils/utils.cpp
+        ${SRC}/vkCube.h
+        ${SRC}/framework.h
+        ${SRC}/framework.cpp
+        ${SRC}/dbgValidationLayer.h
         ${COMMONS_DIR}/shadersAndModel.h
         ${IMGUIZMO_DIR}/imguizmo_quat.h
         ${IMGUIZMO_DIR}/imguizmo_quat.cpp
@@ -90,63 +71,80 @@ addVulkanLibs(glslang-default-resource-limits)
         ${IMGUI_DIR}/imstb_textedit.h
         ${IMGUI_DIR}/imstb_truetype.h)
 
-set(SOURCE_FILES_GLFW
-        ${IMGUI_DIR}/imgui_impl_glfw.cpp
-        ${IMGUI_DIR}/imgui_impl_glfw.h
-)
-set(SOURCE_FILES_SDL
-        ${IMGUI_DIR}/imgui_impl_sdl2.cpp
-        ${IMGUI_DIR}/imgui_impl_sdl2.h
-)
-set(COMMONS_UI_FILES "")
+
+#    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DIMGUI_IMPL_OPENGL_LOADER_GLAD -DGLFW_INCLUDE_NONE -DGLAPP_NO_OGL_DSA")
 
 
-file( GLOB APP_SOURCES ${SRC}/vkCube*.cpp )
+file( GLOB APP_SOURCES ${SRC}/vkCube_*.cpp )
 foreach( vkCubeSourceFile ${APP_SOURCES} )
     get_filename_component( vkCubeName ${vkCubeSourceFile} NAME_WE )      # Cut off the file extension and directory path
     project(${vkCubeName})
 
     if(${vkCubeName} MATCHES "Cube_07")
-        set(COMMONS_UI_FILES
+        set(SOURCE_FILES ${SOURCE_FILES}
                 ${COMMONS_DIR}/uiMainDlg.cpp
                 ${COMMONS_DIR}/uiSettings.cpp
         )
     endif()
 
-    if(${vkCubeName} MATCHES "SDL")
-        find_package(SDL2)
-        add_executable( ${PROJECT_NAME} ${vkCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_SDL} ${COMMONS_UI_FILES})
+    if(USE_SDL2)
+        find_package(SDL2 REQUIRED)
+        set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DAPP_USES_SDL2")
+
+        set(SOURCE_FILES ${SOURCE_FILES}
+            ${IMGUI_DIR}/imgui_impl_sdl2.cpp
+            ${IMGUI_DIR}/imgui_impl_sdl2.h )
+
+        add_executable(${PROJECT_NAME} ${vkCubeSourceFile} ${SOURCE_FILES})
         include_directories(${SDL2_INCLUDE_DIRS})
-        set(TARGET_LIBS ${CMAKE_DL_LIBS} ${SDL2_LIBRARIES})
-    else()
-        add_executable( ${PROJECT_NAME} ${vkCubeSourceFile} ${SOURCE_FILES} ${SOURCE_FILES_GLFW} ${COMMONS_UI_FILES})
-        target_link_libraries(${PROJECT_NAME} glfw)
-        set(TARGET_LIBS ${CMAKE_DL_LIBS} )
+        target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
+    elseif(USE_SDL3)
+            find_package(SDL3 REQUIRED)
+            set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DAPP_USES_SDL3")
+
+            set(SOURCE_FILES ${SOURCE_FILES}
+                ${IMGUI_DIR}/imgui_impl_sdl3.cpp
+                ${IMGUI_DIR}/imgui_impl_sdl3.h )
+
+            add_executable(${PROJECT_NAME} ${vkCubeSourceFile} ${SOURCE_FILES})
+            include_directories(${SDL3_INCLUDE_DIRS})
+            target_link_libraries(${PROJECT_NAME} ${SDL3_LIBRARIES})
+        else()
+            find_package(glfw3 REQUIRED)
+
+            set(SOURCE_FILES ${SOURCE_FILES}
+                    ${IMGUI_DIR}/imgui_impl_glfw.cpp
+                    ${IMGUI_DIR}/imgui_impl_glfw.h)
+
+            add_executable(${PROJECT_NAME} ${vkCubeSourceFile} ${SOURCE_FILES})
+            target_link_libraries(${PROJECT_NAME} glfw)
+    endif(USE_SDL2)
+
+    if(${CMAKE_BUILD_TYPE} MATCHES "Debug" OR FORCE_VALIDATION_LAYER)
+        set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DENABLE_VALIDATION_LAYER")
     endif()
 
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations -fpermissive)
+
+    target_include_directories(${PROJECT_NAME} PUBLIC .)
+    target_link_libraries(${PROJECT_NAME} ${MORE_LIBS} ${TARGET_LIBS})
+
+    find_package(Vulkan REQUIRED)
+    message(STATUS "Vulkan found in: ${SHADERC_LIB}")
+
+    # it's necessary only to compile shaders from code
+    find_library(SHADERC_LIB shaderc_combined $ENV{VULKAN_SDK}/lib)
+    message(STATUS "Shaderc found in: ${SHADERC_LIB}")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${M_GLOBAL_FLAGS}")
+    #target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations -fpermissive)
+    #if(EXISTS $ENV{RAMDISK}) #my RAMDISK env
+    #    set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY $ENV{RAMDISK}/${PROJECT_NAME})
+    #else()
+    #    set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+    #endif()
 
     if(VULKAN_FOUND)
         target_include_directories(${PROJECT_NAME} PUBLIC $ENV{VULKAN_SDK}/include)
-        target_link_libraries (${PROJECT_NAME} ${Vulkan_LIBRARIES} -lpthread -lX11 -lrt ${VK_ADD_LIBS})
+        target_link_libraries (${PROJECT_NAME} ${Vulkan_LIBRARIES} ${CMAKE_DL_LIBS}  ${SHADERC_LIB})
     endif (VULKAN_FOUND)
-    
-    target_link_libraries(${vkCubeName} ${OPENGL_LIBRARY} ${TARGET_LIBS})
 endforeach( vkCubeSourceFile ${APP_SOURCES} )
-
-
-
-# target_include_directories(${PROJECT_NAME} PUBLIC .)
-
-#addVulkanLibs(VkLayer_khronos_validation)
-#addVulkanLibs(glslang)
-#addVulkanLibs(MachineIndependent)
-#addVulkanLibs(SPIRV)
-#addVulkanLibs(OSDependent)
-#addVulkanLibs(GenericCodeGen)
-#addVulkanLibs(OGLCompiler)
-# it's necessary only to compile shaders from code
-
-
-
-

@@ -17,7 +17,12 @@
 //#include <cfloat>
 
 #include "imguizmo_config.h"    // used (also) to modify/specify ImGui include directory
-#include "vGizmo.h"
+
+#if defined(IMGUIZMO_USES_GLM) && !defined(VGIZMO_USES_GLM)
+    #define VGIZMO_USES_GLM
+#endif
+
+#include "vGizmo3D.h"
 
 #ifndef IMGUIZMO_MANUAL_IMGUI_INCLUDE
     #if !defined(IMGUIZMO_IMGUI_FOLDER)
@@ -83,7 +88,23 @@
 // The data structure that holds the orientation among other things
 struct imguiGizmo
 {
-
+    imguiGizmo() {
+        #if defined(IMGUIZMO_FLIP_ROT_X)
+            isFlipRotX = true;
+        #endif
+        #if defined(IMGUIZMO_FLIP_ROT_Y)
+            isFlipRotY = true;
+        #endif
+        #if defined(IMGUIZMO_FLIP_PAN_X)
+            isFlipPanX = true;
+        #endif
+        #if defined(IMGUIZMO_FLIP_PAN_Y)
+            isFlipPanY = true;
+        #endif
+        #if defined(IMGUIZMO_FLIP_DOLLY)
+            isFlipDolly = true;
+        #endif
+    }
     quat qtV  = quat(1.0f, vec3(0.0f)); // Quaternion value
     quat qtV2 = quat(1.0f, vec3(0.0f)); // Quaternion value
 #ifndef IMGUIZMO_USE_ONLY_ROT
@@ -93,7 +114,7 @@ struct imguiGizmo
     vec3 viewVecModifier{ IMGUIZMO_VMOD_AXIS_X 1, IMGUIZMO_VMOD_AXIS_Y 1, IMGUIZMO_VMOD_AXIS_Z 1 };
 
     enum      {                              //0b0000'0000, //C++14 notation
-                mode3Axes          = 0x0001, //0b0000'0001, 
+                mode3Axes          = 0x0001, //0b0000'0001,
                 modeDirection      = 0x0002, //0b0000'0010,
                 modeDirPlane       = 0x0004, //0b0000'0100,
                 modeDual           = 0x0008, //0b0000'1000,
@@ -217,10 +238,41 @@ struct imguiGizmo
     static float getPanScale() { return panScale; }
 #endif
 
+/// flipX mouse coord
+///@param[in] b bool
+    static void setFlipRotX(bool b) { isFlipRotX = b; }
+/// flipY mouse coord
+///@param[in] b bool
+    static void setFlipRotY(bool b) { isFlipRotY = b; }
+/// flipZ mouse coord
+///@param[in] b bool
+    static void setFlipDolly(bool b) { isFlipDolly = b; }
+/// flipZ mouse coord
+///@param[in] b bool
+    static void setFlipPanX(bool b) { isFlipPanX = b; }
+/// flipZ mouse coord
+///@param[in] b bool
+    static void setFlipPanY(bool b) { isFlipPanY = b; }
+
+/// get flip Rot X status
+/// @retval bool : current flip Rot X status
+    static bool getFlipRotX() { return isFlipRotX; }
+/// get flip Rot Y status
+/// @retval bool : current flip Rot Y status
+    static bool getFlipRotY() { return isFlipRotY; }
+/// get flip Pan X status
+/// @retval bool : current flip Pan X status
+    static bool getFlipPanX() { return isFlipPanX; }
+/// get flip Pan Y status
+/// @retval bool : current flip Pan Y status
+    static bool getFlipPanY() { return isFlipPanY; }
+/// get flipZ mouse status
+/// @retval bool : current flipZ status
+    static bool getFlipDolly() { return isFlipDolly; }
 
     //  internals
     //--------------------------------------------------------------------------
-    static bool solidAreBuilded;
+    static bool solidAreBuilt;
     static bool dragActivate;
 
     int drawMode = mode3Axes;
@@ -350,9 +402,16 @@ struct imguiGizmo
     //-------------------------------------
     static float gizmoFeelingRot; // >1 more mouse sensibility, <1 less mouse sensibility
 #ifndef IMGUIZMO_USE_ONLY_ROT
-    static float panScale, dollyScale, dollyWheelScale;
+    static float panScale, dollyScale, dollyWheelScale, dollyWheelMulFactor;
     static vgModifiers panMod, dollyMod;
 #endif
+
+
+    // Flipping mouse control
+    //-------------------------------------
+    static bool isFlipRotX , isFlipRotY;
+    static bool isFlipPanX , isFlipPanY, isFlipDolly;
+
 
     static const int imguiGizmoDefaultSize;
 

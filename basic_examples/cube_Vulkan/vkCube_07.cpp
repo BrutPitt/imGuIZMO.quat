@@ -32,6 +32,8 @@
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
 #include <imGuIZMOquat.h> // now also imguizmo_quat.h
 
+void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height);
+
 
 uint32_t getGraphicsIndex(const vk::PhysicalDevice &physicalDevice)
 {
@@ -328,6 +330,11 @@ void vkApp::setPerspective()
 
 }
 
+vec3 getLightPosFromQuat(quat &q, float centerDistance) { return (q * vec3(-1.0f, 0.0f, 0.0f)) * centerDistance ;}
+quat getQuatRotFromVec3(vec3 &lPos) {
+    return normalize(angleAxis(acosf(-lPos.x/length(lPos)), normalize(vec3(FLT_EPSILON, lPos.z, -lPos.y))));
+}
+
 vec3 lightPos(2, 2.5, 3);        // Light Position
 void vkApp::setScene()
 {
@@ -350,10 +357,6 @@ void vkApp::setScene()
     // for Pan & Dolly always bounded on screen coords (x = left/right, y = up/douw, z = in/out) we remove viewMatrix rotation
     // otherwise Pan & Dolly have as reference the Cartesian axes
     compensateView = inverse(mat4_cast(quat(viewMatrix)));
-
-
-    // light model
-    vec3 lightPos(2, 2.5, 3);        // Light Position
 
     // acquiring rotation for the light pos
     const float len = length(lightPos);
@@ -445,47 +448,15 @@ void vkApp::run()
     // ImGui: Your windows here
 
 
-    // Imgui window: build a transparent window (container) to insert widget
-        float widgetSize=240;
-        ImGuiStyle& style = ImGui::GetStyle();
-        ImGui::SetNextWindowSize(ImVec2(widgetSize, height), ImGuiCond_Always); // top ...
-        ImGui::SetNextWindowPos(ImVec2(width-widgetSize, 0), ImGuiCond_Always); // ... right aligned
+    // using vec3 (lightPos) is necessary sync with vGizmo3D : in next example (08) this will no longer be necessary
+        lightPos = getLightPosFromQuat(vgTrackball.getSecondRotRef() ,length(lightPos)); //to syncronize trackball & lightPos passed to the Widgets call
 
-        ImGui::PushStyleColor(ImGuiCol_WindowBg,ImVec4(0.f,0.f,0.f,0.f));       // transparent Wnd Background
-        ImGui::PushStyleColor(ImGuiCol_FrameBg,ImVec4(0.f,0.f,0.f,0.f));        // transparent frame Background
-        const float prevWindowBorderSize = style.WindowBorderSize;              // Save current border size...
-        style.WindowBorderSize = .0f;                                           // ... to draw the window with ZERO broder
+    // Render ALL ImGuIZMO_quat widgets
+        renderWidgets(vgTrackball, lightPos, width, height); // in next example (08) we will use directly quaternions
 
-        bool isVisible = true;                                                  // visibility flag: always on
-        ImGui::Begin("##giz", &isVisible, ImGuiWindowFlags_NoTitleBar|          // noTitle / noResize / Noscrollbar
-                                          ImGuiWindowFlags_NoResize|
-                                          ImGuiWindowFlags_NoScrollbar);
+    // using vec3 (lightPos) is necessary re-sync with vGizmo3D: in next example (08) this will no longer be necessary
+        vgTrackball.setSecondRot(getQuatRotFromVec3(lightPos));   //to re-syncronize trackball & lightPos passed to the Widgets call
 
-
-    // colored text for display quat(w,x,y,z) components
-        ImGui::SetCursorPos(ImVec2(0,0));
-        ImGui::PushItemWidth(widgetSize*.25-2);
-        ImGui::TextColored(ImVec4(1,1,1,1), "w: % 1.2f", vgTrackball.getRotation().w); ImGui::SameLine();
-        ImGui::TextColored(ImVec4(1,0,0,1), "x: % 1.2f", vgTrackball.getRotation().x); ImGui::SameLine();
-        ImGui::TextColored(ImVec4(0,1,0,1), "y: % 1.2f", vgTrackball.getRotation().y); ImGui::SameLine();
-        ImGui::TextColored(ImVec4(0,0,1,1), "z: % 1.2f", vgTrackball.getRotation().z);
-        ImGui::PopItemWidth();
-
-    // ImGuIZMO.quat widget
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ImGui::gizmo3D("##aaa", vgTrackball.getRotationRef(), vgTrackball.getSecondRotRef(), widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
-
-    // ImGuIZMO.quat with also pan and Dolly/zoom
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ImGui::gizmo3D("##a01", vgTrackball.getPositionRef(), vgTrackball.getRotationRef(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
-
-
-
-    // End Imgui window (container) block
-        ImGui::End();
-        style.WindowBorderSize = prevWindowBorderSize;                          // restore border size
-        ImGui::PopStyleColor();                                                 // frame color (pushed)
-        ImGui::PopStyleColor();                                                 // Background (pushed)
 
     // transferring the rotation to cube model matrix...
         mat4 modelMatrix = cubeObj * mat4_cast(vgTrackball.getRotation());

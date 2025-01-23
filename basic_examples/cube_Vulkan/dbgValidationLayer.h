@@ -1,6 +1,3 @@
-#pragma once
-#include <vulkan/vulkan.hpp>
-#include <iostream>
 
 // Debug Validation Layer
 /////////////////////////////////////////////
@@ -42,7 +39,7 @@ public:
 
         return false;
     }
-#ifndef NDEBUG
+#ifdef ENABLE_VALIDATION_LAYER
     const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 #else
     const std::vector<const char*> validationLayers = {};
@@ -57,7 +54,7 @@ private:
     VkDebugUtilsMessengerEXT debugMessenger;
 };
 
-#ifndef NDEBUG
+#ifdef ENABLE_VALIDATION_LAYER
     #define BUILD_DEBUG_MESSENGER(I) debug.setupDebugMessenger(I);
     #define DESTROY_DEBUG_MESSENGER(I) debug.destroyDebugMessenger(I);
     #define CHECK_VALIDATION_LAYER_SUPPORT() if(!debug.checkValLayer()) { throw std::runtime_error("validation layers requested, but not available!"); }

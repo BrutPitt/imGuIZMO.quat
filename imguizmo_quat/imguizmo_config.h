@@ -35,35 +35,7 @@
 //
 // Default ==> Pan & Dolly enabled
 //------------------------------------------------------------------------------
-
 //#define IMGUIZMO_USE_ONLY_ROT
-
-//------------------------------------------------------------------------------
-// v3.1 and later
-//
-//      IMGUIZMO_MANUAL_IMGUI_INCLUDE
-//
-//        - if DEFINED (uncommented/defined) is necessary to specify the following
-//            ImGui includes:
-//                  #include <imgui.h>
-//                  #include <imgui_internal.h>
-//            or
-//                  #include <imgui_folder/imgui.h>
-//                  #include <imgui_folder/imgui_internal.h>
-//            or
-//                  #include "imgui_folder/imgui.h"
-//                  #include "imgui_folder/imgui_internal.h"
-//
-//            in relation to where is your imgui_folder and if is in your "INCLUDE"
-//              search paths
-//
-//          if DEFINED (uncommented/defined) IMGUIZMO_IMGUI_FOLDER is NOT used
-//            (see below)
-//------------------------------------------------------------------------------
-
-// #define IMGUIZMO_MANUAL_IMGUI_INCLUDE
-// #include <imgui.h>
-// #include <imgui_internal.h>
 
 //------------------------------------------------------------------------------
 // v3.0 and later ==> from 3.1 non more strictly necessary
@@ -89,8 +61,33 @@
 //
 // N.B. Final slash to end of path is REQUIRED!
 //------------------------------------------------------------------------------
-
 // #define IMGUIZMO_IMGUI_FOLDER ImGui/
+
+//------------------------------------------------------------------------------
+// v3.1 and later
+//
+//      IMGUIZMO_MANUAL_IMGUI_INCLUDE
+//
+//        - if DEFINED (uncommented/defined) is necessary to specify the following
+//            ImGui includes:
+//                  #include <imgui.h>
+//                  #include <imgui_internal.h>
+//            or
+//                  #include <imgui_folder/imgui.h>
+//                  #include <imgui_folder/imgui_internal.h>
+//            or
+//                  #include "imgui_folder/imgui.h"
+//                  #include "imgui_folder/imgui_internal.h"
+//
+//            in relation to where is your imgui_folder and if is in your "INCLUDE"
+//              search paths
+//
+//          if DEFINED (uncommented/defined) IMGUIZMO_IMGUI_FOLDER is NOT used
+//            (see above)
+//------------------------------------------------------------------------------
+// #define IMGUIZMO_MANUAL_IMGUI_INCLUDE
+// #include <imgui.h>
+// #include <imgui_internal.h>
 
 //------------------------------------------------------------------------------
 // v3.1 and later
@@ -106,9 +103,7 @@
 //      IMGUIZMO_HAS_NEGATIVE_VEC3_LIGHT
 //
 //------------------------------------------------------------------------------
-
 // #define IMGUIZMO_HAS_NEGATIVE_VEC3_LIGHT
-
 
 //------------------------------------------------------------------------------
 // v3.1 and later
@@ -124,10 +119,61 @@
 //
 //  Now you can also show (visually) a RIGHT_HAND system
 //------------------------------------------------------------------------------
-
 //#define IMGUIZMO_VMOD_AXIS_X +
 //#define IMGUIZMO_VMOD_AXIS_Y +
 //#define IMGUIZMO_VMOD_AXIS_Z +
+
+//------------------------------------------------------------------------------
+// v3.1 and later
+//
+// uncomment to flip the mouse movement in a specific direction / operation:
+//      IMGUIZMO_FLIP_ROT_X  -  Rotation on X movement - Default: OFF = FALSE
+//      IMGUIZMO_FLIP_ROT_Y  -  Rotation on Y movement - Default: ON  = TRUE
+//      IMGUIZMO_FLIP_PAN_X  -  Pan on X movement      - Default: OFF = FALSE
+//      IMGUIZMO_FLIP_PAN_Y  -  Pan on Y movement      - Default: ON  = TRUE
+//      IMGUIZMO_FLIP_Dolly  -  Dolly on Y movement    - Default: OFF = FALSE
+//
+// The default values are set for use in OpenGL /WebGL
+//
+// Possibilty to override the default settings also inside of the code
+// calling the relative function:
+//    void setFlipRotX(bool b)  { isFlipRotX = b; }
+//    void setFlipRotY(bool b)  { isFlipRotY = b; }
+//    void setFlipPanX(bool b)  { isFlipPanX = b; }
+//    void setFlipPanY(bool b)  { isFlipPanY = b; }
+//    void setFlipDolly(bool b) { isFlipDolly = b; }
+//
+// Or acquire current status:
+//    bool getFlipRotX() { return isFlipRotX; }
+//    bool getFlipRotY() { return isFlipRotY; }
+//    bool getFlipPanX() { return isFlipPanX; }
+//    bool getFlipPanY() { return isFlipPanY; }
+//    bool getFlipDolly() { return isFlipDolly; }
+//
+//------------------------------------------------------------------------------
+//#define IMGUIZMO_FLIP_ROT_X
+#define IMGUIZMO_FLIP_ROT_Y
+//#define IMGUIZMO_FLIP_PAN_X
+#define IMGUIZMO_FLIP_PAN_Y
+//#define IMGUIZMO_FLIP_DOLLY
+
+//------------------------------------------------------------------------------
+// uncomment to use "glm" (0.9.9 or higher) library instead of vgMath
+//      Need to have "glm" installed and in your INCLUDE research compiler path
+//
+// vgMath is a subset of "glm" and is compatible with glm types and calls
+//      change only namespace from "vgm" to "glm". It's automatically set by
+//      including vGizmo.h or vgMath.h or imGuIZMOquat.h
+//
+// note: affects only virtualGizmo3D / imGuIZMO.quat on which library to use
+//      internally: vgMath | glm
+//
+// Default ==> use vgMath
+//      If you enable GLM use, automatically is enabled also VGM_USES_TEMPLATE
+//------------------------------------------------------------------------------
+#define IMGIZMO_USES_GLM
+
+
 
 
 // TODO for v.3.2?

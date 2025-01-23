@@ -20,7 +20,7 @@ ImVector<vec3> imguiGizmo::cubeVtx;
 ImVector<vec3> imguiGizmo::cubeNorm;
 ImVector<vec3> imguiGizmo::planeVtx;
 ImVector<vec3> imguiGizmo::planeNorm;
-bool imguiGizmo::solidAreBuilded = false;
+bool imguiGizmo::solidAreBuilt = false;
 bool imguiGizmo::dragActivate = false;
 //
 //  Settings
@@ -96,9 +96,13 @@ ImU32 imguiGizmo::savedSphereColors[2]  = { 0xff401010, 0xffc0a0a0 };
 float imguiGizmo::gizmoFeelingRot = 1.f; // >1 more mouse sensibility, <1 less mouse sensibility
 
 #ifndef IMGUIZMO_USE_ONLY_ROT
-float imguiGizmo::dollyScale = 1.f, imguiGizmo::panScale = 1.f, imguiGizmo::dollyWheelScale = 2.f;
+float imguiGizmo::dollyScale = 1.f, imguiGizmo::panScale = 1.f, imguiGizmo::dollyWheelScale = 1.f, imguiGizmo::dollyWheelMulFactor = 5.f;
 vgModifiers imguiGizmo::panMod = vg::evControlModifier, imguiGizmo::dollyMod = vg::evShiftModifier;
 #endif
+
+bool imguiGizmo::isFlipRotX = false, imguiGizmo::isFlipRotY = false;
+bool imguiGizmo::isFlipPanX = false, imguiGizmo::isFlipPanY = false, imguiGizmo::isFlipDolly = false;
+
 
 //
 //  for all gizmo3D
@@ -428,7 +432,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
 
     //  build solids... once!
     ///////////////////////////////////////
-    if (!solidAreBuilded)  {
+    if (!solidAreBuilt)  {
         const float arrowBgn = -1.0f, arrowEnd = 1.0f;     
 
         buildCone    (arrowEnd - coneLength, arrowEnd, coneRadius, coneSlices);
@@ -436,7 +440,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
         buildSphere(sphereRadius, sphereTessFactor);
         buildCube(cubeSize);
         buildPlane(planeSize);
-        solidAreBuilded = true;
+        solidAreBuilt = true;
     }
 
     ImGui::PushID(label);
@@ -462,25 +466,31 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     if(io.KeySuper) { vgMods |= vg::evSuperModifier;   vgModsActive = true; }
 
     vg::vImGuIZMO track;
+    track.setFlipRotX(isFlipRotX);
+    track.setFlipRotY(isFlipRotY);
+    track.setFlipPanX(isFlipPanX);
+    track.setFlipPanY(isFlipPanY);
+    track.setFlipDolly(isFlipDolly);
+    track.setGizmoFeeling(gizmoFeelingRot);
+    track.viewportSize(innerSize.x, innerSize.y);
+#ifndef IMGUIZMO_USE_ONLY_ROT
+    float screenFactor = innerSize.x / ((io.DisplaySize.x + io.DisplaySize.y) * .5f);
+    track.setPosition(posPanDolly);
+    track.setDollyControl(buttonPanDolly, dollyMod);
+    track.setPanControl(buttonPanDolly, panMod);
+    track.setPanScale(screenFactor*panScale);
+    track.setDollyScale(screenFactor*dollyScale);
+    track.wheel(0.f, dollyWheelScale*dollyWheelMulFactor*io.MouseWheel);
+#endif
     //  getTrackball
     //      in : q -> quaternion to which applay rotations
     //      out: q -> quaternion with rotations
     ////////////////////////////////////////////////////////////////////////////
     auto getTrackball = [&] (quat &q) {
         ImVec2 mouse = ImGui::GetMousePos() - controlPos;
-
-        track.viewportSize(innerSize.x, innerSize.y);
         track.setRotation(q);
-        track.setGizmoFeeling(gizmoFeelingRot);
 #ifndef IMGUIZMO_USE_ONLY_ROT
         if(drawMode&modePanDolly || io.MouseWheel!=0) {
-            float screenFactor = 1.f/(io.DisplaySize.x<io.DisplaySize.y ? io.DisplaySize.x : io.DisplaySize.y);
-            track.setPosition(posPanDolly);
-            track.setDollyControl(buttonPanDolly, dollyMod);
-            track.setPanControl(buttonPanDolly, panMod);
-            track.setPanScale(screenFactor*panScale);
-            track.setDollyScale(screenFactor*dollyScale);
-            track.wheel(0.f, dollyWheelScale*io.MouseWheel);
             track.motionImmediateMode(mouse.x, mouse.y, io.MouseDelta.x, io.MouseDelta.y, vgMods);
             // get new rotation only if !Pan && ! Dolly
             if((!track.isDollyActive() && !track.isPanActive() && io.MouseWheel==0)) q = track.getRotation();
