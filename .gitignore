@@ -39,3 +39,5 @@
 /imGuIZMO.quat/Backup/
 *.db
 bfg.jar
+.idea/
+imgui_docking/

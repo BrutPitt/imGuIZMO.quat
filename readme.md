@@ -1,4 +1,8 @@
-# imGuIZMO.quat &nbsp;v3.0
+# imGuIZMO.quat &nbsp;v4.0 WiP
+
+### v4.0 Work in Progress
+**Currently I maintain both v3.0 in `ImGuUIZMO.quat` folder and new v4.0 WiP `imguizmo_quat`*
+**New** [**easy_examples**](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) (Vulkan and OpenGL) refer to the latter: soon a beta will be released and everything will be adequate to v4.0
 
 <p align="right"> <span style="position:relative; top:-10px;"> <i> also  &nbsp; </i> </span> <a href="https://github.com/RenderKit/ospray-studio/tree/master/external/imGuIZMO.quat" target="_blank"><img width="200" height="40" src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/studio.png"/></a> &nbsp; <span style="position:relative; top:-10px;"> <i> uses <b> imGuIZMO.quat</b></i></span></p> 
 
@@ -11,9 +15,10 @@ With **imGuIZMO.quat** you can manipulate objects starting from $\color{red}{\te
 **imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: it provides a way to rotate and move (pan/dolly) models, lights, objects, cameras (etc), with mouse, adding $\color{red}{\textbf{only 4 code lines!}}$ to your code.
 It uses **quaternions** algebra, internally, to manage rotations, and offers the possibility (also) to interfacing with **vec3**, **vec4**, **mat3x3** or **mat4x4**
 
-### Live WebGL2 demo examples 
+## Live WebGL2 demo examples 
 
 You can run/try **WebGL 2** examples of **imGuIZMO** from following links:
+- **NEW [v4.0 WiP cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglCubeExample.html)** - from new [easy_examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) (Vulkan and OpenGL)
 - [**imGuIZMO.quat** used together **virtualGizmo3D**  direct 3D mouse/screen manipulator](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
 - [**imGuIZMO.quat** manipulator (only)](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSet.html), now with 3D Pan/Dolly (move/zoom) features - **since v3.0*
 - A different example: [**imGuIZMO.quat** + **virtualGizmo3D** used to manipulate axes](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglGizmo.html)  
@@ -21,7 +26,7 @@ You can run/try **WebGL 2** examples of **imGuIZMO** from following links:
 
 It works only on browsers with **WebGl 2** and *webAssembly* support (FireFox/Opera/Chrome/Edge and Chromium based): test if your browser supports **WebGL2**, here: [WebGL2 Report](http://webglreport.com/?v=2)
 
-****imGuIZMO.quat** was originally developed (and currently used) for my **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)** project: consult the source code for more examples.*
+****imGuIZMO.quat** was originally developed (and currently used) for my [**glChAoS.P**](https://github.com/BrutPitt/glChAoS.P) project: consult the source code for more examples.*
 
 
 
@@ -79,22 +84,6 @@ Finally in your render function (or where you prefer) you can get back the trans
 ```
 now we have modelMatrix with rotation then we can build MV and MVP matrix
 
-### alternately
-
-Maybe can be more elegant to add two helper functions
-```cpp
-// two helper functions, not really necessary (but comfortable)
-    void setRotation(const quat &q) { qRot = q; }
-    quat& getRotation() { return qRot; }
- ```
-And to change the widget call
-
-```cpp
-    quat qt = getRotation();
-    if(ImGui::gizmo3D("##gizmo1", qt /*, size,  mode */)) {  setRotation(qt); }
-```
-but the essence of the code does not change
-
 ### Pan & Dolly - v3.0
 From ver. 3.0 you can use all widgets also to "move" the objects, using Pan (x,y) & Dolly (z):
 ```cpp
@@ -107,7 +96,7 @@ In your **ImGui** window you call/declare a widget...
 ```cpp
     // Call new function available from v.3.0 imGuIZMO.quat
     ImGui::gizmo3D("##gizmo1", PanDolly, qRot /*, size,  mode */);
-    // PanDolly returns/changes (x,y,z) values, depending on Pan/Dolly movements
+    // PanDolly returns/changes (x,y,z) values, depending on Pan(x,y,0)/Dolly(0,0,z) movements
 ```
 In your render function (or where you prefer) you can get back the transformations matrix
 ```cpp
@@ -122,7 +111,7 @@ In your render function (or where you prefer) you can get back the transformatio
 
 ## Widget types
 
-**Axes mode:**
+#### Axes mode:
 ```cpp
     quat qt = getRotation();
 // get/setRotation are helper funcs that you have ideally defined to manage your global/member objs
@@ -135,7 +124,7 @@ In your render function (or where you prefer) you can get back the transformatio
     // Default mode: guiGizmo::mode3Axes|guiGizmo::cubeAtOrigin -> 3 Axes with cube @ origin
 ```
 
-**Directional arrow:**
+#### Directional arrow:
 ```cpp
 // I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify 
 // a light spot toward origin need to change direction
@@ -147,7 +136,7 @@ In your render function (or where you prefer) you can get back the transformatio
 
     // Default arrow color is YELLOW: ImVec4(1.0, 1.0, 0.0, 1.0);
 ```
-**Directional plane:**
+#### Directional plane:
 ```cpp
     static vec3 dir(1.0, 0.0, 0.0);
     if(ImGui::gizmo3D("##Dir1", dir, 100,  imguiGizmo::modeDirPlane)  { }
@@ -156,7 +145,7 @@ In your render function (or where you prefer) you can get back the transformatio
     // Default plane color is: ImVec4(0.0f, 0.5f, 1.0f, STARTING_ALPHA_PLANE);
 ```
 
-**Axes + spot:**
+#### Axes + spot:
 ```cpp
 // I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify 
 // a light spot toward origin need to change direction, it's maintained for uniformity even in spot
@@ -175,7 +164,7 @@ In your render function (or where you prefer) you can get back the transformatio
 
 To each of the functions listed above was added a `vec3` parameter, as second parameter, to get the object movement: **Pan/Dolly**, so the **Axes mode** function becomes:
 
-**Axes mode + Pan/Dolly:**
+#### Axes mode + Pan/Dolly:
 ```cpp
     quat qt = getRotation();
     vec3 pos = getPosition();
@@ -194,7 +183,7 @@ To each of the functions listed above was added a `vec3` parameter, as second pa
 
 
 
-### **Prototypes** 
+#### Prototypes 
 All possible widget calls (rotations only):
 ```cpp
 IMGUI_API bool gizmo3D(const char*, quat&, float=IMGUIZMO_DEF_SIZE, const int=imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
@@ -227,7 +216,7 @@ The widget are also used in **[glChAoS.P](https://github.com/BrutPitt/glChAoS.P)
 **If you want use (also) full-screen manipulator, outside **ImGui** widget, look at [**virtualGizmo3D**](https://github.com/BrutPitt/virtualGizmo3D) (is its feature)... also in attached example, enabling `#define GLAPP_USE_VIRTUALGIZMO` define in `glWindow.cpp` file*
 
 
-**Sizes and colors**
+#### Sizes and colors
 
 To change size and color of one or all widgets, **imGuIZMO.quat** have some [helper funcs](https://github.com/BrutPitt/imGuIZMO.quat/blob/master/imGuIZMO.quat/imGuIZMOquat.h#L115#L145)
 
@@ -245,7 +234,7 @@ Instead to change the color of a single widget:
 ```
 It's like the push/pop mechanism used in **ImGui**, but only that I don't have a stack (for now I don't see the reason): just a single variable where to save the value. The other functions work in the same way.
 
-**Mouse sensitivity** - since v2.2
+**Mouse sensitivity** - *since v2.2*
 
 ```cpp    
     // Call it once, to set all widgets... or if you need it
@@ -254,7 +243,7 @@ It's like the push/pop mechanism used in **ImGui**, but only that I don't have a
     static float getGizmoFeelingRot() { return gizmoFeelingRot; }
 ```
 
-**Pan/Dolly change/set key modifier** - since v3.0
+**Pan/Dolly change/set key modifier** - *since v3.0*
 ```cpp    
 // available vgModifiers values:
 //      evShiftModifier   -> Shift - default for Dolly
@@ -265,7 +254,7 @@ It's like the push/pop mechanism used in **ImGui**, but only that I don't have a
     static void setDollyModifier(vgModifiers v) { panMod = v; }  // Change default assignment for Dolly
 ```
 
-**Pan/Dolly scale** - since v3.0
+**Pan/Dolly scale** - *since v3.0*
 ```cpp    
     // Call it once, to set all widgets... or if you need it
     // default 1.0, >1 more, <1 less
@@ -377,7 +366,7 @@ You can do this simply by commenting / uncommenting a line in `vgConfig.h` or ad
 //------------------------------------------------------------------------------
 //#define VGM_USES_LEFT_HAND_AXES
 ```
-**Since v.2.1**
+#### Since v.2.1
 ```cpp
 // uncomment to avoid vgMath.h add folow line code:
 //      using namespace vgm | glm; // if (!VGIZMO_USES_GLM | VGIZMO_USES_GLM)
@@ -409,7 +398,7 @@ You can do this simply by commenting / uncommenting a line in `vgConfig.h` or ad
 //#define VGM_USES_HLSL_TYPES 
 ```
 
-**Since v.3.0**
+#### Since v.3.0
 ```cpp
 //------------------------------------------------------------------------------
 // imGuiZmo.quat - v3.0 and later - (used only inside it)
@@ -469,7 +458,7 @@ You need to have [**GLFW**](https://www.glfw.org/) (or [**SDL**](https://libsdl.
 
 If want use [**glm**](https://github.com/g-truc/glm), in place of internal [**vgMath**](https://github.com/BrutPitt/vgMath), you need to download it
 
-**CMake**
+#### CMake
 
 Use the following command-line defines to enable different options:  
   - `-DUSE_SDL:BOOL=TRUE` to enable **SDL** framework instead of **GLFW**
@@ -490,7 +479,7 @@ They are located in root example directory, or examine their content to pass app
 
 **To build with [**EMSCRIPTEN**](https://kripken.github.io/emscripten-site/index.html), obviously you need to have installed EMSCRIPTEN SDK on your computer (1.38.10 or higher)*
 
-**Emscripten in Windows**
+#### Emscripten in Windows
 
 To build the **EMSCRIPTEN** version, in Windows, with CMake, need to have **mingw32-make.exe** in your computer and search PATH (only the make utility is enough): it is a condition of EMSDK tool to build with CMake in Windows.
 

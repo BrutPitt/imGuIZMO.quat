@@ -3,7 +3,7 @@ These *easy* examples was written using `vulkan.hpp` / vulkan-hpp
 
 
 
-They are similar to OpenGL examples and to [vGizmo3D v3.1 WebGL2 - easy_cube example](https://brutpitt.github.io/myRepos/vGizmo3D/wglCubeExamples.html)
+They is similar to OpenGL examples [glCube_07 v4.0 WebGL2 - easy_cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglCubeExample.html)
 
 <p>&nbsp;<br></p>
 In the OpenGL version of the examples, it was opted to separate the GLFW and SDL versions in distinct files.
@@ -59,5 +59,8 @@ Then execute CMake depending on your setting (devel packages installed):
 - `cmake -G "Unix Makefiles"" ..` ==> to build with **make** and GLFW framework
 - `cmake -DUSE_SDL3=ON -G Ninja ..` ==> to build with **ninja** and SDL3 framework
 
-Now type
-`ninja` or `make -j` or run the building system chosed.
+And now type
+`ninja` or `make -j` or run the *building system* chosed to build examples
+
+
+**currently tested in Linux, but it should also work in Windows and/or MacOS... it will be tested soon on both
