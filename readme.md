@@ -1,8 +1,8 @@
 # imGuIZMO.quat &nbsp;v4.0 WiP
 
 ### v4.0 Work in Progress
-**Currently I maintain both v3.0 in `ImGuUIZMO.quat` folder and new v4.0 WiP `imguizmo_quat`*
-**New** [**easy_examples**](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) (Vulkan and OpenGL) refer to the latter: soon a beta will be released and everything will be adequate to v4.0
+**Currently are maintained both v3.0 in `ImGuUIZMO.quat` folder and the new v4.0 WiP `imguizmo_quat`*
+The **NEW** [**easy_examples**](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) (Vulkan and OpenGL) added refer to the latter: soon a beta will be released and everything will be adequate to v4.0
 
 <p align="right"> <span style="position:relative; top:-10px;"> <i> also  &nbsp; </i> </span> <a href="https://github.com/RenderKit/ospray-studio/tree/master/external/imGuIZMO.quat" target="_blank"><img width="200" height="40" src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/studio.png"/></a> &nbsp; <span style="position:relative; top:-10px;"> <i> uses <b> imGuIZMO.quat</b></i></span></p> 
 

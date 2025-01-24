@@ -1,11 +1,14 @@
-# vGizmo3D Vulkan easy examples
-These *easy* examples was written using `vulkan.hpp` / vulkan-hpp      
+# ImGuIZMO_quat Vulkan easy examples
+These *easy* examples was written using `vulkan.hpp` / vulkan-hpp 
 
+<p align="center"><a href="https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglCubeExample.html"> 
+<img width="640" height="400" src="https://brutpitt.github.io/myRepos/imGuIZMO/screenshots/cube_ex.png"></a>
+</p>
 
-
+These "step by step" examples guide in the use of the various widgets and and how to use the transformations obtained to build an MVP matrix.
 They is similar to OpenGL examples [glCube_07 v4.0 WebGL2 - easy_cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglCubeExample.html)
 
-<p>&nbsp;<br></p>
+
 In the OpenGL version of the examples, it was opted to separate the GLFW and SDL versions in distinct files.
 
 If you are starting to become familiar with widgets I recommend starting from the OpenGL examples: they are more linear and differentiated (SDL/GLFW), and using Vulkan examples to view the interaction with this graphical backend
