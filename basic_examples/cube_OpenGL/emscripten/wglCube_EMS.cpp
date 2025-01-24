@@ -383,6 +383,7 @@ void mainLoop()
 
     // vGizmo3D: check changing button state to activate/deactivate drag movements (pressing together left/right activate/deactivate both)
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    if(!ImGui::GetIO().WantCaptureMouse) {
         static int leftPress = 0, rightPress = 0, middlePress = 0;
         double x, y;
         glfwGetCursorPos(glfwWindow, &x, &y);
@@ -406,6 +407,7 @@ void mainLoop()
     // vGizmo3D: if "drag" active update internal rotations (primary and secondary)
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         track.motion(x,y);
+    }
 
     // vGizmo3D: call it every rendering loop if you want a continue rotation until you do not click on screen
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -413,7 +415,7 @@ void mainLoop()
                         // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                         // It can be stopped by click on screen (without mouse movement)
 
-        track.idleSecondary(); // set continuous rotation on Idle for secondary rot
+        track.idleSecondary(); // set continuous rotation on Idle also for secondary rot
 
 
     // ImGUI: prepare new frame

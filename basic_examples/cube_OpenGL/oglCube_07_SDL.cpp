@@ -349,6 +349,7 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
         track.idle();   // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movements
                         // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                         // It can be stopped by click on screen (without mouse movement)
+        track.idleSecondary(); // set continuous rotation on Idle also for secondary rot
 
     // ImGUI: prepare new frame
         ImGui_ImplOpenGL3_NewFrame();

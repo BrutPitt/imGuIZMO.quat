@@ -15,17 +15,18 @@ They cover both GLFW and SDL2 frameworks in distinct/separate files.
 
 `CMakeLists.txt` file is provided to build the examples
 
-From command (where is `CMakeLists.txt`) line type:
+From command line (where is `CMakeLists.txt`)  type:
 - `mkdir build` ==> create a directory where to build
 - `cd build` ==> go to in it   
 
-Then execute CMake depending on your setting (devel packages installed):
+Then execute CMake depending on your settings (devel packages installed).
+For example, use:
 - `cmake -G Ninja ..` ==> to build with **ninja** and GLFW framework
 - `cmake -G "Unix Makefiles"" ..` ==> to build with **make** and GLFW framework
 - `cmake -DUSE_SDL3=ON -G Ninja ..` ==> to build with **ninja** and SDL3 framework
 
-And now type
-`ninja` or `make -j` or run the *building system* chosed to build examples
+And now run the command:
+`ninja` or `make -j` or the *building system* chosed to build examples
 
-
-**currently tested in Linux, but it should also work in Windows and/or MacOS... it will be tested soon on both
+**obviously is necessary to have GLFW | SDL2 (devel package) installed: one is enaugh*
+**currently tested in Linux, but it should also work in Windows and/or MacOS... it will be tested soon on both*

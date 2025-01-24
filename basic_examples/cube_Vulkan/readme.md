@@ -32,38 +32,39 @@ But all (almost) was relegated in the `run()` function of `vkApp class`, of `vkC
 
 ### Different representation of the 3D space
 Despite a different representation of the 3D space between Vulkan and OpenGL/Webgl, there are no changes in the use of imgiuzmo_quat / ImGuIZMO.quat or vGizmo3D.
-This not also thanks to frameworks (ImGui) that report same mouse coords on widget ([0,0] is in top-left corner) always, but mainly thanks to the choice to select a "clip matrix space" consonant to my needs.
+This not also thanks to ImGui that report same mouse coords on widget ([0,0] is in top-left corner), but mainly thanks to the choice to select a "clip matrix" consonant to my needs to build MVP Matrix.
 
-Changing the representation of the model is necessary to choose a different Projection Matrix for Vulkan to maintain (respect OpenGL/WebGL).
-If you have difficulty I invite to read: [Setting Up a Proper Projection Matrix for Vulkan](https://johannesugb.github.io/gpu-programming/setting-up-a-proper-vulkan-projection-matrix/) 
+In `vkCube_*` examples I have used a *clip-Matrix* with (only) `Y` inverted and "half" `Z`.
 
+If you have difficulty to understand my transforms, I invite to read: [Setting Up a Proper Projection Matrix for Vulkan](https://johannesugb.github.io/gpu-programming/setting-up-a-proper-vulkan-projection-matrix/) (not same, but very similar)
+Are also mentioned other tecniques to maintain compatibility on grahical backends (OpenGL/Vulkan)
 
-In `vkCube` example I have used a *clip-Matrix*, just a bit different from previous link, and with (only) `Y` inverted and "half" `Z`.
-
-This permit me to have a rappresentation of 3D space similar to "Cartesian" rappresentation, and no invert the rotation (on some axie) of the wigets/trackball (imguizmo_quat / vGizmo3D).
+Using the *clip-Matrix* have allowed me to have a rapresentation of 3D space similar to "Cartesian" 3D space (also in Vulkan), and no reversing the rotation (on some axes) of the wigets/trackball (imguizmo_quat / vGizmo3D).
 But, since everyone can do what they want with their own "model" in the ImGuIZMO.quat v4.0 I added the possibility:
-- To invert rotations: X/Y rotation, X/Y Pan & Dolly (code setting or defaults: via `imguizmo_config.h` or compile defines)
-- To invert (versus/direction) the widget axes, grafically, to adapt to your 3D space
+- To reverse: X/Y rotation, X/Y Pan & Dolly movements (code setting or defaults: via `imguizmo_config.h` or compile defines)
+- To reverse (toward/direction) the widget axes, grafically, to adapt to your 3D space
 
 In the examples I added some other models of 3d space "transformation":
-Full inversion `-Y` and `-Z`, or "untouched" Vulkan model: in the end of `vkCube` have added this possibility (un-comment what you prefer)
+e.g. full inversion `-Y` and `-Z` axes, or "untouched" Vulkan space (Y grows down, and Z forward).
+In the end of `vkCube.h` you can find these possibility (un-comment what you prefer)
 
 
 ### Build examples
 
 `CMakeLists.txt` file is provided to build the examples
 
-From command (where is `CMakeLists.txt`) line type:
+From command line (where is `CMakeLists.txt`) type:
 - `mkdir build` ==> create a directory where to build
 - `cd build` ==> go to in it   
 
-Then execute CMake depending on your setting (devel packages installed):
+Then execute CMake depending on your settings (devel packages installed).
+For example, use:
 - `cmake -G Ninja ..` ==> to build with **ninja** and GLFW framework
 - `cmake -G "Unix Makefiles"" ..` ==> to build with **make** and GLFW framework
 - `cmake -DUSE_SDL3=ON -G Ninja ..` ==> to build with **ninja** and SDL3 framework
 
-And now type
+And now run the command:
 `ninja` or `make -j` or run the *building system* chosed to build examples
 
-
-**currently tested in Linux, but it should also work in Windows and/or MacOS... it will be tested soon on both
+**obviously is necessary to have GLFW | SDL2 | SDL3 (devel package) installed: one is enaugh*
+**currently tested in Linux, but it should also work in Windows and/or MacOS... it will be tested soon on both*
