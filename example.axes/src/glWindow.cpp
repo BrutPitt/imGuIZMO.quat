@@ -80,7 +80,7 @@ void glWindow::onInit()
 #endif
 
     axes = new oglAxes(true);
-    axes->setBackgroundColor(vec4(.25f));
+    axes->setBackgroundColor(vec4(.20f));
     axes->initShaders(vtxDefs, fragDefs);
     axes->cubeMgnitude(10);
 

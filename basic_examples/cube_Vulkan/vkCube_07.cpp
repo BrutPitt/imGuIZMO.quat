@@ -346,9 +346,14 @@ void vkApp::setScene()
     // Now scale cube to better view light position
     cubeObj = mat4(1); // nothing to do ... scale( vec3(.5));
 
+    mat4 clipMatrixA = mat4(1.0f,  0.0f, 0.0f, 0.0f,
+                            0.0f, -1.0f, 0.0f, 0.0f,
+                            0.0f,  0.0f,-1.0f, 0.0f,
+                            0.0f,  0.0f, 0.0f, 1.0f );  // vulkan clip space: -y & -z
+
 /// imGuIZMO / vGizmo3D
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //track.setRotation(quat(1,0,0,0));                     // vGizmo3D with NO initial rotation (default initialization)
+    vgTrackball.setRotation(quat(1,0,0,0));                     // vGizmo3D with NO initial rotation (default initialization)
     //track.setRotation(eulerAngleXYZ(vec3(radians(45),
     //                                     radians( 0),
     //                                     radians( 0))));  // vGizmo3D with rotation of 45 degrees on X axis
@@ -418,7 +423,7 @@ void vkApp::run()
 
     // imGuIZMO: set mouse feeling and key mods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    imguiGizmo::setGizmoFeelingRot(1.5f);          // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
+    imguiGizmo::setGizmoFeelingRot(.75f);          // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
     imguiGizmo::setPanScale(.5f);                  // default 1.0, >1 more, <1 less
     imguiGizmo::setDollyScale(.5f);                // default 1.0, >1 more, <1 less
     imguiGizmo::setDollyWheelScale(.5f);           // default 1.0, > more, < less ... (from v3.1 separate values)
@@ -540,11 +545,20 @@ void vkApp::onInit()        // called from constructor @ startup
     uboSceneMat.update();
     updateDescriptorsSets(uboSceneMat.uniformBuffer, uboSceneMat.bufferSize);
 
+
     // If you need to flip "mouse movements"
     // you can set they in the code or set as default values in vGizmo3D_config.h
+    // the values below are used only in Vulkan native space: look in the end of vkCube.h
+
     APP_FLIP_ROT_X
+    APP_FLIP_ROT_Y
+    APP_FLIP_ROT_Z
+    APP_FLIP_PAN_X
     APP_FLIP_PAN_Y
+    APP_FLIP_ROT_X
     APP_FLIP_DOLLY
+
+    APP_REVERSE_AXES
 }
 
 void vkApp::onExit()        // called from destructor @ exit

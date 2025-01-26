@@ -131,7 +131,7 @@ static void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int actio
 
 
 
-void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+static void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {   
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
     if(ImGui::GetIO().WantCaptureMouse)  return;

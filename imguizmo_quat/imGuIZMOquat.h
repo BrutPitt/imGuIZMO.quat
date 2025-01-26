@@ -36,17 +36,6 @@
     #include INC_PATH(imgui_internal.h)
 #endif
 
-#ifndef IMGUIZMO_VMOD_AXIS_X
-    #define IMGUIZMO_VMOD_AXIS_X
-#endif
-#ifndef IMGUIZMO_VMOD_AXIS_Y
-    #define IMGUIZMO_VMOD_AXIS_Y
-#endif
-#ifndef IMGUIZMO_VMOD_AXIS_Z
-    #define IMGUIZMO_VMOD_AXIS_Z
-#endif
-
-
 #define IMGUI_DEFINE_MATH_OPERATORS
 
 //--------------------------------------------------------------------------
@@ -88,30 +77,13 @@
 // The data structure that holds the orientation among other things
 struct imguiGizmo
 {
-    imguiGizmo() {
-        #if defined(IMGUIZMO_FLIP_ROT_X)
-            isFlipRotX = true;
-        #endif
-        #if defined(IMGUIZMO_FLIP_ROT_Y)
-            isFlipRotY = true;
-        #endif
-        #if defined(IMGUIZMO_FLIP_PAN_X)
-            isFlipPanX = true;
-        #endif
-        #if defined(IMGUIZMO_FLIP_PAN_Y)
-            isFlipPanY = true;
-        #endif
-        #if defined(IMGUIZMO_FLIP_DOLLY)
-            isFlipDolly = true;
-        #endif
-    }
     quat qtV  = quat(1.0f, vec3(0.0f)); // Quaternion value
     quat qtV2 = quat(1.0f, vec3(0.0f)); // Quaternion value
 #ifndef IMGUIZMO_USE_ONLY_ROT
     vec3 posPanDolly = vec3(0.f);
     vgButtons buttonPanDolly = vg::evLeftButton;
 #endif
-    vec3 viewVecModifier{ IMGUIZMO_VMOD_AXIS_X 1, IMGUIZMO_VMOD_AXIS_Y 1, IMGUIZMO_VMOD_AXIS_Z 1 };
+    vec3 axesVecModifier{ reverseAxisX, reverseAxisY, reverseAxisZ };
 
     enum      {                              //0b0000'0000, //C++14 notation
                 mode3Axes          = 0x0001, //0b0000'0001,
@@ -238,13 +210,15 @@ struct imguiGizmo
     static float getPanScale() { return panScale; }
 #endif
 
-/// flipX mouse coord
+/// flipX X coord
 ///@param[in] b bool
-    static void setFlipRotX(bool b) { isFlipRotX = b; }
-/// flipY mouse coord
+    static void flipRotOnX(bool b = true) { rotOnX = b; }
+/// flipY Y coord
 ///@param[in] b bool
-    static void setFlipRotY(bool b) { isFlipRotY = b; }
-/// flipZ mouse coord
+    static void flipRotOnY(bool b = true) { rotOnY = b; }
+/// flipY Z coord
+///@param[in] b bool
+    static void flipRotOnZ(bool b = true) { rotOnZ = b; }
 ///@param[in] b bool
     static void setFlipDolly(bool b) { isFlipDolly = b; }
 /// flipZ mouse coord
@@ -256,10 +230,13 @@ struct imguiGizmo
 
 /// get flip Rot X status
 /// @retval bool : current flip Rot X status
-    static bool getFlipRotX() { return isFlipRotX; }
+    static bool getFlipRotOnX() { return rotOnX; }
 /// get flip Rot Y status
 /// @retval bool : current flip Rot Y status
-    static bool getFlipRotY() { return isFlipRotY; }
+    static bool getFlipRotOnY() { return rotOnY; }
+/// get flip Rot Y status
+/// @retval bool : current flip Rot Y status
+    static bool getFlipRotOnZ() { return rotOnZ; }
 /// get flip Pan X status
 /// @retval bool : current flip Pan X status
     static bool getFlipPanX() { return isFlipPanX; }
@@ -269,6 +246,19 @@ struct imguiGizmo
 /// get flipZ mouse status
 /// @retval bool : current flipZ status
     static bool getFlipDolly() { return isFlipDolly; }
+
+/// flipX X coord
+///@param[in] b bool
+    static void reverseX(bool b = true) { reverseAxisX = b ? -1.f : 1.f; }
+    static void reverseY(bool b = true) { reverseAxisY = b ? -1.f : 1.f; }
+    static void reverseZ(bool b = true) { reverseAxisZ = b ? -1.f : 1.f; }
+
+/// get flip Rot X status
+/// @retval bool : current flip Rot X status
+    static bool getReverseX() { return reverseAxisX < 0; }
+    static bool getReverseY() { return reverseAxisY < 0; }
+    static bool getReverseZ() { return reverseAxisZ < 0; }
+
 
     //  internals
     //--------------------------------------------------------------------------
@@ -288,9 +278,10 @@ struct imguiGizmo
 
     // vec3 -> quat -> trackbalTransforms -> quat -> vec3
     //--------------------------------------------------------------------------
-    bool getTransforms(quat& q, const char* label, vec3& dir, float size) {
-        float len = length(dir);
+    bool getTransforms(quat& q, const char* label, vec3& vDir, float size) {
+        vec3 dir { checkTowards(vDir) } ;
 
+        float len = length(dir);
         if(len<1.0 && len>= FLT_EPSILON) { normalize(dir); len = 1.0; }
         else if(len< FLT_EPSILON) { dir = vec3(1.f, 0.f, 0.f); len = 1.0; }
 
@@ -303,20 +294,23 @@ struct imguiGizmo
         bool ret = drawFunc(label, size);
         if (ret) dir = (q * vec3(-1.0f, 0.0f, 0.0f)) * len ; //return vector with original lenght
 #endif
-
-
+        vDir = checkTowards(dir);
         return ret;
     }
     // Vec4 (xyz axis, w angle) -> quat -> trackbalTransforms -> quat -> vec4
     //--------------------------------------------------------------------------
     bool getTransforms(quat& q, const char* label, vec4& axis_angle, float size) {
-        q = angleAxis(axis_angle.w,normalize(vec3(axis_angle))); //g.ConvertFromAxisAngle();
+        q = angleAxis(axis_angle.w,normalize(checkTowards(vec3(axis_angle)))); //g.ConvertFromAxisAngle();
    
         bool ret = drawFunc(label, size);
-        if (ret) axis_angle = vec4(normalize(axis(q)),angle(normalize(q)));
+        if (ret) axis_angle = vec4(normalize(checkTowards(axis(q))),angle(normalize(q)));
 
         return ret; 
     }
+
+    vec3 checkTowards(const vec3 &v) { return axesVecModifier * v; }
+    vec4 checkTowards(const vec4 &v) { return { axesVecModifier.x * v.x, axesVecModifier.y * v.y, axesVecModifier.z * v.z, v.w }; }
+    quat checkTowards(const quat &q) { return { q.w, axesVecModifier.x * q.x, axesVecModifier.y * q.y, axesVecModifier.z * q.z }; }
 
     //
     //  Settings
@@ -409,8 +403,9 @@ struct imguiGizmo
 
     // Flipping mouse control
     //-------------------------------------
-    static bool isFlipRotX , isFlipRotY;
-    static bool isFlipPanX , isFlipPanY, isFlipDolly;
+    static bool rotOnX, rotOnY, rotOnZ;
+    static bool isFlipPanX, isFlipPanY, isFlipDolly;
+    static float reverseAxisX, reverseAxisY, reverseAxisZ;
 
 
     static const int imguiGizmoDefaultSize;

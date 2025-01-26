@@ -51,18 +51,18 @@ set(SOURCE_FILES
     ${SRC}/ui/uiMainDlg.h
     ${SRC}/ui/uiMainDlg.cpp
     ${SRC}/ui/uiSettings.cpp
-    ${SRC}/tools/glslProgramObject.cpp
-    ${SRC}/tools/glslShaderObject.cpp
-    ${SRC}/tools/glslProgramObject.h
-    ${SRC}/tools/glslShaderObject.h
+    ${SRC}/tools.old/glslProgramObject.cpp
+    ${SRC}/tools.old/glslShaderObject.cpp
+    ${SRC}/tools.old/glslProgramObject.h
+    ${SRC}/tools.old/glslShaderObject.h
     ${SRC}/tools/imGuIZMOquat.cpp
     ${SRC}/tools/imGuIZMOquat.h
     ${SRC}/tools/vgMath.h
     ${SRC}/tools/vgConfig.h
     ${SRC}/tools/vGizmo.h
-    ${SRC}/tools/transforms.h
-    ${SRC}/tools/oglAxes.cpp
-    ${SRC}/tools/oglAxes.h
+    ${SRC}/tools.old/transforms.h
+    ${SRC}/tools.old/oglAxes.cpp
+    ${SRC}/tools.old/oglAxes.h
     ${SRC}/libs/${IMGUI_DIR}/imconfig.h
     ${SRC}/libs/${IMGUI_DIR}/imgui.h
     ${SRC}/libs/${IMGUI_DIR}/imgui.cpp

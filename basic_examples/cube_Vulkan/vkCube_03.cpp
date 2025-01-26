@@ -388,7 +388,7 @@ void vkApp::run()
 
     // imGuIZMO: set mouse feeling and key mods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    imguiGizmo::setGizmoFeelingRot(1.5f);          // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
+    imguiGizmo::setGizmoFeelingRot(.75f);          // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
     imguiGizmo::setPanScale(.5f);                  // default 1.0, >1 more, <1 less
     imguiGizmo::setDollyScale(.5f);                // default 1.0, >1 more, <1 less
     imguiGizmo::setDollyWheelScale(.5f);           // default 1.0, > more, < less ... (from v3.1 separate values)
@@ -535,8 +535,14 @@ void vkApp::onInit()        // called from constructor @ startup
     // If you need to flip "mouse movements"
     // you can set they in the code or set as default values in vGizmo3D_config.h
     APP_FLIP_ROT_X
+    APP_FLIP_ROT_Y
+    APP_FLIP_ROT_Z
+    APP_FLIP_PAN_X
     APP_FLIP_PAN_Y
-    APP_FLIP_DOLLY
+    APP_FLIP_ROT_X
+APP_FLIP_DOLLY
+
+    APP_REVERSE_AXES
 }
 
 void vkApp::onExit()        // called from destructor @ exit

@@ -57,8 +57,9 @@
 //    bool getFlipDolly() { return isFlipDolly; }
 //
 //------------------------------------------------------------------------------
-//#define VGIZMO3D_FLIP_ROT_X
-#define VGIZMO3D_FLIP_ROT_Y
+#define VGIZMO3D_FLIP_ROT_ON_X
+//#define VGIZMO3D_FLIP_ROT_ON_Y
+//#define VGIZMO3D_FLIP_ROT_ON_Z
 //#define VGIZMO3D_FLIP_PAN_X
 #define VGIZMO3D_FLIP_PAN_Y
 //#define VGIZMO3D_FLIP_DOLLY

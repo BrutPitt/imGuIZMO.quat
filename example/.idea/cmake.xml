@@ -2,7 +2,7 @@
 <project version="4">
   <component name="CMakeSharedSettings">
     <configurations>
-      <configuration PROFILE_NAME="MinSizeRel-EMS" ENABLED="true" CONFIG_NAME="MinSizeRel" TOOLCHAIN_NAME="EMS" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE:STRING=${EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DBUILD_EMSCRIPTEN:BOOL=TRUE -DUSE_VIRTUALGIZMO:BOOL=FALSE -G Ninja" />
+      <configuration PROFILE_NAME="MinSizeRel-EMS" ENABLED="true" GENERATION_DIR="/RamDisk/wgl_qjSet/ems" CONFIG_NAME="MinSizeRel" TOOLCHAIN_NAME="EMS" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE:STRING=${EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DBUILD_EMSCRIPTEN:BOOL=TRUE -DUSE_VIRTUALGIZMO:BOOL=TRUE -G Ninja" />
     </configurations>
   </component>
 </project>

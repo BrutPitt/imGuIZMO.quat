@@ -313,7 +313,7 @@ void initVGizmo3D()     // Settings to control vGizmo3D
     // track.setGizmoFeeling(1.0);              // 1.0 default,  > 1.0 more sensible, < 1.0 less sensible
 
     // setIdleRotSpeed(1.0)                     // If used Idle() feature (continue rotation on Idle) it set that speed: more speed > 1.0 ,  less < 1.0
-        track.setWheelScale(20);
+        track.setWheelScale(1);
 
     // other settings if you need it
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

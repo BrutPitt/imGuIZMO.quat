@@ -13,21 +13,21 @@ In the OpenGL version of the examples, it was opted to separate the GLFW and SDL
 
 If you are starting to become familiar with widgets I recommend starting from the OpenGL examples: they are more linear and differentiated (SDL/GLFW), and using Vulkan examples to view the interaction with this graphical backend
 
-In Vulkan, given the greater complexity of the graphical interface and the integration of the framwork with the creation of the Vulkan surface, there any example have CMake compiler options for GLFW / SDL2 / SDL3.
+In Vulkan, given the greater complexity of the graphical interface and the integration of the framwork with the creation of the Vulkan surface and any example have CMake build options for GLFW / SDL2 / SDL3.
 - GLFW is the DEFAULT option
 - `cmake -DUSE_SDL2=ON` builds for SDL2
 - `cmake -DUSE_SDL3=ON` builds for SDL3
 *obviously is necessary to have GLFW | SDL2 | SDL3 (devel package) installed: one is enaugh*
 
-They were encapsulated in a `framwork` base class and its subclasses (files `framework.cpp` and `framework.h`): it manages mouse and other framework events, and also **ImGui** specific interaction, in a univocal way.
-This permits more linearity in reading the code (of "main render loop/function") and the differences are commented.
+They were encapsulated in a `framwork` base class (and its subclasses: files `framework.cpp` and `framework.h`): these classes manage mouse and other framework events, and also **ImGui** specific framwork interaction in a univocal way.
+This permits more linearity in reading the code (in "main render loop/function") and the differences are commented.
 
 The `vkCube` code is divided into (main) 2 parts:
 - `vkAppBase class` the bulk of Vulkan initialization 
 - `vkApp class` draw and manipulate scene objects (and initialization of ImGui)
 
-But all (almost) was relegated in the `run()` function of `vkApp class`, of `vkCube_*.cpp` files. 
-(look also `setScene()`)
+All widgets and 3D manipulation code (or almost) was relegated in the [`run()`](https://github.com/BrutPitt/imGuIZMO.quat/blob/24799735456308e298f07474eab2eea90d4941ca/basic_examples/cube_Vulkan/vkCube_06.cpp#L404) function (of `vkApp class`, of `vkCube_*.cpp` files). 
+(look also [`setScene()`](https://github.com/BrutPitt/imGuIZMO.quat/blob/24799735456308e298f07474eab2eea90d4941ca/basic_examples/cube_Vulkan/vkCube_06.cpp#L332) )
 
 
 ### Different representation of the 3D space

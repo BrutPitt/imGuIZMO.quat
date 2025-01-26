@@ -351,9 +351,8 @@ private:
                               // And it's necessary if you want use also direct-screen manipulator
 };
 
-
 //////////////////////////////////////////////////////////////////////
-// Possible 3D (clipped) spaces ==> Use ONLY ONE of the following
+// Possible 3D (clip-Matrix) spaces ==> Use ONLY ONE of the following
 
 #define APP_HAS_NEG_Y
 #if defined(APP_HAS_NEG_Y)
@@ -375,8 +374,13 @@ private:
 
     // No rotation changes
     #define APP_FLIP_ROT_X
+    #define APP_FLIP_ROT_Y
+    #define APP_FLIP_ROT_Z
+    #define APP_FLIP_PAN_X
+    #define APP_FLIP_ROT_Y
     #define APP_FLIP_PAN_Y
     #define APP_FLIP_DOLLY
+    #define APP_REVERSE_AXES
 #endif
 
 //#define APP_HAS_NEG_YZ
@@ -384,23 +388,27 @@ private:
     mat4 clipMatrix = mat4(1.0f,  0.0f, 0.0f, 0.0f,
                            0.0f, -1.0f, 0.0f, 0.0f,
                            0.0f,  0.0f,-1.0f, 0.0f,
-                           0.0f,  0.0f, 0.0f, 1.0f );  // vulkan clip space: -y & -z
+                           0.0f,  0.0f, 1.0f, 1.0f );  // vulkan clip space: -y & -z
 
-    #define PERSPECTIVE perspectiveLH_ZO // RightHanded space and Z-Buffer [0,1] ==> default "prespective" (both GLM/vgMath) is set to perspectiveRH_NO
-    #define LOOK_AT     lookAtRH            // default "looAt" (both GLM/vgMath) is set to lookAtRH ==> !!! you can change ALL defaults in vgMath_config or in GLM (if use it) !!!
+    #define PERSPECTIVE perspectiveRH_ZO // RightHanded space and Z-Buffer [0,1] ==> default "prespective" (both GLM/vgMath) is set to perspectiveRH_NO
+    #define LOOK_AT     lookAt             // default "looAt" (both GLM/vgMath) is set to lookAtRH ==> !!! you can change ALL defaults in vgMath_config or in GLM (if use it) !!!
     // the defautl values can be changed vgMath_config (vgMath) or in GLM (if use it) !!!
 
     // -Z set depthBufferCompareOp = vk::CompareOp::eGreaterOrEqual and depthBufferClearValue = 0.0
-    vk::CompareOp depthBufferCompareOp = vk::CompareOp::eLessOrEqual;    // of vk::PipelineDepthStencilStateCreateInfo
-    const float depthBufferClearValue  = 1.0;                               // "depth" value of vk::ClearDepthStencilValue
+    vk::CompareOp depthBufferCompareOp = vk::CompareOp::eGreaterOrEqual;    // of vk::PipelineDepthStencilStateCreateInfo
+    const float depthBufferClearValue  = 0.0;                               // "depth" value of vk::ClearDepthStencilValue
 
     auto vertCode = vk_vertex_instanced;
     auto fragCode = fragment_code;
 
     // No rotation changes
     #define APP_FLIP_ROT_X
+    #define APP_FLIP_ROT_Y
+    #define APP_FLIP_ROT_Z
+    #define APP_FLIP_PAN_X
     #define APP_FLIP_PAN_Y
     #define APP_FLIP_DOLLY
+    #define APP_REVERSE_AXES
 #endif
 
     ///////////////////////////////////
@@ -410,7 +418,7 @@ private:
     mat4 clipMatrix = mat4(1.0f,  0.0f, 0.0f, 0.0f,
                            0.0f, -1.0f, 0.0f, 0.0f,
                            0.0f,  0.0f,-1.0f, 0.0f,
-                           0.0f,  0.0f,  .0f, 1.0f );  // vulkan clip space: -y & -z
+                           0.0f,  0.0f, 1.0f, 1.0f );  // vulkan clip space: -y & -z
 
     #define PERSPECTIVE perspectiveRH_ZO // RightHanded space and Z-Buffer [0,1] ==> default "prespective" (both GLM/vgMath) is set to perspectiveRH_NO
     #define LOOK_AT     lookAt           // default "looAt" (both GLM/vgMath) is set to lookAtRH ==> !!! you can change ALL defaults in vgMath_config or in GLM (if use it) !!!
@@ -427,16 +435,20 @@ private:
 
     // No rotation changes
     #define APP_FLIP_ROT_X
+    #define APP_FLIP_ROT_Y
+    #define APP_FLIP_ROT_Z
+    #define APP_FLIP_PAN_X
     #define APP_FLIP_PAN_Y
     #define APP_FLIP_DOLLY
+    #define APP_REVERSE_AXES
 #endif
-
 
     //////////////////////////////////////////////////////////////////////
     // A possible vulkan "untouched" 3D space ==> with identity clipMatrix (therefore no changes)
     // lightPosition is always: vec3(2, 2.5, 3) ... but:
     // The "cube light spot" is DOWN respect MainCube centered in (0,0,0) ==> Y grows down
     // It's also behind the MainCube ==> Z grows forward
+    // reversing Y axis change also the "apparent" rotation (toward from POV)
 
 //#define APP_VULKAN_NATIVE
 #if defined(APP_VULKAN_NATIVE)
@@ -451,11 +463,34 @@ private:
     #define LOOK_AT     lookAtLH         // LeftHanded space ==> default "looAt" is set to lookAtRH ==> !!! you can change defaults in vGizmo3D_config !!!
     // the defautl values can be changed in vgConfig.h
 
-    // Is necessary override some rotation:
-    // you can set it (or your personal) in the code or set as default in vGizmo3D_config.h
-    #define APP_FLIP_ROT_X vgTrackball.setFlipRotX(!vgTrackball.getFlipRotX());
-    #define APP_FLIP_PAN_Y vgTrackball.setFlipPanY(!vgTrackball.getFlipPanY());
-    #define APP_FLIP_DOLLY vgTrackball.setFlipDolly(!vgTrackball.getFlipDolly());
+
+    // Default if ImGuIZMO looks like Cartesian axes:
+    //      X grows towards right
+    //      Y grows towards up
+    //      Z grows towards near (from monitor to you)
+    // If is not used a clip-matrix is necessary change also the visula representation
+    #define APP_REVERSE_AXES imguiGizmo::reverseY(!imguiGizmo::getReverseY());\
+                             imguiGizmo::reverseZ(!imguiGizmo::getReverseZ());
+
+    // And is also necessary override some rotation:
+    // reversing Y axis change also the "apparent" rotation (toward from POV)
+    // and obviously also the all the Y drag: also Dolly (in/out) is influenced from mouse Y (up/douw)
+
+    // ALL these settings can be made in the code or (una tantum) set as default in imguizmo_config.h and/or vGizmo3D_config.h (if use it)
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    #define APP_FLIP_ROT_X //imguiGizmo::flipRotOnY(!imguiGizmo::getFlipRotOnY());\
+                             vgTrackball.flipRotOnY(!vgTrackball.getFlipRotOnY());
+    #define APP_FLIP_ROT_Y vgTrackball.flipRotOnY(!vgTrackball.getFlipRotOnY());\
+                            //imguiGizmo::flipRotOnY(!imguiGizmo::getFlipRotOnY());
+    #define APP_FLIP_ROT_Z vgTrackball.flipRotOnZ(!vgTrackball.getFlipRotOnZ());\
+                            //imguiGizmo::flipRotOnZ(!imguiGizmo::getFlipRotOnZ());
+    #define APP_FLIP_PAN_X //imguiGizmo::setFlipPanY(!imguiGizmo::getFlipPanY());\
+                           vgTrackball.setFlipPanY(!vgTrackball.getFlipPanY());
+    #define APP_FLIP_PAN_Y imguiGizmo::setFlipPanY(!imguiGizmo::getFlipPanY());\
+                           vgTrackball.setFlipPanY(!vgTrackball.getFlipPanY());
+    #define APP_FLIP_DOLLY imguiGizmo::setFlipDolly(!imguiGizmo::getFlipDolly());\
+                           vgTrackball.setFlipDolly(!vgTrackball.getFlipDolly());
 
     auto vertCode = vk_vertex_instanced;
     auto fragCode = fragment_code;

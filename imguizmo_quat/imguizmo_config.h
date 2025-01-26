@@ -108,20 +108,19 @@
 //------------------------------------------------------------------------------
 // v3.1 and later
 //
-// Show a different representation of one or more axes (only VISUAL representation)
+// Show a different representation of one or more axes
 //
-//  IMGUIZMO_VMOD_AXIS_X +  ==> X grows from left  to right
-//  IMGUIZMO_VMOD_AXIS_X -  ==> X grows from right to left
-//  IMGUIZMO_VMOD_AXIS_Y +  ==> Y grows from down  to up
-//  IMGUIZMO_VMOD_AXIS_Y -  ==> Y grows from up    to down
-//  IMGUIZMO_VMOD_AXIS_Z +  ==> Z grows from far   to near  
-//  IMGUIZMO_VMOD_AXIS_Z -  ==> Z grows from near  to far
+//     defined IMGUIZMO_REVERSE_AXIS_X ==> X grows from left  to right
+//  un-defined IMGUIZMO_REVERSE_AXIS_X ==> X grows from right to left
+//     defined IMGUIZMO_REVERSE_AXIS_Y ==> Y grows from down  to up
+//  un-defined IMGUIZMO_REVERSE_AXIS_Y ==> Y grows from up    to down
+//     defined IMGUIZMO_REVERSE_AXIS_Z ==> Z grows from far   to near
+//  un-defined IMGUIZMO_REVERSE_AXIS_Z ==> Z grows from near  to far
 //
-//  Now you can also show (visually) a RIGHT_HAND system
 //------------------------------------------------------------------------------
-//#define IMGUIZMO_VMOD_AXIS_X +
-//#define IMGUIZMO_VMOD_AXIS_Y +
-//#define IMGUIZMO_VMOD_AXIS_Z +
+//#define IMGUIZMO_REVERSE_AXIS_X
+//#define IMGUIZMO_REVERSE_AXIS_Y
+//#define IMGUIZMO_REVERSE_AXIS_Z
 
 //------------------------------------------------------------------------------
 // v3.1 and later
@@ -151,8 +150,9 @@
 //    bool getFlipDolly() { return isFlipDolly; }
 //
 //------------------------------------------------------------------------------
-//#define IMGUIZMO_FLIP_ROT_X
-#define IMGUIZMO_FLIP_ROT_Y
+#define IMGUIZMO_FLIP_ROT_ON_X
+//#define IMGUIZMO_FLIP_ROT_ON_Y
+//#define IMGUIZMO_FLIP_ROT_ON_Z
 //#define IMGUIZMO_FLIP_PAN_X
 #define IMGUIZMO_FLIP_PAN_Y
 //#define IMGUIZMO_FLIP_DOLLY
@@ -172,8 +172,6 @@
 //      If you enable GLM use, automatically is enabled also VGM_USES_TEMPLATE
 //------------------------------------------------------------------------------
 #define IMGIZMO_USES_GLM
-
-
 
 
 // TODO for v.3.2?

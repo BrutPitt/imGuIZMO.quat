@@ -119,11 +119,14 @@ public:
                                yRotationModifier(evControlModifier),
                                zRotationModifier(evAltModifier|evSuperModifier)
     {
-#if defined(VGIZMO3D_FLIP_ROT_X)
-        isFlipRotX = true;
+#if defined(VGIZMO3D_FLIP_ROT_ON_X)
+        flipRotOnX();
 #endif
-#if defined(VGIZMO3D_FLIP_ROT_Y)
-        isFlipRotY = true;
+#if defined(VGIZMO3D_FLIP_ROT_ON_Y)
+        flipRotOnY();
+#endif
+#if defined(VGIZMO3D_FLIP_ROT_ON_Z)
+        flipRotOnZ();
 #endif
 #if defined(VGIZMO3D_FLIP_PAN_X)
         isFlipPanX = true;
@@ -174,11 +177,11 @@ public:
     {
         if ( (button == tbControlButton) && pressed && (tbControlModifiers ? tbControlModifiers & mod : tbControlModifiers == mod) ) {
             tbActive = true;
-            activateMouse(rotFlipX(x),rotFlipY(y));
+            activateMouse(x,y);
         }
         if((button == tbSecControlButton) && pressed && (tbSecControlModifiers ? tbSecControlModifiers & mod : tbSecControlModifiers == mod) ) {
             tbSecActive = true;
-            activateMouse(rotFlipX(x),rotFlipY(y));
+            activateMouse(x,y);
         }
         if ( (button == tbSecControlButton || button == tbControlButton) && !pressed) {
             deactivateMouse();
@@ -187,9 +190,9 @@ public:
         }
 
         if((button == tbRotationButton) && pressed) {
-            if      (xRotationModifier & mod) { tbActive = true; rotationVector = tVec3(T(1), T(0), T(0)); activateMouse(rotFlipX(x),rotFlipY(y)); }
-            else if (yRotationModifier & mod) { tbActive = true; rotationVector = tVec3(T(0), T(1), T(0)); activateMouse(rotFlipX(x),rotFlipY(y)); }
-            else if (zRotationModifier & mod) { tbActive = true; rotationVector = tVec3(T(0), T(0), T(1)); activateMouse(rotFlipX(x),rotFlipY(y)); }
+            if      (xRotationModifier & mod) { tbActive = true; rotationVector = tVec3(T(1), T(0), T(0)); activateMouse(x,y); }
+            else if (yRotationModifier & mod) { tbActive = true; rotationVector = tVec3(T(0), T(1), T(0)); activateMouse(x,y); }
+            else if (zRotationModifier & mod) { tbActive = true; rotationVector = tVec3(T(0), T(0), T(1)); activateMouse(x,y); }
         } else if((button == tbRotationButton) && !pressed) { 
             deactivateMouse(); rotationVector = tVec3(T(1)); tbActive = false;
         }
@@ -254,32 +257,39 @@ public:
         }
 
         tVec3 a(T(pos.x-delta.x), T(pos.y-delta.y), T(0));
-        tVec3 b(T(pos.x    ),     T(pos.y        ), T(0));
+        tVec3 b(T(pos.x        ), T(pos.y        ), T(0));
 
         auto vecFromPos = [&] (tVec3 &v) {
             v -= offset;
             v /= minVal;
             const T len = length(v);
             v.z = len>T(0) ? pow(T(2), -T(.5) * len) : T(1);
-            v = normalize(v);
+            return normalize(v);
         };
 
-        vecFromPos(a);
-        vecFromPos(b);
+        a = vecFromPos(a);
+        b = vecFromPos(b);
 
         tVec3 axis = normalize(cross(a, b));
 
         T AdotB = dot(a, b);
-        T angle = acos( AdotB>T(1) ? T(1) : (AdotB<-T(1) ? -T(1) : AdotB)); // clamp need!!! corss float is approximate to FLT_EPSILON
+        T angle = acos( AdotB>T(1) ? T(1) : (AdotB<-T(1) ? -T(1) : AdotB)); // clamp necessary!!! corss float is approximate to FLT_EPSILON
 
-        qtStep = normalize(angleAxis(angle * tbScale * fpsRatio , axis * rotationVector));
+        auto flipRotation = [=] (quat q) {
+            return quat(q.w, rotOnX * q.x, rotOnY * q.y, rotOnZ * -q.z);
+        };
+
+        auto getNormalizedQuat = [&] (float factor = T(1)) {
+            return normalize(angleAxis(angle * tbScale * fpsRatio * factor, axis * rotationVector));
+        };
+        qtStep = flipRotation(getNormalizedQuat());
 
         if(tbActive) {
-            qtIdle = normalize(angleAxis(angle * tbScale * fpsRatio * qIdleSpeedRatio * qIdleReduction, axis * rotationVector));
+            qtIdle = flipRotation(getNormalizedQuat(qIdleSpeedRatio * qIdleReduction));
             qtRot = qtStep*qtRot;
         }
         if(tbSecActive) {
-            qtIdleSec = normalize(angleAxis(angle * tbScale * fpsRatio * qIdleSpeedRatio * qIdleReduction, axis * rotationVector));
+            qtIdleSec = flipRotation(getNormalizedQuat(qIdleSpeedRatio * qIdleReduction));
             qtSecondaryRot = qtStep*qtSecondaryRot;
         }
     }
@@ -440,12 +450,15 @@ public:
 ///@param[in] q quat& : reference quaternion containing rotation to set
     void setSecondRot(const tQuat &q) { qtSecondaryRot = q; }
 
-/// flipX mouse coord
+/// flipX X coord
 ///@param[in] b bool
-    void setFlipRotX(bool b) { isFlipRotX = b; }
-/// flipY mouse coord
+    void flipRotOnX(bool b = true) { rotOnX = b ? -T(1) : T(1); }
+/// flipY Y coord
 ///@param[in] b bool
-    void setFlipRotY(bool b) { isFlipRotY = b; }
+    void flipRotOnY(bool b = true) { rotOnY = b ? -T(1) : T(1); }
+/// flipY Z coord
+///@param[in] b bool
+    void flipRotOnZ(bool b = true) { rotOnZ = b ? -T(1) : T(1); }
 /// flipZ mouse coord
 ///@param[in] b bool
     void setFlipDolly(bool b) { isFlipDolly = b; }
@@ -458,10 +471,13 @@ public:
 
 /// get flip Rot X status
 /// @retval bool : current flip Rot X status
-    bool getFlipRotX() { return isFlipRotX; }
+    bool getFlipRotOnX() { return rotOnX < 0; }
 /// get flip Rot Y status
 /// @retval bool : current flip Rot Y status
-    bool getFlipRotY() { return isFlipRotY; }
+    bool getFlipRotOnY() { return rotOnY < 0; }
+/// get flip Rot Y status
+/// @retval bool : current flip Rot Y status
+    bool getFlipRotOnZ() { return rotOnZ < 0; }
 /// get flip Pan X status
 /// @retval bool : current flip Pan X status
     bool getFlipPanX() { return isFlipPanX; }
@@ -490,16 +506,16 @@ public:
     //////////////////////////////////////////////////////////////////
     void motionImmediateLeftButton( T x, T y, T dx, T dy) {
         tbActive = true;
-        delta = tVec2(isFlipRotX ? -dx : dx, isFlipRotY ? -dy : dy);
-        pos   = tVec2(rotFlipX(x), rotFlipY(y));
+        delta = tVec2(dx, dy);
+        pos   = tVec2( x,  y);
         update();
     }
     //  for imGuIZMO or immediate mode control
     //////////////////////////////////////////////////////////////////
     virtual void motionImmediateMode( T x, T y, T dx, T dy,  vgModifiers mod) {
         tbActive = true;
-        delta = tVec2(isFlipRotX ? -dx : dx, isFlipRotY ? -dy : dy);
-        pos   = tVec2(rotFlipX(x), rotFlipY(y));
+        delta = tVec2(dx, dy);
+        pos   = tVec2( x,  y);
         if      (xRotationModifier & mod) { rotationVector = tVec3(T(1), T(0), T(0)); }
         else if (yRotationModifier & mod) { rotationVector = tVec3(T(0), T(1), T(0)); }
         else if (zRotationModifier & mod) { rotationVector = tVec3(T(0), T(0), T(1)); }
@@ -522,8 +538,6 @@ protected:
     //////////////////////////////////////////////////////////////////
     tQuat getStepRotation() { return qtStep; }
 
-    T rotFlipX(T x)  { return isFlipRotX  ? width  - x : x; }
-    T rotFlipY(T y)  { return isFlipRotY  ? height - y : y; }
     T panFlipX(T x)  { return isFlipPanX  ?         -x : x; }
     T panFlipY(T y)  { return isFlipPanY  ?         -y : y; }
     T dollyFlip(T z) { return isFlipDolly ?         -z : z; }
@@ -566,10 +580,10 @@ protected:
     bool tbActive    = false;  // trackbal activated via mouse
     bool tbSecActive = false;
 
-    bool isFlipRotX = false, isFlipRotY = false;
+    T rotOnX {1},  rotOnY = {1}, rotOnZ = {1};
     bool isFlipPanX = false, isFlipPanY = false, isFlipDolly = false;
 
-    T width, height;
+    T width {640}, height {320}; // init to dummy values
 };
 
 /// vGizmo / virtualGizmo 2D class
@@ -677,7 +691,7 @@ public:
     //void motion( int x, int y, T z=T(0)) { motion( T(x), T(y), z); }
     void motion( T x, T y, T z=T(0)) {
         povPanDollyFactor = abs(z) * distScale * constDistScale;
-        if( this->tbActive || this->tbSecActive) VGIZMO_BASE_CLASS::motion(this->rotFlipX(x),this->rotFlipY(y));
+        if( this->tbActive || this->tbSecActive) VGIZMO_BASE_CLASS::motion(x, y);
         else if(panActive || dollyActive)        VGIZMO_BASE_CLASS::motion(x, y);
     }
 
@@ -758,7 +772,7 @@ public:
         panControlButton = b;
         panControlModifiers = m;
     }
-    int getPanControlButton() { return panControlButton; }
+    int getPanControlButton()   { return panControlButton; }
     int getPanControlModifier() { return panControlModifiers; }
 
     /// Set mouse wheel sensitivity (in %) for Dolly movements
@@ -854,20 +868,10 @@ public:
 
     void motionImmediateMode( T x, T y, T dx, T dy,  vgModifiers mod) {
         this->tbActive = true;
-        if (dollyControlModifiers & mod) {
-            dollyActive = true;
-            this->delta = tVec2(dx,dy);
-            this->pos   = tVec2(x, y);
-        }
-        else if (panControlModifiers & mod) {
-            panActive = true;
-            this->delta = tVec2(dx,dy);
-            this->pos   = tVec2(x, y);
-        }
-        else {
-            this->delta = tVec2(this->isFlipRotX ? -dx : dx, this->isFlipRotY ? -dy : dy);
-            this->pos   = tVec2(this->rotFlipX(x), this->rotFlipY(y));
-        }
+        this->delta = tVec2(dx,dy);
+        this->pos   = tVec2(x, y);
+        if (dollyControlModifiers & mod)    dollyActive = true;
+        else if (panControlModifiers & mod) panActive   = true;
         update();
     }
 

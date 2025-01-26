@@ -144,33 +144,34 @@ int frameworkSDL::getVGizmo3DKeyModifier() {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void frameworkSDL::checkVGizmo3DMouseEvent(vg::vGizmo3D &vgTrackball) {
     static int leftPress = 0, rightPress = 0, middlePress;
+    if(!ImGui::GetIO().WantCaptureMouse) {
 #ifdef APP_USES_SDL2
-    int x, y;
+        int x, y;
 #else  // APP_USES_SDL3
-    float x, y;
+        float x, y;
 #endif
-    int mouseState = SDL_GetMouseState(&x, &y);
-    if(leftPress != (mouseState & SDL_BUTTON_LMASK)) {                  // check if leftButton state is changed
-        leftPress =  mouseState & SDL_BUTTON_LMASK ;                    // set new (different!) state
-        vgTrackball.mouse(vg::evLeftButton, getVGizmo3DKeyModifier(),   // send communication to vGizmo3D...
-                                      leftPress, x, y);                 // ... checking if a key modifier currently is pressed
-    }
-    if(rightPress != (mouseState & SDL_BUTTON_RMASK)) {                 // check if rightButton state is changed
-        rightPress =  mouseState & SDL_BUTTON_RMASK;                    // set new (different!) state
-        vgTrackball.mouse(vg::evRightButton, getVGizmo3DKeyModifier(),  // send communication to vGizmo3D...
-                                       rightPress, x, y);               // ... checking if a key modifier currently is pressed
-    }
-    // Simulating a double press (left+right button) using MIDDLE button,
-    // sending two "consecutive" activation/deactivation to rotate cube and light spot together
-    if(middlePress != (mouseState & SDL_BUTTON_MMASK)) {             // check if middleButton state is changed
-        middlePress =  mouseState & SDL_BUTTON_MMASK;                // set new (different!) middle button state
-        vgTrackball.mouse(vg::evRightButton, getVGizmo3DKeyModifier(), middlePress, x, y);  // call Right activation/deactivation with same "middleStatus"
-        vgTrackball.mouse(vg::evLeftButton,  getVGizmo3DKeyModifier(), middlePress, x, y);  // call Left  activation/deactivation with same "middleStatus"
-    }
-
+        int mouseState = SDL_GetMouseState(&x, &y);
+        if(leftPress != (mouseState & SDL_BUTTON_LMASK)) {                  // check if leftButton state is changed
+            leftPress =  mouseState & SDL_BUTTON_LMASK ;                    // set new (different!) state
+            vgTrackball.mouse(vg::evLeftButton, getVGizmo3DKeyModifier(),   // send communication to vGizmo3D...
+                                          leftPress, x, y);                 // ... checking if a key modifier currently is pressed
+        }
+        if(rightPress != (mouseState & SDL_BUTTON_RMASK)) {                 // check if rightButton state is changed
+            rightPress =  mouseState & SDL_BUTTON_RMASK;                    // set new (different!) state
+            vgTrackball.mouse(vg::evRightButton, getVGizmo3DKeyModifier(),  // send communication to vGizmo3D...
+                                           rightPress, x, y);               // ... checking if a key modifier currently is pressed
+        }
+        // Simulating a double press (left+right button) using MIDDLE button,
+        // sending two "consecutive" activation/deactivation to rotate cube and light spot together
+        if(middlePress != (mouseState & SDL_BUTTON_MMASK)) {             // check if middleButton state is changed
+            middlePress =  mouseState & SDL_BUTTON_MMASK;                // set new (different!) middle button state
+            vgTrackball.mouse(vg::evRightButton, getVGizmo3DKeyModifier(), middlePress, x, y);  // call Right activation/deactivation with same "middleStatus"
+            vgTrackball.mouse(vg::evLeftButton,  getVGizmo3DKeyModifier(), middlePress, x, y);  // call Left  activation/deactivation with same "middleStatus"
+        }
 // vGizmo3D: if "drag" active update internal rotations (primary and secondary)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    vgTrackball.motion(x,y);
+        vgTrackball.motion(x,y);
+    }
 }
 
 #else
@@ -266,6 +267,7 @@ int frameworkClass::getVGizmo3DKeyModifier()
 void frameworkClass::checkVGizmo3DMouseEvent(vg::vGizmo3D &vgTrackball)
 {
         static int leftPress = 0, rightPress = 0, middlePress = 0;
+    if(!ImGui::GetIO().WantCaptureMouse) {
         double x, y;
         glfwGetCursorPos(getWindow(), &x, &y);
         if(glfwGetMouseButton(getWindow(), GLFW_MOUSE_BUTTON_LEFT) != leftPress) {  // check if leftButton state is changed
@@ -290,5 +292,6 @@ void frameworkClass::checkVGizmo3DMouseEvent(vg::vGizmo3D &vgTrackball)
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         vgTrackball.motion(x,y);
         //vgTrackball.motion(x,y,vgTrackball.getDollyPosition().z);
+    }
 }
 #endif

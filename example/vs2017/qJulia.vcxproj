@@ -267,6 +267,8 @@
     <ClCompile>
       <PreprocessorDefinitions>GLAPP_USE_SDL;IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>SDL2main.lib;SDL2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>

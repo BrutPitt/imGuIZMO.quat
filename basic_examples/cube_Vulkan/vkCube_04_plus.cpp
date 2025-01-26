@@ -569,8 +569,14 @@ void vkApp::onInit()        // called from constructor @ startup
     // If you need to flip "mouse movements"
     // you can set they in the code or set as default values in vGizmo3D_config.h
     APP_FLIP_ROT_X
+    APP_FLIP_ROT_Y
+    APP_FLIP_ROT_Z
+    APP_FLIP_PAN_X
     APP_FLIP_PAN_Y
-    APP_FLIP_DOLLY
+    APP_FLIP_ROT_X
+APP_FLIP_DOLLY
+
+    APP_REVERSE_AXES
 }
 
 void vkApp::onExit()        // called from destructor @ exit

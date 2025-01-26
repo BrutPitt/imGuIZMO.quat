@@ -13,12 +13,12 @@
 cmake_minimum_required(VERSION 3.27)
 project(oglCubeExamples)
 
-find_package(glm CONFIG)
 
-option(IMGUIZMO_USES_GLM "Use GLM instead of internal vgMath" ON)
-# glm_FOUND OR 
+option(IMGUIZMO_USES_GLM "Use GLM instead of internal vgMath" OFF)
+# glm_FOUND OR
 if(IMGUIZMO_USES_GLM)
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVGIZMO_USES_GLM")
+    find_package(glm CONFIG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVGIZMO_USES_GLM")
 endif(IMGUIZMO_USES_GLM)
 
 set(CMAKE_CXX_STANDARD 17)

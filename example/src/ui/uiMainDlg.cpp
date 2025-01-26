@@ -316,6 +316,11 @@ void mainImGuiDlgClass::renderImGui()
         if( ImGui::gizmo3D("##RotA", a,sz, imguiGizmo::modeDirPlane)) {}   
         imguiGizmo::restoreDirectionColor();
         imguiGizmo::restoreAxesSize();
+        
+        vgm::Vec3 aadir(-1, 0, 0);
+        ImGui::gizmo3D("Direction", aadir);
+
+        vgm::Vec3 zzz = aadir;
 
     }
 

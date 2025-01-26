@@ -78,7 +78,7 @@ set(SOURCE_FILES
 include_directories(${SRC})
 include_directories(${SRC}/libs)
 include_directories(${SRC}/tools)
-include_directories(${SRC}/tools)
+include_directories(${SRC}/../../Shaders) #CLion: add folder to Project tool window
 #include_directories($ENV{INCLUDE})
 #include_directories("D:/Lang/mingw64/include")
 
@@ -101,10 +101,10 @@ if (${BUILD_EMSCRIPTEN})
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
 
 # relative emscripten output files
-    set(EMSOUT "emsOut")
-    file(MAKE_DIRECTORY ${EMSOUT})
-    file(MAKE_DIRECTORY ${EMSOUT}/${CMAKE_BUILD_TYPE})
-    set(EMSOUT ${EMSOUT}/${CMAKE_BUILD_TYPE})
+#    set(EMSOUT "emsOut")
+#    file(MAKE_DIRECTORY ${EMSOUT})
+#    file(MAKE_DIRECTORY ${EMSOUT}/${CMAKE_BUILD_TYPE})
+#    set(EMSOUT ${EMSOUT}/${CMAKE_BUILD_TYPE})
 
 # emcc compiler options
     set(M_EMCC_FLAGS "-DGLAPP_NO_OGL_DSA -DGLFW_INCLUDE_ES3")
@@ -141,8 +141,8 @@ if (${BUILD_EMSCRIPTEN})
 #    set(M_EMCC_OPTIONS "-s \"BINARYEN_TRAP_MODE='clamp'\" ${M_EMCC_SHELL_FILE} ${M_EMCC_OGL_OPTIONS} ${M_EMCC_BINARYEN} ${M_EMCC_EMBED_FILES}")
     set(M_EMCC_OPTIONS "-s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 -s ALLOW_MEMORY_GROWTH=1 -s PRECISE_F32=1 ${M_EMCC_SHELL_FILE} ${M_EMCC_OGL_OPTIONS} ${M_EMCC_BINARYEN} ${M_EMCC_EMBED_FILES}")
 
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/${EMSOUT}")
-    set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}/${EMSOUT}")
+#    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/${EMSOUT}")
+#    set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}/${EMSOUT}")
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${M_GLOBAL_FLAGS} ${M_EMCC_FLAGS} ${M_EMCC_OPTIONS}")
 
