@@ -12,7 +12,7 @@
 //------------------------------------------------------------------------------
 #pragma once
 
-#include "vgMath_config.h"
+#include "vgConfig.h"
 
 #ifdef VGM_USES_DOUBLE_PRECISION
     #define VG_T_TYPE double
@@ -20,6 +20,35 @@
 #else
     #define VG_T_TYPE float
 #endif
+
+#ifdef VGIZMO_USES_GLM
+    #ifndef VGM_USES_TEMPLATE
+        #define VGM_USES_TEMPLATE    // glm uses template ==> vGizmo needs to know
+    #endif
+
+    #define VGM_NAMESPACE glm
+
+    #include <glm/glm.hpp>
+    #include <glm/gtx/vector_angle.hpp>
+    #include <glm/gtx/exterior_product.hpp>
+    #include <glm/gtc/type_ptr.hpp>
+    #include <glm/gtc/quaternion.hpp>
+    #include <glm/gtc/matrix_transform.hpp>
+
+    using tVec2 = glm::tvec2<VG_T_TYPE>;
+    using tVec3 = glm::tvec3<VG_T_TYPE>;
+    using tVec4 = glm::tvec4<VG_T_TYPE>;
+    using tQuat = glm::tquat<VG_T_TYPE>;
+    using tMat3 = glm::tmat3x3<VG_T_TYPE>;
+    using tMat4 = glm::tmat4x4<VG_T_TYPE>;
+
+    #define T_PI glm::pi<VG_T_TYPE>()
+    #define T_INV_PI glm::one_over_pi<VG_T_TYPE>()
+
+    #define VGIZMO_BASE_CLASS virtualGizmoBaseClass<T>
+    #define TEMPLATE_TYPENAME_T  template<typename T>
+
+#else // use vGizmoMath
 
     #include <cmath>
     #include <cstdint>
@@ -556,7 +585,7 @@ TEMPLATE_TYPENAME_T inline MAT4_T lookAtLH(const VEC3_T& pov, const VEC3_T& tgt,
 
 TEMPLATE_TYPENAME_T inline MAT4_T lookAtRH(const VEC3_T& pov, const VEC3_T& tgt, const VEC3_T& up)
 {
-    VEC3_T k = normalize(pov - tgt), i = normalize(cross(up, k)), j = cross(k, i);
+    VEC3_T k = normalize(tgt - pov), i = normalize(cross(k, up)), j = cross(i, k);   k = -k;
     return {     i.x,          j.x,          k.x,     T(0),
                  i.y,          j.y,          k.y,     T(0),
                  i.z,          j.z,          k.z,     T(0),
@@ -764,6 +793,7 @@ TEMPLATE_TYPENAME_T inline MAT4_T frustum     (cT l, cT r, cT b, cT t, cT n, cT 
     #undef MAT4_PRECISION
 
 
+#endif // use vGizmoMath
 #if !defined(VGM_DISABLE_AUTO_NAMESPACE) || defined(VGIZMO_H_FILE)
     using namespace VGM_NAMESPACE;
 #endif

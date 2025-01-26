@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//  Copyright (c) 2018-2025 Michele Morrone
+//  Copyright (c) 2018-2024 Michele Morrone
 //  All rights reserved.
 //
 //  https://michelemorrone.eu - https://brutpitt.com
@@ -54,8 +54,19 @@
 //
 // Default ==> use vgMath
 //      If you enable GLM use, automatically is enabled also VGM_USES_TEMPLATE
+//          if you can, I recommend to use GLM
 //------------------------------------------------------------------------------
 //#define VGIZMO_USES_GLM
+
+//------------------------------------------------------------------------------
+// uncomment to use LeftHanded 
+//
+// This is used only in: lookAt / perspective / ortho / frustrum - functions
+//      DX is LeftHanded, OpenGL is RightHanded
+//
+// Default ==> RightHanded
+//------------------------------------------------------------------------------
+//#define VGM_USES_LEFT_HAND_AXES
 
 //------------------------------------------------------------------------------
 // uncomment to avoid vgMath.h add folow line code:
@@ -88,44 +99,39 @@
 //#define VGM_USES_HLSL_TYPES 
 
 //------------------------------------------------------------------------------
-// uncomment to use Left Handed system default call for specific functions:
+// imGuiZmo.quat - v3.0 and later - (used only inside it)
 //
-//      lookAt
-//      perspective
-//      ortho
-//      frustrum
+//      Used to remove Pan & Dolly feature to imGuIZMO.quat widget and to use
+//          only rotation feature (like v2.2 and above)
 //
-//  They have ALSO independent direct calls adding:
-//   RH /  LH ==> Right Hand / Left Hand
-//  _ZO / _NO ==> Z-Buffer / depth-Buffer type range [0, 1] / [-1, 1]
+//          Pan/Dolly use virtualGizmo3DClass just a little bit complex of
+//          virtualGizmoClass that uses only "quat" rotations
+//          uncomment for very low resources ==> Pan & Dolly will be disabled
 //
-//  Example: perspectiveRH_ZO ==> call "perspective" for Right Handed system and
-//              using z-Buffer in range [0, 1]
-//
-//  N.B. lookAt have only lookAtRH and lookAtLH direct calls (obviously)
-//
-// Default ==> Right Handed
+// Default ==> Pan & Dolly enabled 
 //------------------------------------------------------------------------------
-//#define VGM_USES_LEFT_HAND_AXES
+//#define IMGUIZMO_USE_ONLY_ROT
 
 //------------------------------------------------------------------------------
-// uncomment to use Z-Buffer / depth-Buffer range [0, 1] default call for
-//              specific functions:
+// imGuiZmo.quat - v3.0 and later - (used only inside it)
 //
-//      perspective
-//      ortho
-//      frustrum
+//      used to specify where ImGui include files should be searched
+//          #define IMGUIZMO_IMGUI_FOLDER  
+//              is equivalent to use:
+//                  #include <imgui.h>
+//                  #include <imgui_internal.h>
+//          #define IMGUIZMO_IMGUI_FOLDER myLibs/ImGui/
+//              (final slash is REQUIRED) is equivalent to use: 
+//                  #include <myLib/ImGui/imgui.h>
+//                  #include <myLib/ImGui/imgui_internal.h>
+//          Default: IMGUIZMO_IMGUI_FOLDER commented/undefined
+//              is equivalent to use:
+//                  #include <imgui/imgui.h>
+//                  #include <imgui/imgui_internal.h>
 //
-//  They have ALSO independent direct calls adding:
-//   RH /  LH ==> Right Hand / Left Hand
-//  _ZO / _NO ==> Z-Buffer / depth-Buffer type range [0, 1] / [-1, 1]
-//
-//  Example: orthoLH_NO ==> call "ortho" for Left Handed system and using
-//              z-Buffer in range [-1, 1]
-//
-// Default ==> Z-Buffer / depth-Buffer range [-1, 1]
+// N.B. Final slash to end of path is REQUIRED!
 //------------------------------------------------------------------------------
-//#define VGM_USES_ZERO_ONE_ZBUFFER
+// #define IMGUIZMO_IMGUI_FOLDER ImGui/
 
 //  v g M a t h   C O N F I G   end
 ////////////////////////////////////////////////////////////////////////////////
