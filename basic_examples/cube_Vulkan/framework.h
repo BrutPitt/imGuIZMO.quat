@@ -31,7 +31,7 @@
     #endif
 #endif
 
-#include <vGizmo3D.h>
+#include <imguizmo_quat.h>
 
 class frameworkBase
 {

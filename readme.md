@@ -82,7 +82,7 @@ Finally in your render function (or where you prefer) you can get back the trans
     mat4 modelMatrix = mat4_cast(qRot);
     // now you have modelMatrix with rotation then can build MV and MVP matrix
 ```
-now we have modelMatrix with rotation then we can build MV and MVP matrix
+now we have modelMatrix with rotation then we can [build MVP matrix](https://github.com/BrutPitt/imGuIZMO.quat/blob/29ee9962781921036762100098e3fca7b58742f8/basic_examples/cube_OpenGL/oglCube_01_better.cpp#L235-L240) (taken from basic_example #01)
 
 ### Pan & Dolly - v3.0
 From ver. 3.0 you can use all widgets also to "move" the objects, using Pan (x,y) & Dolly (z):
@@ -98,14 +98,15 @@ In your **ImGui** window you call/declare a widget...
     ImGui::gizmo3D("##gizmo1", PanDolly, qRot /*, size,  mode */);
     // PanDolly returns/changes (x,y,z) values, depending on Pan(x,y,0)/Dolly(0,0,z) movements
 ```
-In your render function (or where you prefer) you can get back the transformations matrix
+In your render function (or where you prefer) you can get back the transformations matrix: translate and rotation
 ```cpp
     // if you need a "translation" matrix with Pan/Dolly values 
-    mat4 mTranslate(1.f); translate(mTranslate, vec4(PanDolly, 1.f));
+    mat4 translateMatrix(translate(mat4(1.f), vec4(PanDolly, 1.f)));
     
     mat4 modelMatrix = mat4_cast(qRot);
     // now you have modelMatrix with rotation then can build MV and MVP matrix
-```
+```  
+now we have modelMatrix with rotation then we can [build MVP matrix](https://github.com/BrutPitt/imGuIZMO.quat/blob/29ee9962781921036762100098e3fca7b58742f8/basic_examples/cube_OpenGL/oglCube_03.cpp#L251-L255) (taken from basic_example #03)
 
 <p>&nbsp;<br></p>
 
@@ -124,18 +125,18 @@ In your render function (or where you prefer) you can get back the transformatio
     // Default mode: guiGizmo::mode3Axes|guiGizmo::cubeAtOrigin -> 3 Axes with cube @ origin
 ```
 
-#### Directional arrow:
+#### Directional arrow: ** **WARNING** ** changed behavior
 ```cpp
-// I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify 
-// a light spot toward origin need to change direction
-    vec3 light(-getLight()));
 // get/setLigth are helper funcs that you have ideally defined to manage your global/member objs
-    if(ImGui::gizmo3D("##Dir1", light /*, size,  mode */)  setLight(-light);
+    if(ImGui::gizmo3D("##Dir1", light /*, size,  mode */) {}
     // or explicitly
-    if(ImGui::gizmo3D("##Dir1", light, 100, imguiGizmo::modeDirection)  setLight(-light);
+    if(ImGui::gizmo3D("##Dir1", light, 100, imguiGizmo::modeDirection)  {}}
 
     // Default arrow color is YELLOW: ImVec4(1.0, 1.0, 0.0, 1.0);
 ```
+**The vector direction should no longer be changed: now you can use it directly
+The old behavior can be enabled by `IMGUIZMO_HAS_NEGATIVE_VEC3_LIGHT` define in the `imguizmo_config.h` file or via "compiler define" `-D` option*
+
 #### Directional plane:
 ```cpp
     static vec3 dir(1.0, 0.0, 0.0);
@@ -145,21 +146,18 @@ In your render function (or where you prefer) you can get back the transformatio
     // Default plane color is: ImVec4(0.0f, 0.5f, 1.0f, STARTING_ALPHA_PLANE);
 ```
 
-#### Axes + spot:
+#### Axes + spot:   ** **WARNING** ** changed behavior
 ```cpp
 // I assume, for a vec3, a direction starting from origin, so if you use a vec3 to identify 
-// a light spot toward origin need to change direction, it's maintained for uniformity even in spot
-    vec3 light(-getLight()));
-    quat qt = getRotation();
 // get/setLigth get/setRotation are helper funcs that you have ideally defined to manage your global/member objs
-    if(ImGui::gizmo3D("##gizmo1", qt, light /*, size,  mode */))  { 
-        setLight(-light); 
-        setRotation(qt);
-    }
+    if(ImGui::gizmo3D("##gizmo1", qt, light /*, size,  mode */))  {   }
     // Default size: ImGui::GetFrameHeightWithSpacing()*4
     // Default mode: guiGizmo::mode3Axes|guiGizmo::cubeAtOrigin -> 3 Axes with cube @ origin
     // Default spot color is same of default arrow color: YELLOW -> ImVec4(1.0, 1.0, 0.0, 1.0);
 ```
+**The vector direction should no longer be changed: now you can use it directly
+The old behavior can be enabled by `IMGUIZMO_HAS_NEGATIVE_VEC3_LIGHT` define in the `imguizmo_config.h` file or via "compiler define" `-D` option*
+
 ### Added since version 3.0
 
 To each of the functions listed above was added a `vec3` parameter, as second parameter, to get the object movement: **Pan/Dolly**, so the **Axes mode** function becomes:
@@ -242,6 +240,8 @@ It's like the push/pop mechanism used in **ImGui**, but only that I don't have a
     static void setGizmoFeelingRot(float f) { gizmoFeelingRot = f; } 
     static float getGizmoFeelingRot() { return gizmoFeelingRot; }
 ```
+[How to use](https://github.com/BrutPitt/imGuIZMO.quat/blob/29ee9962781921036762100098e3fca7b58742f8/basic_examples/cube_OpenGL/oglCube_03.cpp#L179) (taken from basic_example #03)
+<p>&nbsp;<br></p>
 
 **Pan/Dolly change/set key modifier** - *since v3.0*
 ```cpp    
@@ -252,7 +252,10 @@ It's like the push/pop mechanism used in **ImGui**, but only that I don't have a
 //      evSuperModifier   -> Super
     static void setPanModifier(vgModifiers v) { panMod = v; }    // Change default assignment for Pan
     static void setDollyModifier(vgModifiers v) { panMod = v; }  // Change default assignment for Dolly
-```
+``` 
+[How to use](https://github.com/BrutPitt/imGuIZMO.quat/blob/29ee9962781921036762100098e3fca7b58742f8/basic_examples/cube_OpenGL/oglCube_03.cpp#L183-L184) (taken from basic_example #03)
+<p>&nbsp;</p>
+
 
 **Pan/Dolly scale** - *since v3.0*
 ```cpp    
@@ -267,8 +270,10 @@ It's like the push/pop mechanism used in **ImGui**, but only that I don't have a
     static void setPanScale(float scale) { panScale = scale; }
     static float getPanScale() { return panScale; }
 ```
-
+[How to use](https://github.com/BrutPitt/imGuIZMO.quat/blob/29ee9962781921036762100098e3fca7b58742f8/basic_examples/cube_OpenGL/oglCube_03.cpp#L180-L182) (taken from basic_example #03)
 <p>&nbsp;<br></p>
+
+
 
 
 ## All widgets visualization

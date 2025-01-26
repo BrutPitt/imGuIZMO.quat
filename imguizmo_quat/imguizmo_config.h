@@ -15,10 +15,8 @@
 //------------------------------------------------------------------------------
 // imguizmo_quat configuration file
 //
-// Obviously all #define can be passed directly to compiler with -D option
-//
+// All #define can be (also) passed directly to compiler with -D option
 //------------------------------------------------------------------------------
-
 
 
 //------------------------------------------------------------------------------
@@ -171,7 +169,7 @@
 // Default ==> use vgMath
 //      If you enable GLM use, automatically is enabled also VGM_USES_TEMPLATE
 //------------------------------------------------------------------------------
-#define IMGIZMO_USES_GLM
+#define IMGUIZMO_USES_GLM
 
 
 // TODO for v.3.2?

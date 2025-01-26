@@ -17,7 +17,7 @@ class vkApp;
 #include "framework.h"
 
 #include "../commons/shadersAndModel.h"
-#include <vGizmo3D.h>
+#include <imguizmo_quat.h>
 
 #define VSYNC_ENABLED true         // true/false vSync on/off ==> pass from FiFo to Immediate presentation mode
 

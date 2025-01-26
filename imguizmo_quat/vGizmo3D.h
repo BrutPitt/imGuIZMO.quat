@@ -450,22 +450,22 @@ public:
 ///@param[in] q quat& : reference quaternion containing rotation to set
     void setSecondRot(const tQuat &q) { qtSecondaryRot = q; }
 
-/// flipX X coord
+/// flip X Rot
 ///@param[in] b bool
     void flipRotOnX(bool b = true) { rotOnX = b ? -T(1) : T(1); }
-/// flipY Y coord
+/// flip Y Rot
 ///@param[in] b bool
     void flipRotOnY(bool b = true) { rotOnY = b ? -T(1) : T(1); }
-/// flipY Z coord
+/// flip Z Rot
 ///@param[in] b bool
     void flipRotOnZ(bool b = true) { rotOnZ = b ? -T(1) : T(1); }
-/// flipZ mouse coord
+/// flip Dolly mouse coord
 ///@param[in] b bool
     void setFlipDolly(bool b) { isFlipDolly = b; }
-/// flipZ mouse coord
+/// flip Pan X mouse coord
 ///@param[in] b bool
     void setFlipPanX(bool b) { isFlipPanX = b; }
-/// flipZ mouse coord
+/// flip Pan Y mouse coord
 ///@param[in] b bool
     void setFlipPanY(bool b) { isFlipPanY = b; }
 
@@ -475,8 +475,8 @@ public:
 /// get flip Rot Y status
 /// @retval bool : current flip Rot Y status
     bool getFlipRotOnY() { return rotOnY < 0; }
-/// get flip Rot Y status
-/// @retval bool : current flip Rot Y status
+/// get flip Rot Z status
+/// @retval bool : current flip Rot Z status
     bool getFlipRotOnZ() { return rotOnZ < 0; }
 /// get flip Pan X status
 /// @retval bool : current flip Pan X status
@@ -484,8 +484,8 @@ public:
 /// get flip Pan Y status
 /// @retval bool : current flip Pan Y status
     bool getFlipPanY() { return isFlipPanY; }
-/// get flipZ mouse status
-/// @retval bool : current flipZ status
+/// get flip Dolly status
+/// @retval bool : current flip Dolly status
     bool getFlipDolly() { return isFlipDolly; }
 
     // attenuation<1.0 / increment>1.0 of rotation speed in idle
