@@ -169,7 +169,7 @@
 // Default ==> use vgMath
 //      If you enable GLM use, automatically is enabled also VGM_USES_TEMPLATE
 //------------------------------------------------------------------------------
-#define IMGUIZMO_USES_GLM
+//#define IMGUIZMO_USES_GLM
 
 
 // TODO for v.3.2?
