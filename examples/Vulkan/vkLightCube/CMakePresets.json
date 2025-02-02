@@ -1,0 +1,59 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "debug GLFW",
+      "displayName": "Debug GLFW",
+      "binaryDir": "$env{RAMDISK}${sourceDirName}.build/GLFW/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+	{
+      "name": "release GLFW",
+      "displayName": "Release GLFW",
+      "binaryDir": "$env{RAMDISK}${sourceDirName}.build/GLFW/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "debug SDL2",
+      "displayName": "Debug SDL2",
+      "binaryDir": "$env{RAMDISK}${sourceDirName}.build/SDL2/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "USE_SDL2": "ON"
+      }
+    },
+	{
+      "name": "release SDL2",
+      "displayName": "Release SDL2",
+      "binaryDir": "$env{RAMDISK}${sourceDirName}.build/SDL2/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "USE_SDL2": "ON"
+      }
+    },
+    {
+      "name": "debug SDL3",
+      "displayName": "Debug SDL3",
+      "binaryDir": "$env{RAMDISK}${sourceDirName}.build/SDL3/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "USE_SDL3": "ON"
+      }
+    },
+	{
+      "name": "release SDL3",
+      "displayName": "Release SDL3",
+      "binaryDir": "$env{RAMDISK}${sourceDirName}.build/SDL3/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "USE_SDL3": "ON"
+      }
+    }
+  ]
+}
+
+
