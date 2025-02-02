@@ -277,7 +277,7 @@ void initVGizmo3D()     // Settings to control vGizmo3D
         track.setGizmoRotYControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
         track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
     // Set vGizmo3D control for secondary rotation
-        track.setGizmoSecondaryRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
+        track.setGizmoSecondRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
     // Pan and Dolly/Zoom: mouse button and key modifier
         track.setDollyControl            (vg::evButton2 /* or vg::evRightButton */, vg::evControlModifier);
         track.setPanControl              (vg::evButton2 /* or vg::evRightButton */, vg::evShiftModifier);
@@ -355,7 +355,7 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
         track.idle();   // set continuous rotation on Idle: the smooth rotation depends on speed of last mouse movements
                         // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                         // It can be stopped by click on screen (without mouse movement)
-        track.idleSecondary(); // set continuous rotation on Idle also for secondary rot
+        track.idleSecond(); // set continuous rotation on Idle also for secondary rot
 
         if (glfwGetWindowAttrib(glfwWindow, GLFW_ICONIFIED) != 0)   {
             ImGui_ImplGlfw_Sleep(10);
@@ -395,11 +395,11 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
 
     // ImGuIZMO.quat widget
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ImGui::gizmo3D("##aaa", track.getRotationRef(), track.getSecondRotRef(), widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
+        ImGui::gizmo3D("##aaa", track.refRotation(), track.refSecondRot(), widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
 
     // ImGuIZMO.quat with also pan and Dolly/zoom
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ImGui::gizmo3D("##a01", track.getPositionRef(), track.getRotationRef(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
+        ImGui::gizmo3D("##a01", track.refPosition(), track.refRotation(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
 
     // End Imgui window (container) block
         ImGui::End();

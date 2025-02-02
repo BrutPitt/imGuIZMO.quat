@@ -67,7 +67,7 @@ void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height)
 
     // Upper right corner widget
     ///////////////////////////////////
-    ImGui::gizmo3D("##aaa", track.getRotationRef(), vLight, widgetSize);
+    ImGui::gizmo3D("##aaa", track.refRotation(), vLight, widgetSize);
 
     widgetSize*=.5;
 
@@ -75,7 +75,7 @@ void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height)
     ///////////////////////////////////
 
     // Pan & Dolly axes
-    ImGui::gizmo3D("Pan & Dolly", track.getPositionRef(), track.getRotationRef(), widgetSize);
+    ImGui::gizmo3D("Pan & Dolly", track.refPosition(), track.refRotation(), widgetSize);
 
     ImGui::SameLine();
 
@@ -318,15 +318,15 @@ void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height)
 
             if(isPanDolly) {
                 if(mode & imguiGizmo::modeDual) {
-                    ImGui::gizmo3D("pan & zoom mode", track.getRotationRef(), vLight, w, mode|draw);
+                    ImGui::gizmo3D("pan & zoom mode", track.refRotation(), vLight, w, mode|draw);
                 } else {
-                    ImGui::gizmo3D("pan & zoom mode", track.getPositionRef(), track.getRotationRef(), w, mode|draw );
+                    ImGui::gizmo3D("pan & zoom mode", track.refPosition(), track.refRotation(), w, mode|draw );
                 }
             } else {
                 if(mode & imguiGizmo::modeDual) {
-                    ImGui::gizmo3D("##gizmoV2", track.getRotationRef(), vLight, w, mode|draw);
+                    ImGui::gizmo3D("##gizmoV2", track.refRotation(), vLight, w, mode|draw);
                 } else {
-                    ImGui::gizmo3D("##gizmoV1", track.getRotationRef(), w, mode|draw );
+                    ImGui::gizmo3D("##gizmoV1", track.refRotation(), w, mode|draw );
                 }
             }
             imguiGizmo::restoreSolidSize();

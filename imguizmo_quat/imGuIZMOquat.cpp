@@ -557,7 +557,7 @@ bool imguiGizmo::drawFunc(const char* label, float size)
     // LeftClick
     if (ImGui::IsItemActive()) {
         highlighted = true;
-        if(ImGui::IsMouseDragging(0))                          getTrackball(qtV);        
+        if(ImGui::IsMouseDragging(0))                          getTrackball(qtV);
         if((drawMode&modeDual) && ImGui::IsMouseDragging(1))   getTrackball(qtV2); // if dual mode... move together
         //if((drawMode&modeDual) && ImGui::IsMouseDragging(2)) { getTrackball(qtV);  getTrackball(qtV2); } // middle if dual mode... move together
 

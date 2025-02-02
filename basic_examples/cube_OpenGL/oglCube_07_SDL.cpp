@@ -242,7 +242,7 @@ void initVGizmo3D()     // Settings to control vGizmo3D
         track.setGizmoRotYControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
         track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
     // Set vGizmo3D control for secondary rotation
-        track.setGizmoSecondaryRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
+        track.setGizmoSecondRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
     // Pan and Dolly/Zoom: mouse button and key modifier
         track.setDollyControl            (vg::evButton2 /* or vg::evRightButton */, vg::evControlModifier);
         track.setPanControl              (vg::evButton2 /* or vg::evRightButton */, vg::evShiftModifier);
@@ -349,7 +349,7 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
         track.idle();   // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movements
                         // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                         // It can be stopped by click on screen (without mouse movement)
-        track.idleSecondary(); // set continuous rotation on Idle also for secondary rot
+        track.idleSecond(); // set continuous rotation on Idle also for secondary rot
 
     // ImGUI: prepare new frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -359,7 +359,7 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
     // ImGui: Your windows here
 
     // using vec3 (lightPos) is necessary sync with vGizmo3D : in next example (08) this will no longer be necessary
-        lightPos = getLightPosFromQuat(track.getSecondRotRef() ,length(lightPos)); //to syncronize trackball & lightPos passed to the Widgets call
+        lightPos = getLightPosFromQuat(track.refSecondRot() ,length(lightPos)); //to syncronize trackball & lightPos passed to the Widgets call
 
     // Render ALL ImGuIZMO_quat widgets
         renderWidgets(track, lightPos, width, height); // in next example (08) we will use directly quaternions

@@ -278,11 +278,11 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
 
     // ImGuIZMO.quat widget
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ImGui::gizmo3D("##aaa", track.getRotationRef(), track.getSecondRotRef(), widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
+        ImGui::gizmo3D("##aaa", track.refRotation(), track.refSecondRot(), widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated   secondario
 
     // ImGuIZMO.quat with also pan and Dolly/zoom
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ImGui::gizmo3D("##a01", track.getPositionRef(), track.getRotationRef(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
+        ImGui::gizmo3D("##a01", track.refPosition(), track.refRotation(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
 
     // End Imgui window (container) block
         ImGui::End();

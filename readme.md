@@ -1,7 +1,12 @@
-# imGuIZMO.quat &nbsp;v4.0 WiP
+# imGuIZMO.quat &nbsp;v4.0 WiP  
+
+
 
 ### v4.0 Work in Progress
 **Currently are maintained both v3.0 in `ImGuUIZMO.quat` folder and the new v4.0 WiP `imguizmo_quat`*
+*To make improvements, I am intervened simultaneously on the 3 components **ImGuIZMOquat** and also on **vGizmo3D** (the engine) and **vgMath** (optional math library)* 
+ *Please feel free to report any malfunction, also via direct e-mail (if you don't have account on Github): addresses are in the source code*
+
 The **NEW** [**easy_examples**](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) (Vulkan and OpenGL) added refer to the latter: soon a beta will be released and everything will be adequate to v4.0
 
 <p align="right"> <span style="position:relative; top:-10px;"> <i> also  &nbsp; </i> </span> <a href="https://github.com/RenderKit/ospray-studio/tree/master/external/imGuIZMO.quat" target="_blank"><img width="200" height="40" src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/studio.png"/></a> &nbsp; <span style="position:relative; top:-10px;"> <i> uses <b> imGuIZMO.quat</b></i></span></p> 
@@ -18,6 +23,7 @@ It uses **quaternions** algebra, internally, to manage rotations, and offers the
 ## Live WebGL2 demo examples 
 
 You can run/try **WebGL 2** examples of **imGuIZMO** from following links:
+- **NEW [v4.0 WiP Illuminated cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglLightCube.html)** - from new [LightCube example](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) (Vulkan and OpenGL)
 - **NEW [v4.0 WiP cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglCubeExample.html)** - from new [easy_examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) (Vulkan and OpenGL)
 - [**imGuIZMO.quat** used together **virtualGizmo3D**  direct 3D mouse/screen manipulator](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
 - [**imGuIZMO.quat** manipulator (only)](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSet.html), now with 3D Pan/Dolly (move/zoom) features - **since v3.0*

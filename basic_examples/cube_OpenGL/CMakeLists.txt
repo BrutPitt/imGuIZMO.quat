@@ -13,14 +13,6 @@
 cmake_minimum_required(VERSION 3.27)
 project(oglCubeExamples)
 
-
-option(IMGUIZMO_USES_GLM "Use GLM instead of internal vgMath" OFF)
-# glm_FOUND OR
-if(IMGUIZMO_USES_GLM)
-    find_package(glm CONFIG)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVGIZMO_USES_GLM")
-endif(IMGUIZMO_USES_GLM)
-
 set(CMAKE_CXX_STANDARD 17)
 
 find_package(OpenGL)
@@ -74,12 +66,6 @@ set(SOURCE_FILES
         ${TOOLS_DIR}/glad/glad.cpp
         ${TOOLS_DIR}/glad/glad.h)
 
-set(SOURCE_FILES_GLFW
-        ${IMGUI_DIR}/imgui_impl_glfw.cpp
-        ${IMGUI_DIR}/imgui_impl_glfw.h)
-set(SOURCE_FILES_SDL
-        ${IMGUI_DIR}/imgui_impl_sdl2.cpp
-        ${IMGUI_DIR}/imgui_impl_sdl2.h)
 
 file( GLOB APP_SOURCES ${SRC}/oglCube*.cpp )
 foreach( oglCubeSourceFile ${APP_SOURCES} )

@@ -44,16 +44,16 @@ void frameworkBase::initVGizmo3D(vg::vGizmo3D &vgTrackball)     // Settings to c
     // Initialization is necessary to associate your preferences to vGizmo3D
     // These are also the DEFAULT values, so if you want to maintain these combinations you can omit they
     // and to override only the associations that you want modify
-        vgTrackball.setGizmoRotControl         (vg::evButton1  /* or vg::evLeftButton */, 0 /* vg::evNoModifier */ );
+        vgTrackball.setGizmoRotControl      (vg::evButton1  /* or vg::evLeftButton */, 0 /* vg::evNoModifier */ );
     // Rotations around specific axis: mouse button and key modifier
-        vgTrackball.setGizmoRotXControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evShiftModifier);
-        vgTrackball.setGizmoRotYControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
-        vgTrackball.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
+        vgTrackball.setGizmoRotXControl     (vg::evButton1  /* or vg::evLeftButton */, vg::evShiftModifier);
+        vgTrackball.setGizmoRotYControl     (vg::evButton1  /* or vg::evLeftButton */, vg::evControlModifier);
+        vgTrackball.setGizmoRotZControl     (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
     // Set vGizmo3D control for secondary rotation
-        vgTrackball.setGizmoSecondaryRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
+        vgTrackball.setGizmoSecondRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
     // Pan and Dolly/Zoom: mouse button and key modifier
-        vgTrackball.setDollyControl            (vg::evButton2 /* or vg::evRightButton */, vg::evControlModifier);
-        vgTrackball.setPanControl              (vg::evButton2 /* or vg::evRightButton */, vg::evShiftModifier);
+        vgTrackball.setDollyControl         (vg::evButton2 /* or vg::evRightButton */, vg::evControlModifier);
+        vgTrackball.setPanControl           (vg::evButton2 /* or vg::evRightButton */, vg::evShiftModifier);
     // N.B. vg::enums are ONLY mnemonic: select and pass specific vg::enum to framework (that can have also different IDs)
 
     // passing the screen sizes auto-set the mouse sensitivity

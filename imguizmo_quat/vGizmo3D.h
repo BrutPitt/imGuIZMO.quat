@@ -240,9 +240,9 @@ public:
 ///@code
 ///     while (!glfwWindowShouldClose(glfwWindow)) {
 ///         ...
-///         track.idleSecondary();  // get continuous rotation on Idle
+///         track.idleSecond();  // get continuous rotation on Idle
 ///@endcode
-    void idleSecondary() { qtSecondaryRot = qtIdleSec*qtSecondaryRot; }
+    void idleSecond() { qtSecondRot = qtIdleSec*qtSecondRot; }
 
     //    Call after changed settings
     //--------------------------------------------------------------------------
@@ -251,6 +251,7 @@ public:
     {
         if(delta.x == 0 && delta.y == 0) {
             qtStep = tQuat(T(1), T(0), T(0), T(0)); //no rotation
+            qtStepSec = tQuat(T(1), T(0), T(0), T(0)); //no rotation
             if(tbActive) qtIdle = tQuat(T(1), T(0), T(0), T(0));
             if(tbSecActive) qtIdleSec = tQuat(T(1), T(0), T(0), T(0));
             return;
@@ -282,15 +283,17 @@ public:
         auto getNormalizedQuat = [&] (float factor = T(1)) {
             return normalize(angleAxis(angle * tbScale * fpsRatio * factor, axis * rotationVector));
         };
-        qtStep = flipRotation(getNormalizedQuat());
+
 
         if(tbActive) {
+            qtStep = flipRotation(getNormalizedQuat());
             qtIdle = flipRotation(getNormalizedQuat(qIdleSpeedRatio * qIdleReduction));
             qtRot = qtStep*qtRot;
         }
         if(tbSecActive) {
+            qtStepSec = flipRotation(getNormalizedQuat());
             qtIdleSec = flipRotation(getNormalizedQuat(qIdleSpeedRatio * qIdleReduction));
-            qtSecondaryRot = qtStep*qtSecondaryRot;
+            qtSecondRot = qtStepSec*qtSecondRot;
         }
     }
 
@@ -327,7 +330,7 @@ public:
 ///    track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
 ///
 ///    // Set vGizmo3D control for secondary rotation
-///    track.setGizmoSecondaryRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
+///    track.setGizmoSecondRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
 ///
 ///    // Pan and Dolly/Zoom: mouse button and key modifier
 ///    track.setDollyControl            (vg::evButton2 /* or vg::evRightButton */, vg::evControlModifier);
@@ -355,14 +358,14 @@ public:
 ///    track.setGizmoRotZControl        (vg::evButton1  /* or vg::evLeftButton */, vg::evAltModifier | vg::evSuperModifier);
 ///
 ///    // Set vGizmo3D control for secondary rotation
-///    track.setGizmoSecondaryRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
+///    track.setGizmoSecondRotControl(vg::evButton2  /* or vg::evRightButton */, 0 /* vg::evNoModifier */ );
 ///
 ///    // Pan and Dolly/Zoom: mouse button and key modifier
 ///    track.setDollyControl            (vg::evButton2 /* or vg::evRightButton */, vg::evControlModifier);
 ///    track.setPanControl              (vg::evButton2 /* or vg::evRightButton */, vg::evShiftModifier);
 ///@endcode
 ///@note the example values are also DEFAULT values: you can omit to set they and to override only the associations that you want modify
-    void setGizmoSecondaryRotControl( vgButtons b, vgModifiers m = evNoModifier) {
+    void setGizmoSecondRotControl( vgButtons b, vgModifiers m = evNoModifier) {
         tbSecControlButton = b;
         tbSecControlModifiers = m;
     }
@@ -428,18 +431,18 @@ public:
 /// Returns the reference to quaternion containing current vGizmo3D rotation
 /// @retval quat& : reference to vGizmo3D quaternion containing actual rotation
 /// to acquire and modify, very useful to use directly in ImGuUIZMO_quat
-    virtual tQuat &getRotationRef() { return qtRot; }
+    virtual tQuat &refRotation() { return qtRot; }
 
 /// Returns the quaternion containing current vGizmo3D secondary
 /// rotation (usually used to rotate light)
 /// @retval quat : quaternion contain actual rotation */
-    virtual tQuat getSecondRot() { return qtSecondaryRot; }
+    virtual tQuat getSecondRot() { return qtSecondRot; }
 
 /// Returns the reference to quaternion containing current vGizmo3D secondary
 /// rotation (usually used to rotate light)
 /// @retval quat& : reference to vGizmo3D quaternion containing actual rotation
 /// to acquire and modify, very useful to use directly in ImGuUIZMO_quat  */
-    virtual tQuat &getSecondRotRef() { return qtSecondaryRot; }
+    virtual tQuat &refSecondRot() { return qtSecondRot; }
 
 
 /// Set current rotation of vGizmo3D
@@ -448,7 +451,7 @@ public:
 
 /// Set current rotation of vGizmo3D
 ///@param[in] q quat& : reference quaternion containing rotation to set
-    void setSecondRot(const tQuat &q) { qtSecondaryRot = q; }
+    void setSecondRot(const tQuat &q) { qtSecondRot = q; }
 
 /// flip X Rot
 ///@param[in] b bool
@@ -534,9 +537,11 @@ protected:
     //  set the rotation increment
     //////////////////////////////////////////////////////////////////
     void setStepRotation(const tQuat &q) { qtStep = q; }
+    void setStepSecondRot(const tQuat &q) { qtStepSec = q; }
     //  get the rotation increment
     //////////////////////////////////////////////////////////////////
     tQuat getStepRotation() { return qtStep; }
+    tQuat getStepSecondRot() { return qtStepSec; }
 
     T panFlipX(T x)  { return isFlipPanX  ?         -x : x; }
     T panFlipY(T y)  { return isFlipPanY  ?         -y : y; }
@@ -552,8 +557,9 @@ protected:
     //tVec3 rotationVector = tVec3(T(1));
 
     tQuat qtRot          = tQuat(T(1), T(0), T(0), T(0));
-    tQuat qtSecondaryRot = tQuat(T(1), T(0), T(0), T(0));
+    tQuat qtSecondRot    = tQuat(T(1), T(0), T(0), T(0));
     tQuat qtStep         = tQuat(T(1), T(0), T(0), T(0));
+    tQuat qtStepSec      = tQuat(T(1), T(0), T(0), T(0));
     tQuat qtIdle         = tQuat(T(1), T(0), T(0), T(0));
     tQuat qtIdleSec      = tQuat(T(1), T(0), T(0), T(0));
 
@@ -623,7 +629,7 @@ public:
     //void setGizmoScale( T scale) { scale = scale; }
 
     // get the rotation quaternion
-    tQuat &getRotationRef() { return this->qtRot; }
+    tQuat &refRotation() { return this->qtRot; }
 };
 
 //--------------------------------------------------------------------
@@ -860,7 +866,7 @@ public:
     //  Get Pan (xy) & Dolly (z) position
     //////////////////////////////////////////////////////////////////
     tVec3 getPosition() { return vecPanDolly; }
-    tVec3 &getPositionRef() { return vecPanDolly; }
+    tVec3 &refPosition() { return vecPanDolly; }
     void  setPosition(const tVec3 &pos) { vecPanDolly = pos; }
 
     bool isDollyActive() { return dollyActive; }
