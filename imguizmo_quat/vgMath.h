@@ -368,9 +368,9 @@ TEMPLATE_TYPENAME_T inline MAT3_T::Mat3(QUAT_T const& q) {
     *this = { T(1) - T(2) * (yy + zz),         T(2) * (xy + wz),         T(2) * (xz - wy),
                      T(2) * (xy - wz),  T(1) - T(2) * (xx + zz),         T(2) * (yz + wx),
                      T(2) * (xz + wy),         T(2) * (yz - wx),  T(1) - T(2) * (xx + yy) }; }
-TEMPLATE_TYPENAME_T inline MAT4_T::Mat4(QUAT_T const& q)     {  *this = Mat4(Mat3(q)); }
-TEMPLATE_TYPENAME_T inline MAT3_T mat3_cast(QUAT_T const& q) { return Mat3(q); }
-TEMPLATE_TYPENAME_T inline MAT4_T mat4_cast(QUAT_T const& q) { return Mat3(q); }
+TEMPLATE_TYPENAME_T inline MAT4_T::Mat4(QUAT_T const& q)     {  *this = MAT4_T(MAT3_T(q)); }
+TEMPLATE_TYPENAME_T inline MAT3_T mat3_cast(QUAT_T const& q) { return MAT3_T(q); }
+TEMPLATE_TYPENAME_T inline MAT4_T mat4_cast(QUAT_T const& q) { return MAT3_T(q); }
 TEMPLATE_TYPENAME_T inline VEC3_T getTranslationVec(const MAT4_T& m) { return { m.v[3] }; }
 
 
