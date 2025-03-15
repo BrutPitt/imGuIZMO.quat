@@ -1,4 +1,4 @@
-// dear imgui, v1.91.6
+// dear imgui, v1.91.9 WIP
 // (drawing and font code)
 
 /*
@@ -67,13 +67,17 @@ Index of this file:
 #pragma clang diagnostic ignored "-Wreserved-identifier"            // warning: identifier '_Xxx' is reserved because it starts with '_' followed by a capital letter
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"            // warning: 'xxx' is an unsafe pointer used for buffer access
 #pragma clang diagnostic ignored "-Wnontrivial-memaccess"           // warning: first argument in call to 'memset' is a pointer to non-trivially copyable type
+#pragma clang diagnostic ignored "-Wcast-qual"                      // warning: cast from 'const xxxx *' to 'xxx *' drops const qualifier
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpragmas"                          // warning: unknown option after '#pragma GCC diagnostic' kind
 #pragma GCC diagnostic ignored "-Wunused-function"                  // warning: 'xxxx' defined but not used
+#pragma GCC diagnostic ignored "-Wfloat-equal"                      // warning: comparing floating-point with '==' or '!=' is unsafe
 #pragma GCC diagnostic ignored "-Wdouble-promotion"                 // warning: implicit conversion from 'float' to 'double' when passing argument to function
 #pragma GCC diagnostic ignored "-Wconversion"                       // warning: conversion to 'xxxx' from 'xxxx' may alter its value
 #pragma GCC diagnostic ignored "-Wstack-protector"                  // warning: stack protector not protecting local variables: variable length buffer
+#pragma GCC diagnostic ignored "-Wstrict-overflow"                  // warning: assuming signed overflow does not occur when simplifying division / ..when changing X +- C1 cmp C2 to X cmp C2 -+ C1
 #pragma GCC diagnostic ignored "-Wclass-memaccess"                  // [__GNUC__ >= 8] warning: 'memset/memcpy' clearing/writing an object of type 'xxxx' with no trivial copy-assignment; use assignment or value-initialization instead
+#pragma GCC diagnostic ignored "-Wcast-qual"                        // warning: cast from type 'const xxxx *' to type 'xxxx *' casts away qualifiers
 #endif
 
 //-------------------------------------------------------------------------
@@ -105,13 +109,12 @@ namespace IMGUI_STB_NAMESPACE
 #pragma clang diagnostic ignored "-Wunused-function"        // warning: 'xxxx' defined but not used
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wimplicit-fallthrough"
-#pragma clang diagnostic ignored "-Wcast-qual"              // warning: cast from 'const xxxx *' to 'xxx *' drops const qualifier
 #endif
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wtype-limits"              // warning: comparison is always true due to limited range of data type [-Wtype-limits]
-#pragma GCC diagnostic ignored "-Wcast-qual"                // warning: cast from type 'const xxxx *' to type 'xxxx *' casts away qualifiers
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"     // warning: this statement may fall through
 #endif
 
 #ifndef STB_RECT_PACK_IMPLEMENTATION                        // in case the user already have an implementation in the _same_ compilation unit (e.g. unity builds)
@@ -140,6 +143,7 @@ namespace IMGUI_STB_NAMESPACE
 #define STBTT_fabs(x)       ImFabs(x)
 #define STBTT_ifloor(x)     ((int)ImFloor(x))
 #define STBTT_iceil(x)      ((int)ImCeil(x))
+#define STBTT_strlen(x)     ImStrlen(x)
 #define STBTT_STATIC
 #define STB_TRUETYPE_IMPLEMENTATION
 #else
@@ -371,6 +375,7 @@ void ImGui::StyleColorsLight(ImGuiStyle* dst)
 ImDrawListSharedData::ImDrawListSharedData()
 {
     memset(this, 0, sizeof(*this));
+    InitialFringeScale = 1.0f;
     for (int i = 0; i < IM_ARRAYSIZE(ArcFastVtx); i++)
     {
         const float a = ((float)i * 2 * IM_PI) / (float)IM_ARRAYSIZE(ArcFastVtx);
@@ -430,7 +435,7 @@ void ImDrawList::_ResetForNewFrame()
     _Path.resize(0);
     _Splitter.Clear();
     CmdBuffer.push_back(ImDrawCmd());
-    _FringeScale = 1.0f;
+    _FringeScale = _Data->InitialFringeScale;
 }
 
 void ImDrawList::_ClearFreeMemory()
@@ -1666,8 +1671,7 @@ void ImDrawList::AddText(ImFont* font, float font_size, const ImVec2& pos, ImU32
     // Accept null ranges
     if (text_begin == text_end || text_begin[0] == 0)
         return;
-    if (text_end == NULL)
-        text_end = text_begin + strlen(text_begin);
+    // No need to strlen() here: font->RenderText() will do it and may early out.
 
     // Pull default font/size from the shared ImDrawListSharedData instance
     if (font == NULL)
@@ -1690,7 +1694,7 @@ void ImDrawList::AddText(ImFont* font, float font_size, const ImVec2& pos, ImU32
 
 void ImDrawList::AddText(const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end)
 {
-    AddText(NULL, 0.0f, pos, col, text_begin, text_end);
+    AddText(_Data->Font, _Data->FontSize, pos, col, text_begin, text_end);
 }
 
 void ImDrawList::AddImage(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col)
@@ -2372,16 +2376,48 @@ ImFontConfig::ImFontConfig()
 {
     memset(this, 0, sizeof(*this));
     FontDataOwnedByAtlas = true;
-    OversampleH = 2;
-    OversampleV = 1;
+    OversampleH = 0; // Auto == 1 or 2 depending on size
+    OversampleV = 0; // Auto == 1
     GlyphMaxAdvanceX = FLT_MAX;
     RasterizerMultiply = 1.0f;
     RasterizerDensity = 1.0f;
-    EllipsisChar = (ImWchar)-1;
+    EllipsisChar = 0;
 }
 
 //-----------------------------------------------------------------------------
 // [SECTION] ImFontAtlas
+//-----------------------------------------------------------------------------
+// - Default texture data encoded in ASCII
+// - ImFontAtlas::ClearInputData()
+// - ImFontAtlas::ClearTexData()
+// - ImFontAtlas::ClearFonts()
+// - ImFontAtlas::Clear()
+// - ImFontAtlas::GetTexDataAsAlpha8()
+// - ImFontAtlas::GetTexDataAsRGBA32()
+// - ImFontAtlas::AddFont()
+// - ImFontAtlas::AddFontDefault()
+// - ImFontAtlas::AddFontFromFileTTF()
+// - ImFontAtlas::AddFontFromMemoryTTF()
+// - ImFontAtlas::AddFontFromMemoryCompressedTTF()
+// - ImFontAtlas::AddFontFromMemoryCompressedBase85TTF()
+// - ImFontAtlas::AddCustomRectRegular()
+// - ImFontAtlas::AddCustomRectFontGlyph()
+// - ImFontAtlas::CalcCustomRectUV()
+// - ImFontAtlasGetMouseCursorTexData()
+// - ImFontAtlas::Build()
+// - ImFontAtlasBuildMultiplyCalcLookupTable()
+// - ImFontAtlasBuildMultiplyRectAlpha8()
+// - ImFontAtlasBuildWithStbTruetype()
+// - ImFontAtlasGetBuilderForStbTruetype()
+// - ImFontAtlasUpdateSourcesPointers()
+// - ImFontAtlasBuildSetupFont()
+// - ImFontAtlasBuildPackCustomRects()
+// - ImFontAtlasBuildRender8bppRectFromString()
+// - ImFontAtlasBuildRender32bppRectFromString()
+// - ImFontAtlasBuildRenderDefaultTexData()
+// - ImFontAtlasBuildRenderLinesTexData()
+// - ImFontAtlasBuildInit()
+// - ImFontAtlasBuildFinish()
 //-----------------------------------------------------------------------------
 
 // A work of art lies ahead! (. = white layer, X = black layer, others are blank)
@@ -2431,6 +2467,8 @@ static const ImVec2 FONT_ATLAS_DEFAULT_TEX_CURSOR_DATA[ImGuiMouseCursor_COUNT][3
     { ImVec2(73,0), ImVec2(17,17), ImVec2( 8, 8) }, // ImGuiMouseCursor_ResizeNESW
     { ImVec2(55,0), ImVec2(17,17), ImVec2( 8, 8) }, // ImGuiMouseCursor_ResizeNWSE
     { ImVec2(91,0), ImVec2(17,22), ImVec2( 5, 0) }, // ImGuiMouseCursor_Hand
+    { ImVec2(0,3),  ImVec2(12,19), ImVec2(0, 0) },  // ImGuiMouseCursor_Wait       // Arrow + custom code in ImGui::RenderMouseCursor()
+    { ImVec2(0,3),  ImVec2(12,19), ImVec2(0, 0) },  // ImGuiMouseCursor_Progress   // Arrow + custom code in ImGui::RenderMouseCursor()
     { ImVec2(109,0),ImVec2(13,15), ImVec2( 6, 7) }, // ImGuiMouseCursor_NotAllowed
 };
 
@@ -2450,7 +2488,7 @@ ImFontAtlas::~ImFontAtlas()
 void    ImFontAtlas::ClearInputData()
 {
     IM_ASSERT(!Locked && "Cannot modify a locked ImFontAtlas between NewFrame() and EndFrame/Render()!");
-    for (ImFontConfig& font_cfg : ConfigData)
+    for (ImFontConfig& font_cfg : Sources)
         if (font_cfg.FontData && font_cfg.FontDataOwnedByAtlas)
         {
             IM_FREE(font_cfg.FontData);
@@ -2459,12 +2497,12 @@ void    ImFontAtlas::ClearInputData()
 
     // When clearing this we lose access to the font name and other information used to build the font.
     for (ImFont* font : Fonts)
-        if (font->ConfigData >= ConfigData.Data && font->ConfigData < ConfigData.Data + ConfigData.Size)
+        if (font->Sources >= Sources.Data && font->Sources < Sources.Data + Sources.Size)
         {
-            font->ConfigData = NULL;
-            font->ConfigDataCount = 0;
+            font->Sources = NULL;
+            font->SourcesCount = 0;
         }
-    ConfigData.clear();
+    Sources.clear();
     CustomRects.clear();
     PackIdMouseCursors = PackIdLines = -1;
     // Important: we leave TexReady untouched
@@ -2486,6 +2524,7 @@ void    ImFontAtlas::ClearTexData()
 void    ImFontAtlas::ClearFonts()
 {
     IM_ASSERT(!Locked && "Cannot modify a locked ImFontAtlas between NewFrame() and EndFrame/Render()!");
+    ClearInputData();
     Fonts.clear_delete();
     TexReady = false;
 }
@@ -2538,8 +2577,7 @@ ImFont* ImFontAtlas::AddFont(const ImFontConfig* font_cfg)
     IM_ASSERT(!Locked && "Cannot modify a locked ImFontAtlas between NewFrame() and EndFrame/Render()!");
     IM_ASSERT(font_cfg->FontData != NULL && font_cfg->FontDataSize > 0);
     IM_ASSERT(font_cfg->SizePixels > 0.0f && "Is ImFontConfig struct correctly initialized?");
-    IM_ASSERT(font_cfg->OversampleH > 0 && font_cfg->OversampleV > 0 && "Is ImFontConfig struct correctly initialized?");
-    IM_ASSERT(font_cfg->RasterizerDensity > 0.0f);
+    IM_ASSERT(font_cfg->RasterizerDensity > 0.0f && "Is ImFontConfig struct correctly initialized?");
 
     // Create new font
     if (!font_cfg->MergeMode)
@@ -2547,8 +2585,8 @@ ImFont* ImFontAtlas::AddFont(const ImFontConfig* font_cfg)
     else
         IM_ASSERT(Fonts.Size > 0 && "Cannot use MergeMode for the first font"); // When using MergeMode make sure that a font has already been added before. You can use ImGui::GetIO().Fonts->AddFontDefault() to add the default imgui font.
 
-    ConfigData.push_back(*font_cfg);
-    ImFontConfig& new_font_cfg = ConfigData.back();
+    Sources.push_back(*font_cfg);
+    ImFontConfig& new_font_cfg = Sources.back();
     if (new_font_cfg.DstFont == NULL)
         new_font_cfg.DstFont = Fonts.back();
     if (!new_font_cfg.FontDataOwnedByAtlas)
@@ -2564,11 +2602,8 @@ ImFont* ImFontAtlas::AddFont(const ImFontConfig* font_cfg)
     // - We may support it better later and remove this rounding.
     new_font_cfg.SizePixels = ImTrunc(new_font_cfg.SizePixels);
 
-    if (new_font_cfg.DstFont->EllipsisChar == (ImWchar)-1)
-        new_font_cfg.DstFont->EllipsisChar = font_cfg->EllipsisChar;
-
-    // Pointers to ConfigData and BuilderData are otherwise dangling
-    ImFontAtlasUpdateConfigDataPointers(this);
+    // Pointers to Sources data are otherwise dangling
+    ImFontAtlasUpdateSourcesPointers(this);
 
     // Invalidate texture
     TexReady = false;
@@ -2638,7 +2673,7 @@ ImFont* ImFontAtlas::AddFontFromFileTTF(const char* filename, float size_pixels,
     {
         // Store a short copy of filename into into the font name for convenience
         const char* p;
-        for (p = filename + strlen(filename); p > filename && p[-1] != '/' && p[-1] != '\\'; p--) {}
+        for (p = filename + ImStrlen(filename); p > filename && p[-1] != '/' && p[-1] != '\\'; p--) {}
         ImFormatString(font_cfg.Name, IM_ARRAYSIZE(font_cfg.Name), "%s, %.0fpx", p, size_pixels);
     }
     return AddFontFromMemoryTTF(data, (int)data_size, size_pixels, &font_cfg, glyph_ranges);
@@ -2673,7 +2708,7 @@ ImFont* ImFontAtlas::AddFontFromMemoryCompressedTTF(const void* compressed_ttf_d
 
 ImFont* ImFontAtlas::AddFontFromMemoryCompressedBase85TTF(const char* compressed_ttf_data_base85, float size_pixels, const ImFontConfig* font_cfg, const ImWchar* glyph_ranges)
 {
-    int compressed_ttf_size = (((int)strlen(compressed_ttf_data_base85) + 4) / 5) * 4;
+    int compressed_ttf_size = (((int)ImStrlen(compressed_ttf_data_base85) + 4) / 5) * 4;
     void* compressed_ttf = IM_ALLOC((size_t)compressed_ttf_size);
     Decode85((const unsigned char*)compressed_ttf_data_base85, (unsigned char*)compressed_ttf);
     ImFont* font = AddFontFromMemoryCompressedTTF(compressed_ttf, compressed_ttf_size, size_pixels, font_cfg, glyph_ranges);
@@ -2720,24 +2755,24 @@ void ImFontAtlas::CalcCustomRectUV(const ImFontAtlasCustomRect* rect, ImVec2* ou
     *out_uv_max = ImVec2((float)(rect->X + rect->Width) * TexUvScale.x, (float)(rect->Y + rect->Height) * TexUvScale.y);
 }
 
-bool ImFontAtlas::GetMouseCursorTexData(ImGuiMouseCursor cursor_type, ImVec2* out_offset, ImVec2* out_size, ImVec2 out_uv_border[2], ImVec2 out_uv_fill[2])
+bool ImFontAtlasGetMouseCursorTexData(ImFontAtlas* atlas, ImGuiMouseCursor cursor_type, ImVec2* out_offset, ImVec2* out_size, ImVec2 out_uv_border[2], ImVec2 out_uv_fill[2])
 {
     if (cursor_type <= ImGuiMouseCursor_None || cursor_type >= ImGuiMouseCursor_COUNT)
         return false;
-    if (Flags & ImFontAtlasFlags_NoMouseCursors)
+    if (atlas->Flags & ImFontAtlasFlags_NoMouseCursors)
         return false;
 
-    IM_ASSERT(PackIdMouseCursors != -1);
-    ImFontAtlasCustomRect* r = GetCustomRectByIndex(PackIdMouseCursors);
+    IM_ASSERT(atlas->PackIdMouseCursors != -1);
+    ImFontAtlasCustomRect* r = atlas->GetCustomRectByIndex(atlas->PackIdMouseCursors);
     ImVec2 pos = FONT_ATLAS_DEFAULT_TEX_CURSOR_DATA[cursor_type][0] + ImVec2((float)r->X, (float)r->Y);
     ImVec2 size = FONT_ATLAS_DEFAULT_TEX_CURSOR_DATA[cursor_type][1];
     *out_size = size;
     *out_offset = FONT_ATLAS_DEFAULT_TEX_CURSOR_DATA[cursor_type][2];
-    out_uv_border[0] = (pos) * TexUvScale;
-    out_uv_border[1] = (pos + size) * TexUvScale;
+    out_uv_border[0] = (pos) * atlas->TexUvScale;
+    out_uv_border[1] = (pos + size) * atlas->TexUvScale;
     pos.x += FONT_ATLAS_DEFAULT_TEX_DATA_W + 1;
-    out_uv_fill[0] = (pos) * TexUvScale;
-    out_uv_fill[1] = (pos + size) * TexUvScale;
+    out_uv_fill[0] = (pos) * atlas->TexUvScale;
+    out_uv_fill[1] = (pos + size) * atlas->TexUvScale;
     return true;
 }
 
@@ -2746,7 +2781,7 @@ bool    ImFontAtlas::Build()
     IM_ASSERT(!Locked && "Cannot modify a locked ImFontAtlas between NewFrame() and EndFrame/Render()!");
 
     // Default font is none are specified
-    if (ConfigData.Size == 0)
+    if (Sources.Size == 0)
         AddFontDefault();
 
     // Select builder
@@ -2786,6 +2821,13 @@ void    ImFontAtlasBuildMultiplyRectAlpha8(const unsigned char table[256], unsig
     for (int j = h; j > 0; j--, data += stride - w)
         for (int i = w; i > 0; i--, data++)
             *data = table[*data];
+}
+
+void ImFontAtlasBuildGetOversampleFactors(const ImFontConfig* src, int* out_oversample_h, int* out_oversample_v)
+{
+    // Automatically disable horizontal oversampling over size 36
+    *out_oversample_h = (src->OversampleH != 0) ? src->OversampleH : (src->SizePixels * src->RasterizerDensity > 36.0f || src->PixelSnapH) ? 1 : 2;
+    *out_oversample_v = (src->OversampleV != 0) ? src->OversampleV : 1;
 }
 
 #ifdef IMGUI_ENABLE_STB_TRUETYPE
@@ -2828,7 +2870,7 @@ static void UnpackBitVectorToFlatIndexList(const ImBitVector* in, ImVector<int>*
 
 static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
 {
-    IM_ASSERT(atlas->ConfigData.Size > 0);
+    IM_ASSERT(atlas->Sources.Size > 0);
 
     ImFontAtlasBuildInit(atlas);
 
@@ -2842,32 +2884,32 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
     // Temporary storage for building
     ImVector<ImFontBuildSrcData> src_tmp_array;
     ImVector<ImFontBuildDstData> dst_tmp_array;
-    src_tmp_array.resize(atlas->ConfigData.Size);
+    src_tmp_array.resize(atlas->Sources.Size);
     dst_tmp_array.resize(atlas->Fonts.Size);
     memset(src_tmp_array.Data, 0, (size_t)src_tmp_array.size_in_bytes());
     memset(dst_tmp_array.Data, 0, (size_t)dst_tmp_array.size_in_bytes());
 
     // 1. Initialize font loading structure, check font data validity
-    for (int src_i = 0; src_i < atlas->ConfigData.Size; src_i++)
+    for (int src_i = 0; src_i < atlas->Sources.Size; src_i++)
     {
         ImFontBuildSrcData& src_tmp = src_tmp_array[src_i];
-        ImFontConfig& cfg = atlas->ConfigData[src_i];
-        IM_ASSERT(cfg.DstFont && (!cfg.DstFont->IsLoaded() || cfg.DstFont->ContainerAtlas == atlas));
+        ImFontConfig& src = atlas->Sources[src_i];
+        IM_ASSERT(src.DstFont && (!src.DstFont->IsLoaded() || src.DstFont->ContainerAtlas == atlas));
 
-        // Find index from cfg.DstFont (we allow the user to set cfg.DstFont. Also it makes casual debugging nicer than when storing indices)
+        // Find index from src.DstFont (we allow the user to set cfg.DstFont. Also it makes casual debugging nicer than when storing indices)
         src_tmp.DstIndex = -1;
         for (int output_i = 0; output_i < atlas->Fonts.Size && src_tmp.DstIndex == -1; output_i++)
-            if (cfg.DstFont == atlas->Fonts[output_i])
+            if (src.DstFont == atlas->Fonts[output_i])
                 src_tmp.DstIndex = output_i;
         if (src_tmp.DstIndex == -1)
         {
-            IM_ASSERT(src_tmp.DstIndex != -1); // cfg.DstFont not pointing within atlas->Fonts[] array?
+            IM_ASSERT(src_tmp.DstIndex != -1); // src.DstFont not pointing within atlas->Fonts[] array?
             return false;
         }
         // Initialize helper structure for font loading and verify that the TTF/OTF data is correct
-        const int font_offset = stbtt_GetFontOffsetForIndex((unsigned char*)cfg.FontData, cfg.FontNo);
+        const int font_offset = stbtt_GetFontOffsetForIndex((unsigned char*)src.FontData, src.FontNo);
         IM_ASSERT(font_offset >= 0 && "FontData is incorrect, or FontNo cannot be found.");
-        if (!stbtt_InitFont(&src_tmp.FontInfo, (unsigned char*)cfg.FontData, font_offset))
+        if (!stbtt_InitFont(&src_tmp.FontInfo, (unsigned char*)src.FontData, font_offset))
         {
             IM_ASSERT(0 && "stbtt_InitFont(): failed to parse FontData. It is correct and complete? Check FontDataSize.");
             return false;
@@ -2875,7 +2917,7 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
 
         // Measure highest codepoints
         ImFontBuildDstData& dst_tmp = dst_tmp_array[src_tmp.DstIndex];
-        src_tmp.SrcRanges = cfg.GlyphRanges ? cfg.GlyphRanges : atlas->GetGlyphRangesDefault();
+        src_tmp.SrcRanges = src.GlyphRanges ? src.GlyphRanges : atlas->GetGlyphRangesDefault();
         for (const ImWchar* src_range = src_tmp.SrcRanges; src_range[0] && src_range[1]; src_range += 2)
         {
             // Check for valid range. This may also help detect *some* dangling pointers, because a common
@@ -2953,26 +2995,30 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
         buf_rects_out_n += src_tmp.GlyphsCount;
         buf_packedchars_out_n += src_tmp.GlyphsCount;
 
+        // Automatic selection of oversampling parameters
+        ImFontConfig& src = atlas->Sources[src_i];
+        int oversample_h, oversample_v;
+        ImFontAtlasBuildGetOversampleFactors(&src, &oversample_h, &oversample_v);
+
         // Convert our ranges in the format stb_truetype wants
-        ImFontConfig& cfg = atlas->ConfigData[src_i];
-        src_tmp.PackRange.font_size = cfg.SizePixels * cfg.RasterizerDensity;
+        src_tmp.PackRange.font_size = src.SizePixels * src.RasterizerDensity;
         src_tmp.PackRange.first_unicode_codepoint_in_range = 0;
         src_tmp.PackRange.array_of_unicode_codepoints = src_tmp.GlyphsList.Data;
         src_tmp.PackRange.num_chars = src_tmp.GlyphsList.Size;
         src_tmp.PackRange.chardata_for_range = src_tmp.PackedChars;
-        src_tmp.PackRange.h_oversample = (unsigned char)cfg.OversampleH;
-        src_tmp.PackRange.v_oversample = (unsigned char)cfg.OversampleV;
+        src_tmp.PackRange.h_oversample = (unsigned char)oversample_h;
+        src_tmp.PackRange.v_oversample = (unsigned char)oversample_v;
 
         // Gather the sizes of all rectangles we will need to pack (this loop is based on stbtt_PackFontRangesGatherRects)
-        const float scale = (cfg.SizePixels > 0.0f) ? stbtt_ScaleForPixelHeight(&src_tmp.FontInfo, cfg.SizePixels * cfg.RasterizerDensity) : stbtt_ScaleForMappingEmToPixels(&src_tmp.FontInfo, -cfg.SizePixels * cfg.RasterizerDensity);
+        const float scale = (src.SizePixels > 0.0f) ? stbtt_ScaleForPixelHeight(&src_tmp.FontInfo, src.SizePixels * src.RasterizerDensity) : stbtt_ScaleForMappingEmToPixels(&src_tmp.FontInfo, -src.SizePixels * src.RasterizerDensity);
         for (int glyph_i = 0; glyph_i < src_tmp.GlyphsList.Size; glyph_i++)
         {
             int x0, y0, x1, y1;
             const int glyph_index_in_font = stbtt_FindGlyphIndex(&src_tmp.FontInfo, src_tmp.GlyphsList[glyph_i]);
             IM_ASSERT(glyph_index_in_font != 0);
-            stbtt_GetGlyphBitmapBoxSubpixel(&src_tmp.FontInfo, glyph_index_in_font, scale * cfg.OversampleH, scale * cfg.OversampleV, 0, 0, &x0, &y0, &x1, &y1);
-            src_tmp.Rects[glyph_i].w = (stbrp_coord)(x1 - x0 + pack_padding + cfg.OversampleH - 1);
-            src_tmp.Rects[glyph_i].h = (stbrp_coord)(y1 - y0 + pack_padding + cfg.OversampleV - 1);
+            stbtt_GetGlyphBitmapBoxSubpixel(&src_tmp.FontInfo, glyph_index_in_font, scale * oversample_h, scale * oversample_v, 0, 0, &x0, &y0, &x1, &y1);
+            src_tmp.Rects[glyph_i].w = (stbrp_coord)(x1 - x0 + pack_padding + oversample_h - 1);
+            src_tmp.Rects[glyph_i].h = (stbrp_coord)(y1 - y0 + pack_padding + oversample_v - 1);
             total_surface += src_tmp.Rects[glyph_i].w * src_tmp.Rects[glyph_i].h;
         }
     }
@@ -3024,7 +3070,7 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
     // 8. Render/rasterize font characters into the texture
     for (int src_i = 0; src_i < src_tmp_array.Size; src_i++)
     {
-        ImFontConfig& cfg = atlas->ConfigData[src_i];
+        ImFontConfig& src = atlas->Sources[src_i];
         ImFontBuildSrcData& src_tmp = src_tmp_array[src_i];
         if (src_tmp.GlyphsCount == 0)
             continue;
@@ -3032,10 +3078,10 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
         stbtt_PackFontRangesRenderIntoRects(&spc, &src_tmp.FontInfo, &src_tmp.PackRange, 1, src_tmp.Rects);
 
         // Apply multiply operator
-        if (cfg.RasterizerMultiply != 1.0f)
+        if (src.RasterizerMultiply != 1.0f)
         {
             unsigned char multiply_table[256];
-            ImFontAtlasBuildMultiplyCalcLookupTable(multiply_table, cfg.RasterizerMultiply);
+            ImFontAtlasBuildMultiplyCalcLookupTable(multiply_table, src.RasterizerMultiply);
             stbrp_rect* r = &src_tmp.Rects[0];
             for (int glyph_i = 0; glyph_i < src_tmp.GlyphsCount; glyph_i++, r++)
                 if (r->was_packed)
@@ -3053,22 +3099,22 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
     {
         // When merging fonts with MergeMode=true:
         // - We can have multiple input fonts writing into a same destination font.
-        // - dst_font->ConfigData is != from cfg which is our source configuration.
+        // - dst_font->Sources is != from src which is our source configuration.
         ImFontBuildSrcData& src_tmp = src_tmp_array[src_i];
-        ImFontConfig& cfg = atlas->ConfigData[src_i];
-        ImFont* dst_font = cfg.DstFont;
+        ImFontConfig& src = atlas->Sources[src_i];
+        ImFont* dst_font = src.DstFont;
 
-        const float font_scale = stbtt_ScaleForPixelHeight(&src_tmp.FontInfo, cfg.SizePixels);
+        const float font_scale = stbtt_ScaleForPixelHeight(&src_tmp.FontInfo, src.SizePixels);
         int unscaled_ascent, unscaled_descent, unscaled_line_gap;
         stbtt_GetFontVMetrics(&src_tmp.FontInfo, &unscaled_ascent, &unscaled_descent, &unscaled_line_gap);
 
         const float ascent = ImCeil(unscaled_ascent * font_scale);
         const float descent = ImFloor(unscaled_descent * font_scale);
-        ImFontAtlasBuildSetupFont(atlas, dst_font, &cfg, ascent, descent);
-        const float font_off_x = cfg.GlyphOffset.x;
-        const float font_off_y = cfg.GlyphOffset.y + IM_ROUND(dst_font->Ascent);
+        ImFontAtlasBuildSetupFont(atlas, dst_font, &src, ascent, descent);
+        const float font_off_x = src.GlyphOffset.x;
+        const float font_off_y = src.GlyphOffset.y + IM_ROUND(dst_font->Ascent);
 
-        const float inv_rasterization_scale = 1.0f / cfg.RasterizerDensity;
+        const float inv_rasterization_scale = 1.0f / src.RasterizerDensity;
 
         for (int glyph_i = 0; glyph_i < src_tmp.GlyphsCount; glyph_i++)
         {
@@ -3082,7 +3128,7 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
             float y0 = q.y0 * inv_rasterization_scale + font_off_y;
             float x1 = q.x1 * inv_rasterization_scale + font_off_x;
             float y1 = q.y1 * inv_rasterization_scale + font_off_y;
-            dst_font->AddGlyph(&cfg, (ImWchar)codepoint, x0, y0, x1, y1, q.s0, q.t0, q.s1, q.t1, pc.xadvance * inv_rasterization_scale);
+            dst_font->AddGlyph(&src, (ImWchar)codepoint, x0, y0, x1, y1, q.s0, q.t0, q.s1, q.t1, pc.xadvance * inv_rasterization_scale);
         }
     }
 
@@ -3102,17 +3148,17 @@ const ImFontBuilderIO* ImFontAtlasGetBuilderForStbTruetype()
 
 #endif // IMGUI_ENABLE_STB_TRUETYPE
 
-void ImFontAtlasUpdateConfigDataPointers(ImFontAtlas* atlas)
+void ImFontAtlasUpdateSourcesPointers(ImFontAtlas* atlas)
 {
-    for (ImFontConfig& font_cfg : atlas->ConfigData)
+    for (ImFontConfig& src : atlas->Sources)
     {
-        ImFont* font = font_cfg.DstFont;
-        if (!font_cfg.MergeMode)
+        ImFont* font = src.DstFont;
+        if (!src.MergeMode)
         {
-            font->ConfigData = &font_cfg;
-            font->ConfigDataCount = 0;
+            font->Sources = &src;
+            font->SourcesCount = 0;
         }
-        font->ConfigDataCount++;
+        font->SourcesCount++;
     }
 }
 
@@ -3122,7 +3168,7 @@ void ImFontAtlasBuildSetupFont(ImFontAtlas* atlas, ImFont* font, ImFontConfig* f
     {
         font->ClearOutputData();
         font->FontSize = font_config->SizePixels;
-        IM_ASSERT(font->ConfigData == font_config);
+        IM_ASSERT(font->Sources == font_config);
         font->ContainerAtlas = atlas;
         font->Ascent = ascent;
         font->Descent = descent;
@@ -3307,7 +3353,7 @@ void ImFontAtlasBuildFinish(ImFontAtlas* atlas)
         if (r->Font == NULL || r->GlyphID == 0)
             continue;
 
-        // Will ignore ImFontConfig settings: GlyphMinAdvanceX, GlyphMinAdvanceY, GlyphExtraSpacing, PixelSnapH
+        // Will ignore ImFontConfig settings: GlyphMinAdvanceX, GlyphMinAdvanceY, PixelSnapH
         IM_ASSERT(r->Font->ContainerAtlas == atlas);
         ImVec2 uv0, uv1;
         atlas->CalcCustomRectUV(r, &uv0, &uv1);
@@ -3327,6 +3373,16 @@ void ImFontAtlasBuildFinish(ImFontAtlas* atlas)
 //-------------------------------------------------------------------------
 // [SECTION] ImFontAtlas: glyph ranges helpers
 //-------------------------------------------------------------------------
+// - GetGlyphRangesDefault()
+// - GetGlyphRangesGreek()
+// - GetGlyphRangesKorean()
+// - GetGlyphRangesChineseFull()
+// - GetGlyphRangesChineseSimplifiedCommon()
+// - GetGlyphRangesJapanese()
+// - GetGlyphRangesCyrillic()
+// - GetGlyphRangesThai()
+// - GetGlyphRangesVietnamese()
+//-----------------------------------------------------------------------------
 
 // Retrieve list of range (2 int per range, values are inclusive)
 const ImWchar*   ImFontAtlas::GetGlyphRangesDefault()
@@ -3633,21 +3689,8 @@ void ImFontGlyphRangesBuilder::BuildRanges(ImVector<ImWchar>* out_ranges)
 
 ImFont::ImFont()
 {
-    FontSize = 0.0f;
-    FallbackAdvanceX = 0.0f;
-    FallbackChar = (ImWchar)-1;
-    EllipsisChar = (ImWchar)-1;
-    EllipsisWidth = EllipsisCharStep = 0.0f;
-    EllipsisCharCount = 0;
-    FallbackGlyph = NULL;
-    ContainerAtlas = NULL;
-    ConfigData = NULL;
-    ConfigDataCount = 0;
-    DirtyLookupTables = false;
+    memset(this, 0, sizeof(*this));
     Scale = 1.0f;
-    Ascent = Descent = 0.0f;
-    MetricsTotalSurface = 0;
-    memset(Used4kPagesMap, 0, sizeof(Used4kPagesMap));
 }
 
 ImFont::~ImFont()
@@ -3667,7 +3710,7 @@ void    ImFont::ClearOutputData()
     DirtyLookupTables = true;
     Ascent = Descent = 0.0f;
     MetricsTotalSurface = 0;
-    memset(Used4kPagesMap, 0, sizeof(Used4kPagesMap));
+    memset(Used8kPagesMap, 0, sizeof(Used8kPagesMap));
 }
 
 static ImWchar FindFirstExistingGlyph(ImFont* font, const ImWchar* candidate_chars, int candidate_chars_count)
@@ -3675,7 +3718,7 @@ static ImWchar FindFirstExistingGlyph(ImFont* font, const ImWchar* candidate_cha
     for (int n = 0; n < candidate_chars_count; n++)
         if (font->FindGlyphNoFallback(candidate_chars[n]) != NULL)
             return candidate_chars[n];
-    return (ImWchar)-1;
+    return 0;
 }
 
 void ImFont::BuildLookupTable()
@@ -3690,17 +3733,17 @@ void ImFont::BuildLookupTable()
     IndexAdvanceX.clear();
     IndexLookup.clear();
     DirtyLookupTables = false;
-    memset(Used4kPagesMap, 0, sizeof(Used4kPagesMap));
+    memset(Used8kPagesMap, 0, sizeof(Used8kPagesMap));
     GrowIndex(max_codepoint + 1);
     for (int i = 0; i < Glyphs.Size; i++)
     {
         int codepoint = (int)Glyphs[i].Codepoint;
         IndexAdvanceX[codepoint] = Glyphs[i].AdvanceX;
-        IndexLookup[codepoint] = (ImWchar)i;
+        IndexLookup[codepoint] = (ImU16)i;
 
         // Mark 4K page as used
-        const int page_n = codepoint / 4096;
-        Used4kPagesMap[page_n >> 3] |= 1 << (page_n & 7);
+        const int page_n = codepoint / 8192;
+        Used8kPagesMap[page_n >> 3] |= 1 << (page_n & 7);
     }
 
     // Create a glyph to handle TAB
@@ -3714,12 +3757,14 @@ void ImFont::BuildLookupTable()
         tab_glyph.Codepoint = '\t';
         tab_glyph.AdvanceX *= IM_TABSIZE;
         IndexAdvanceX[(int)tab_glyph.Codepoint] = (float)tab_glyph.AdvanceX;
-        IndexLookup[(int)tab_glyph.Codepoint] = (ImWchar)(Glyphs.Size - 1);
+        IndexLookup[(int)tab_glyph.Codepoint] = (ImU16)(Glyphs.Size - 1);
     }
 
     // Mark special glyphs as not visible (note that AddGlyph already mark as non-visible glyphs with zero-size polygons)
-    SetGlyphVisible((ImWchar)' ', false);
-    SetGlyphVisible((ImWchar)'\t', false);
+    if (ImFontGlyph* glyph = (ImFontGlyph*)(void*)FindGlyph((ImWchar)' '))
+        glyph->Visible = false;
+    if (ImFontGlyph* glyph = (ImFontGlyph*)(void*)FindGlyph((ImWchar)'\t'))
+        glyph->Visible = false;
 
     // Setup Fallback character
     const ImWchar fallback_chars[] = { (ImWchar)IM_UNICODE_CODEPOINT_INVALID, (ImWchar)'?', (ImWchar)' ' };
@@ -3742,43 +3787,37 @@ void ImFont::BuildLookupTable()
     // Setup Ellipsis character. It is required for rendering elided text. We prefer using U+2026 (horizontal ellipsis).
     // However some old fonts may contain ellipsis at U+0085. Here we auto-detect most suitable ellipsis character.
     // FIXME: Note that 0x2026 is rarely included in our font ranges. Because of this we are more likely to use three individual dots.
-    const ImWchar ellipsis_chars[] = { (ImWchar)0x2026, (ImWchar)0x0085 };
+    const ImWchar ellipsis_chars[] = { Sources->EllipsisChar, (ImWchar)0x2026, (ImWchar)0x0085 };
     const ImWchar dots_chars[] = { (ImWchar)'.', (ImWchar)0xFF0E };
-    if (EllipsisChar == (ImWchar)-1)
+    if (EllipsisChar == 0)
         EllipsisChar = FindFirstExistingGlyph(this, ellipsis_chars, IM_ARRAYSIZE(ellipsis_chars));
     const ImWchar dot_char = FindFirstExistingGlyph(this, dots_chars, IM_ARRAYSIZE(dots_chars));
-    if (EllipsisChar != (ImWchar)-1)
+    if (EllipsisChar != 0)
     {
         EllipsisCharCount = 1;
         EllipsisWidth = EllipsisCharStep = FindGlyph(EllipsisChar)->X1;
     }
-    else if (dot_char != (ImWchar)-1)
+    else if (dot_char != 0)
     {
-        const ImFontGlyph* glyph = FindGlyph(dot_char);
+        const ImFontGlyph* dot_glyph = FindGlyph(dot_char);
         EllipsisChar = dot_char;
         EllipsisCharCount = 3;
-        EllipsisCharStep = (glyph->X1 - glyph->X0) + 1.0f;
-        EllipsisWidth = EllipsisCharStep * 3.0f - 1.0f;
+        EllipsisCharStep = (float)(int)(dot_glyph->X1 - dot_glyph->X0) + 1.0f;
+        EllipsisWidth = ImMax(dot_glyph->AdvanceX, dot_glyph->X0 + EllipsisCharStep * 3.0f - 1.0f); // FIXME: Slightly odd for normally mono-space fonts but since this is used for trailing contents.
     }
 }
 
-// API is designed this way to avoid exposing the 4K page size
+// API is designed this way to avoid exposing the 8K page size
 // e.g. use with IsGlyphRangeUnused(0, 255)
 bool ImFont::IsGlyphRangeUnused(unsigned int c_begin, unsigned int c_last)
 {
-    unsigned int page_begin = (c_begin / 4096);
-    unsigned int page_last = (c_last / 4096);
+    unsigned int page_begin = (c_begin / 8192);
+    unsigned int page_last = (c_last / 8192);
     for (unsigned int page_n = page_begin; page_n <= page_last; page_n++)
-        if ((page_n >> 3) < sizeof(Used4kPagesMap))
-            if (Used4kPagesMap[page_n >> 3] & (1 << (page_n & 7)))
+        if ((page_n >> 3) < sizeof(Used8kPagesMap))
+            if (Used8kPagesMap[page_n >> 3] & (1 << (page_n & 7)))
                 return false;
     return true;
-}
-
-void ImFont::SetGlyphVisible(ImWchar c, bool visible)
-{
-    if (ImFontGlyph* glyph = (ImFontGlyph*)(void*)FindGlyph((ImWchar)c))
-        glyph->Visible = visible ? 1 : 0;
 }
 
 void ImFont::GrowIndex(int new_size)
@@ -3787,32 +3826,32 @@ void ImFont::GrowIndex(int new_size)
     if (new_size <= IndexLookup.Size)
         return;
     IndexAdvanceX.resize(new_size, -1.0f);
-    IndexLookup.resize(new_size, (ImWchar)-1);
+    IndexLookup.resize(new_size, (ImU16)-1);
 }
 
 // x0/y0/x1/y1 are offset from the character upper-left layout position, in pixels. Therefore x0/y0 are often fairly close to zero.
 // Not to be mistaken with texture coordinates, which are held by u0/v0/u1/v1 in normalized format (0.0..1.0 on each texture axis).
-// 'cfg' is not necessarily == 'this->ConfigData' because multiple source fonts+configs can be used to build one target font.
-void ImFont::AddGlyph(const ImFontConfig* cfg, ImWchar codepoint, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float advance_x)
+// 'src' is not necessarily == 'this->Sources' because multiple source fonts+configs can be used to build one target font.
+void ImFont::AddGlyph(const ImFontConfig* src, ImWchar codepoint, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float advance_x)
 {
-    if (cfg != NULL)
+    if (src != NULL)
     {
         // Clamp & recenter if needed
         const float advance_x_original = advance_x;
-        advance_x = ImClamp(advance_x, cfg->GlyphMinAdvanceX, cfg->GlyphMaxAdvanceX);
+        advance_x = ImClamp(advance_x, src->GlyphMinAdvanceX, src->GlyphMaxAdvanceX);
         if (advance_x != advance_x_original)
         {
-            float char_off_x = cfg->PixelSnapH ? ImTrunc((advance_x - advance_x_original) * 0.5f) : (advance_x - advance_x_original) * 0.5f;
+            float char_off_x = src->PixelSnapH ? ImTrunc((advance_x - advance_x_original) * 0.5f) : (advance_x - advance_x_original) * 0.5f;
             x0 += char_off_x;
             x1 += char_off_x;
         }
 
         // Snap to pixel
-        if (cfg->PixelSnapH)
+        if (src->PixelSnapH)
             advance_x = IM_ROUND(advance_x);
 
-        // Bake spacing
-        advance_x += cfg->GlyphExtraSpacing.x;
+        // Bake extra spacing
+        advance_x += src->GlyphExtraAdvanceX;
     }
 
     int glyph_idx = Glyphs.Size;
@@ -3830,6 +3869,7 @@ void ImFont::AddGlyph(const ImFontConfig* cfg, ImWchar codepoint, float x0, floa
     glyph.U1 = u1;
     glyph.V1 = v1;
     glyph.AdvanceX = advance_x;
+    IM_ASSERT(Glyphs.Size < 0xFFFF); // IndexLookup[] hold 16-bit values and -1 is reserved.
 
     // Compute rough surface usage metrics (+1 to account for average padding, +0.99 to round)
     // We use (U1-U0)*TexWidth instead of X1-X0 to account for oversampling.
@@ -3843,33 +3883,33 @@ void ImFont::AddRemapChar(ImWchar dst, ImWchar src, bool overwrite_dst)
     IM_ASSERT(IndexLookup.Size > 0);    // Currently this can only be called AFTER the font has been built, aka after calling ImFontAtlas::GetTexDataAs*() function.
     unsigned int index_size = (unsigned int)IndexLookup.Size;
 
-    if (dst < index_size && IndexLookup.Data[dst] == (ImWchar)-1 && !overwrite_dst) // 'dst' already exists
+    if (dst < index_size && IndexLookup.Data[dst] == (ImU16)-1 && !overwrite_dst) // 'dst' already exists
         return;
     if (src >= index_size && dst >= index_size) // both 'dst' and 'src' don't exist -> no-op
         return;
 
     GrowIndex(dst + 1);
-    IndexLookup[dst] = (src < index_size) ? IndexLookup.Data[src] : (ImWchar)-1;
+    IndexLookup[dst] = (src < index_size) ? IndexLookup.Data[src] : (ImU16)-1;
     IndexAdvanceX[dst] = (src < index_size) ? IndexAdvanceX.Data[src] : 1.0f;
 }
 
 // Find glyph, return fallback if missing
-const ImFontGlyph* ImFont::FindGlyph(ImWchar c)
+ImFontGlyph* ImFont::FindGlyph(ImWchar c)
 {
     if (c >= (size_t)IndexLookup.Size)
         return FallbackGlyph;
-    const ImWchar i = IndexLookup.Data[c];
-    if (i == (ImWchar)-1)
+    const ImU16 i = IndexLookup.Data[c];
+    if (i == (ImU16)-1)
         return FallbackGlyph;
     return &Glyphs.Data[i];
 }
 
-const ImFontGlyph* ImFont::FindGlyphNoFallback(ImWchar c)
+ImFontGlyph* ImFont::FindGlyphNoFallback(ImWchar c)
 {
     if (c >= (size_t)IndexLookup.Size)
         return NULL;
-    const ImWchar i = IndexLookup.Data[c];
-    if (i == (ImWchar)-1)
+    const ImU16 i = IndexLookup.Data[c];
+    if (i == (ImU16)-1)
         return NULL;
     return &Glyphs.Data[i];
 }
@@ -3990,7 +4030,7 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
 ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, const char* text_begin, const char* text_end, const char** remaining)
 {
     if (!text_end)
-        text_end = text_begin + strlen(text_begin); // FIXME-OPT: Need to avoid this.
+        text_end = text_begin + ImStrlen(text_begin); // FIXME-OPT: Need to avoid this.
 
     const float line_height = size;
     const float scale = size / FontSize;
@@ -4083,14 +4123,14 @@ void ImFont::RenderChar(ImDrawList* draw_list, float size, const ImVec2& pos, Im
 // Note: as with every ImDrawList drawing function, this expects that the font atlas texture is bound.
 void ImFont::RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width, bool cpu_fine_clip)
 {
-    if (!text_end)
-        text_end = text_begin + strlen(text_begin); // ImGui:: functions generally already provides a valid text_end, so this is merely to handle direct calls.
-
     // Align to be pixel perfect
     float x = IM_TRUNC(pos.x);
     float y = IM_TRUNC(pos.y);
     if (y > clip_rect.w)
         return;
+
+    if (!text_end)
+        text_end = text_begin + ImStrlen(text_begin); // ImGui:: functions generally already provides a valid text_end, so this is merely to handle direct calls.
 
     const float scale = size / FontSize;
     const float line_height = FontSize * scale;
@@ -4102,7 +4142,7 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, Im
     if (y + line_height < clip_rect.y)
         while (y + line_height < clip_rect.y && s < text_end)
         {
-            const char* line_end = (const char*)memchr(s, '\n', text_end - s);
+            const char* line_end = (const char*)ImMemchr(s, '\n', text_end - s);
             if (word_wrap_enabled)
             {
                 // FIXME-OPT: This is not optimal as do first do a search for \n before calling CalcWordWrapPositionA().
@@ -4126,7 +4166,7 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, Im
         float y_end = y;
         while (y_end < clip_rect.w && s_end < text_end)
         {
-            s_end = (const char*)memchr(s_end, '\n', text_end - s_end);
+            s_end = (const char*)ImMemchr(s_end, '\n', text_end - s_end);
             s_end = s_end ? s_end + 1 : text_end;
             y_end += line_height;
         }

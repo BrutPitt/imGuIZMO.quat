@@ -93,8 +93,8 @@ void setGUIStyle(void)
     cfg.OversampleH = 3.;
     cfg.OversampleV = 1.;
     cfg.PixelSnapH = true;
-    cfg.GlyphExtraSpacing.x = 0.0f;
-    cfg.GlyphExtraSpacing.y = 0.0f;
+    //cfg.GlyphExtraSpacing.x = 0.0f;
+    //cfg.GlyphExtraSpacing.y = 0.0f;
     cfg.RasterizerMultiply = 1.25f;
 
     //ImVec4 color(style.Colors[ImGuiCol_FrameBg]);

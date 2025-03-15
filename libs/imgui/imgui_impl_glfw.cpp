@@ -9,6 +9,9 @@
 //  [X] Platform: Keyboard support. Since 1.87 we are using the io.AddKeyEvent() function. Pass ImGuiKey values to all key functions e.g. ImGui::IsKeyPressed(ImGuiKey_Space). [Legacy GLFW_KEY_* values are obsolete since 1.87 and not supported since 1.91.5]
 //  [X] Platform: Gamepad support. Enable with 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad'.
 //  [X] Platform: Mouse cursor shape and visibility (ImGuiBackendFlags_HasMouseCursors). Resizing cursors requires GLFW 3.4+! Disable with 'io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange'.
+// Missing features or Issues:
+//  [ ] Touch events are only correctly identified as Touch on Windows. This create issues with some interactions. GLFW doesn't provide a way to identify touch inputs from mouse inputs, we cannot call io.AddMouseSourceEvent() to identify the source. We provide a Windows-specific workaround.
+//  [ ] Missing ImGuiMouseCursor_Wait and ImGuiMouseCursor_Progress cursors.
 
 // You can use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this.
 // Prefer including the entire imgui/ repository into your project (either as a copy or as a submodule), and only build the backends you need.
@@ -25,7 +28,9 @@
 
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
-//  2024-08-22: moved some OS/backend related function pointers from ImGuiIO to ImGuiPlatformIO:
+//  2025-03-11: Added support for ImGuiKey_Oem102, ImGuiKey_AbntC1, ImGuiKey_AbntC2.
+//  2025-03-03: Fixed clipboard handler assertion when using GLFW <= 3.2.1 compiled with asserts enabled.
+//  2024-08-22: Moved some OS/backend related function pointers from ImGuiIO to ImGuiPlatformIO:
 //               - io.GetClipboardTextFn    -> platform_io.Platform_GetClipboardTextFn
 //               - io.SetClipboardTextFn    -> platform_io.Platform_SetClipboardTextFn
 //               - io.PlatformOpenInShellFn -> platform_io.Platform_OpenInShellFn
@@ -190,7 +195,6 @@ static ImGui_ImplGlfw_Data* ImGui_ImplGlfw_GetBackendData()
 ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int keycode, int scancode);
 ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int keycode, int scancode)
 {
-    IM_UNUSED(scancode);
     switch (keycode)
     {
         case GLFW_KEY_TAB: return ImGuiKey_Tab;
@@ -217,6 +221,8 @@ ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int keycode, int scancode)
         case GLFW_KEY_EQUAL: return ImGuiKey_Equal;
         case GLFW_KEY_LEFT_BRACKET: return ImGuiKey_LeftBracket;
         case GLFW_KEY_BACKSLASH: return ImGuiKey_Backslash;
+        case GLFW_KEY_WORLD_1: return ImGuiKey_Oem102;
+        case GLFW_KEY_WORLD_2: return ImGuiKey_Oem102;
         case GLFW_KEY_RIGHT_BRACKET: return ImGuiKey_RightBracket;
         case GLFW_KEY_GRAVE_ACCENT: return ImGuiKey_GraveAccent;
         case GLFW_KEY_CAPS_LOCK: return ImGuiKey_CapsLock;
@@ -310,8 +316,15 @@ ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int keycode, int scancode)
         case GLFW_KEY_F22: return ImGuiKey_F22;
         case GLFW_KEY_F23: return ImGuiKey_F23;
         case GLFW_KEY_F24: return ImGuiKey_F24;
-        default: return ImGuiKey_None;
+        default: break;
     }
+    switch (scancode)
+    {
+        case 115: return ImGuiKey_AbntC1;
+        case 126: return ImGuiKey_AbntC2;
+        default: break;
+    }
+    return ImGuiKey_None;
 }
 
 // X11 does not include current pressed/released modifier key in 'mods' flags submitted by GLFW
@@ -467,7 +480,7 @@ void ImGui_ImplGlfw_CharCallback(GLFWwindow* window, unsigned int c)
 
 void ImGui_ImplGlfw_MonitorCallback(GLFWmonitor*, int)
 {
-	// Unused in 'master' branch but 'docking' branch will use this, so we declare it ahead of it so if you have to install callbacks you can install this one too.
+    // Unused in 'master' branch but 'docking' branch will use this, so we declare it ahead of it so if you have to install callbacks you can install this one too.
 }
 
 #ifdef EMSCRIPTEN_USE_EMBEDDED_GLFW3
@@ -595,8 +608,14 @@ static bool ImGui_ImplGlfw_Init(GLFWwindow* window, bool install_callbacks, Glfw
     bd->Time = 0.0;
 
     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+#if GLFW_VERSION_COMBINED < 3300
+    platform_io.Platform_SetClipboardTextFn = [](ImGuiContext*, const char* text) { glfwSetClipboardString(ImGui_ImplGlfw_GetBackendData()->Window, text); };
+    platform_io.Platform_GetClipboardTextFn = [](ImGuiContext*) { return glfwGetClipboardString(ImGui_ImplGlfw_GetBackendData()->Window); };
+#else
     platform_io.Platform_SetClipboardTextFn = [](ImGuiContext*, const char* text) { glfwSetClipboardString(nullptr, text); };
     platform_io.Platform_GetClipboardTextFn = [](ImGuiContext*) { return glfwGetClipboardString(nullptr); };
+#endif
+
 #ifdef __EMSCRIPTEN__
     platform_io.Platform_OpenInShellFn = [](ImGuiContext*, const char* url) { ImGui_ImplGlfw_EmscriptenOpenURL(url); return true; };
 #endif
