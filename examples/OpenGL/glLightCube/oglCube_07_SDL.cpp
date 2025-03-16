@@ -13,10 +13,14 @@
 #include "oglCube.h"
 
 #include <SDL2/SDL.h>
-#include <imgui/imgui_impl_sdl2.h>
+#include <imgui/backends/imgui_impl_sdl2.h>
 
-#include "oglDebug.h"
-#include "../../assets/shadersAndModel.h"
+#include "utils/oglDebug.h"
+#include "assets/cubePNC.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// vGizmo3D:
+#include <vGizmo3D.h>
 
 #define FRAG_NAME "vkLightCube.frag"
 #define VERT_NAME "vkLightCube.vert"
@@ -29,7 +33,7 @@ SDL_Window *sdlWindow = nullptr;
 SDL_GLContext gl_context;
 
 const int nElemVtx = 4;
-const size_t nVertex = sizeof(cubeData)/sizeof(cubeData[0]);
+const size_t nVertex = sizeof(cubePNC)/sizeof(cubePNC[0]);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
@@ -162,7 +166,7 @@ void initGL()
 
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &vaoBuffer);
-    glNamedBufferStorage(vaoBuffer, sizeof(cubeData), cubeData, 0);
+    glNamedBufferStorage(vaoBuffer, sizeof(cubePNC), cubePNC, 0);
 
     glVertexArrayAttribBinding(vao,loc::vtxIdx, 0);
     glVertexArrayAttribFormat(vao, loc::vtxIdx, nElemVtx, GL_FLOAT, GL_FALSE, 0);
@@ -176,7 +180,7 @@ void initGL()
     glVertexArrayAttribFormat(vao, loc::colIdx, nElemVtx, GL_FLOAT, GL_FALSE, 2*nElemVtx*sizeof(float));
     glEnableVertexArrayAttrib(vao, loc::colIdx);
 
-    glVertexArrayVertexBuffer(vao, 0, vaoBuffer, 0, sizeof(cubeData[0]));
+    glVertexArrayVertexBuffer(vao, 0, vaoBuffer, 0, sizeof(cubePNC[0]));
 
     ubo.create(sizeof(_uboMat), &uboMat, bind::matIdx );
 
@@ -193,7 +197,6 @@ void initGL()
     glDepthRange(-1.0, 1.0);
     setScene();
 }
-
 
 void initFramework()
 {
@@ -253,7 +256,7 @@ void initImGui()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void initVGizmo3D()     // Settings to control vGizmo3D
 {
-    // Initialization are necessary to associate your preferences to vGizmo3D
+    // Initialization is necessary to associate your preferences to vGizmo3D
     // These are also the DEFAULT values, so if you want to maintain these combinations you can omit they
     // and to override only the associations that you want modify
         track.setGizmoRotControl         (vg::evButton1  /* or vg::evLeftButton */, 0 /* vg::evNoModifier */ );
@@ -286,7 +289,7 @@ void initVGizmo3D()     // Settings to control vGizmo3D
     // Watch vGizmo.h for more functionalities
 }
 
-/// vGizmo3D: Check key modifier currently pressed (GLFW version)
+/// vGizmo3D: Check key modifier currently pressed (SDL2 version)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int getModifier(SDL_Window* window = nullptr) {
     SDL_Keymod keyMod = SDL_GetModState();
@@ -345,22 +348,32 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
         glClearBufferfv(GL_COLOR, 0, value_ptr(bgColor));
 
 
-    // vGizmo3D: is necessary intercept mouse event not destined to ImGui
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        if(!ImGui::GetIO().WantCaptureMouse) {
-            static int leftPress = 0, rightPress = 0;
+        if(!ImGui::GetIO().WantCaptureMouse) {  // vGizmo3D: is necessary intercept mouse event not destined to ImGui
+        // vGizmo3D: check changing button state to activate/deactivate drag movements  (pressing both activate/deacivate both functionality)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            static int leftPress = 0, rightPress = 0, middlePress;
             int x, y;
             int mouseState = SDL_GetMouseState(&x, &y);
-            if(leftPress != (mouseState & SDL_BUTTON_LMASK)) {                                   // check if leftButton state is changed
-                leftPress = mouseState & SDL_BUTTON_LMASK ;                                    // set new (different!) state
+            if(leftPress != (mouseState & SDL_BUTTON_LMASK)) {              // check if leftButton state is changed
+                leftPress = mouseState & SDL_BUTTON_LMASK ;                 // set new (different!) state
                 track.mouse(vg::evLeftButton, getModifier(sdlWindow),       // send communication to vGizmo3D...
                                               leftPress, x, y);             // ... checking if a key modifier currently is pressed
             }
-            if(rightPress != (mouseState & SDL_BUTTON_RMASK)) {                                  // check if rightButton state is changed
-                rightPress = mouseState & SDL_BUTTON_RMASK;                                    // set new (different!) state
+            if(rightPress != (mouseState & SDL_BUTTON_RMASK)) {             // check if rightButton state is changed
+                rightPress = mouseState & SDL_BUTTON_RMASK;                 // set new (different!) state
                 track.mouse(vg::evRightButton, getModifier(sdlWindow),      // send communication to vGizmo3D...
                                                rightPress, x, y);           // ... checking if a key modifier currently is pressed
             }
+            // Simulating a double press (left+right button) using MIDDLE button,
+            // sending two "consecutive" activation/deactivation to rotate cube and light spot together
+            if(middlePress != (mouseState & SDL_BUTTON_MMASK)) {             // check if middleButton state is changed
+                middlePress = mouseState & SDL_BUTTON_MMASK;                 // set new (different!) middle button state
+                track.mouse(vg::evRightButton, getModifier(sdlWindow), middlePress, x, y);  // call Right activation/deactivation with same "middleStatus"
+                track.mouse(vg::evLeftButton,  getModifier(sdlWindow), middlePress, x, y);  // call Left  activation/deactivation with same "middleStatus"
+            }
+
+        // vGizmo3D: if "drag" active update internal rotations (primary and secondary)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             track.motion(x,y);
         }
 

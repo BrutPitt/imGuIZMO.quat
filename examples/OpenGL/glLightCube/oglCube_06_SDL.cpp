@@ -13,9 +13,10 @@
 #include "oglCube.h"
 
 #include <SDL2/SDL.h>
+#include <imgui/backends/imgui_impl_sdl2.h>
 
-#include "oglDebug.h"
-#include "../../assets/shadersAndModel.h"
+#include "utils/oglDebug.h"
+#include "assets/cubePNC.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // vGizmo3D:
@@ -32,7 +33,7 @@ SDL_Window *sdlWindow = nullptr;
 SDL_GLContext gl_context;
 
 const int nElemVtx = 4;
-const size_t nVertex = sizeof(cubeData)/sizeof(cubeData[0]);
+const size_t nVertex = sizeof(cubePNC)/sizeof(cubePNC[0]);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
@@ -160,7 +161,7 @@ void initGL()
 
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &vaoBuffer);
-    glNamedBufferStorage(vaoBuffer, sizeof(cubeData), cubeData, 0);
+    glNamedBufferStorage(vaoBuffer, sizeof(cubePNC), cubePNC, 0);
 
     glVertexArrayAttribBinding(vao,loc::vtxIdx, 0);
     glVertexArrayAttribFormat(vao, loc::vtxIdx, nElemVtx, GL_FLOAT, GL_FALSE, 0);
@@ -174,7 +175,7 @@ void initGL()
     glVertexArrayAttribFormat(vao, loc::colIdx, nElemVtx, GL_FLOAT, GL_FALSE, 2*nElemVtx*sizeof(float));
     glEnableVertexArrayAttrib(vao, loc::colIdx);
 
-    glVertexArrayVertexBuffer(vao, 0, vaoBuffer, 0, sizeof(cubeData[0]));
+    glVertexArrayVertexBuffer(vao, 0, vaoBuffer, 0, sizeof(cubePNC[0]));
 
     ubo.create(sizeof(_uboMat), &uboMat, bind::matIdx );
 
@@ -228,6 +229,23 @@ void initFramework()
 
 }
 
+void initImGui()
+{
+        // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplSDL2_InitForOpenGL(sdlWindow, &gl_context);
+    ImGui_ImplOpenGL3_Init("#version 450");
+}
+
 /// vGizmo3D initialize: <br>
 /// set/associate mouse BUTTON IDs and KEY modifier IDs to vGizmo3D functionalities <br><br>
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -266,7 +284,7 @@ void initVGizmo3D()     // Settings to control vGizmo3D
     // Watch vGizmo.h for more functionalities
 }
 
-/// vGizmo3D: Check key modifier currently pressed (GLFW version)
+/// vGizmo3D: Check key modifier currently pressed (SDL2 version)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int getModifier(SDL_Window* window = nullptr) {
     SDL_Keymod keyMod = SDL_GetModState();
@@ -290,11 +308,25 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
     vec4 bgColor = vec4(0.0f);
     GLfloat f=1.0f;
 
+    // Setup/Initialize Dear ImGui context
+    initImGui();
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    // imGuIZMO: set mouse feeling and key mods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    imguiGizmo::setGizmoFeelingRot(1.5f);          // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
+    imguiGizmo::setPanScale(.5f);                  // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyScale(.5f);                // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyWheelScale(.5f);           // default 1.0, > more, < less ... (from v3.1 separate values)
+    imguiGizmo::setPanModifier(vg::evSuperModifier);        // change KEY modifier: CTRL (default) ==> SUPER
+    imguiGizmo::setDollyModifier(vg::evControlModifier);    // change KEY modifier: SHIFT (default) ==> CTRL
+
     SDL_Event event;
     bool done = false;
     // main render/draw loop
     while(!done) {
         while(SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
             if(event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(sdlWindow))
                 done = true;
             if(event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
@@ -311,39 +343,86 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
         glClearBufferfv(GL_COLOR, 0, value_ptr(bgColor));
 
 
-    // vGizmo3D: check changing button state to activate/deactivate drag movements  (pressing both activate/deacivate both functionality)
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        static int leftPress = 0, rightPress = 0, middlePress;
-        int x, y;
-        int mouseState = SDL_GetMouseState(&x, &y);
-        if(leftPress != (mouseState & SDL_BUTTON_LMASK)) {              // check if leftButton state is changed
-            leftPress = mouseState & SDL_BUTTON_LMASK ;                 // set new (different!) state
-            track.mouse(vg::evLeftButton, getModifier(sdlWindow),       // send communication to vGizmo3D...
-                                          leftPress, x, y);             // ... checking if a key modifier currently is pressed
-        }
-        if(rightPress != (mouseState & SDL_BUTTON_RMASK)) {             // check if rightButton state is changed
-            rightPress = mouseState & SDL_BUTTON_RMASK;                 // set new (different!) state
-            track.mouse(vg::evRightButton, getModifier(sdlWindow),      // send communication to vGizmo3D...
-                                           rightPress, x, y);           // ... checking if a key modifier currently is pressed
-        }
-        // Simulating a double press (left+right button) using MIDDLE button,
-        // sending two "consecutive" activation/deactivation to rotate cube and light spot together
-        if(middlePress != (mouseState & SDL_BUTTON_MMASK)) {             // check if middleButton state is changed
-            middlePress = mouseState & SDL_BUTTON_MMASK;                 // set new (different!) middle button state
-            track.mouse(vg::evRightButton, getModifier(sdlWindow), middlePress, x, y);  // call Right activation/deactivation with same "middleStatus"
-            track.mouse(vg::evLeftButton,  getModifier(sdlWindow), middlePress, x, y);  // call Left  activation/deactivation with same "middleStatus"
-        } 
+        if(!ImGui::GetIO().WantCaptureMouse) {  // vGizmo3D: is necessary intercept mouse event not destined to ImGui
+        // vGizmo3D: check changing button state to activate/deactivate drag movements  (pressing both activate/deacivate both functionality)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            static int leftPress = 0, rightPress = 0, middlePress;
+            int x, y;
+            int mouseState = SDL_GetMouseState(&x, &y);
+            if(leftPress != (mouseState & SDL_BUTTON_LMASK)) {              // check if leftButton state is changed
+                leftPress = mouseState & SDL_BUTTON_LMASK ;                 // set new (different!) state
+                track.mouse(vg::evLeftButton, getModifier(sdlWindow),       // send communication to vGizmo3D...
+                                              leftPress, x, y);             // ... checking if a key modifier currently is pressed
+            }
+            if(rightPress != (mouseState & SDL_BUTTON_RMASK)) {             // check if rightButton state is changed
+                rightPress = mouseState & SDL_BUTTON_RMASK;                 // set new (different!) state
+                track.mouse(vg::evRightButton, getModifier(sdlWindow),      // send communication to vGizmo3D...
+                                               rightPress, x, y);           // ... checking if a key modifier currently is pressed
+            }
+            // Simulating a double press (left+right button) using MIDDLE button,
+            // sending two "consecutive" activation/deactivation to rotate cube and light spot together
+            if(middlePress != (mouseState & SDL_BUTTON_MMASK)) {             // check if middleButton state is changed
+                middlePress = mouseState & SDL_BUTTON_MMASK;                 // set new (different!) middle button state
+                track.mouse(vg::evRightButton, getModifier(sdlWindow), middlePress, x, y);  // call Right activation/deactivation with same "middleStatus"
+                track.mouse(vg::evLeftButton,  getModifier(sdlWindow), middlePress, x, y);  // call Left  activation/deactivation with same "middleStatus"
+            }
 
-    // vGizmo3D: if "drag" active update internal rotations (primary and secondary)
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        track.motion(x,y);
+        // vGizmo3D: if "drag" active update internal rotations (primary and secondary)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            track.motion(x,y);
+        }
 
     // vGizmo3D: call it every rendering loop if you want a continue rotation until you do not click on screen
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         track.idle();   // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movements
                         // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                         // It can be stopped by click on screen (without mouse movement)
-        track.idleSecond();
+        track.idleSecond(); // set continuous rotation on Idle also for secondary rot
+
+    // ImGUI: prepare new frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+
+    // ImGui: Your windows here
+
+   // Imgui window: build a transparent window (container) to insert widget
+        float widgetSize=240;
+        ImGui::SetNextWindowSize(ImVec2(widgetSize, height), ImGuiCond_Always); // top ...
+        ImGui::SetNextWindowPos(ImVec2(width-widgetSize, 0), ImGuiCond_Always); // ... right aligned
+
+        ImGui::PushStyleColor(ImGuiCol_WindowBg,ImVec4(0.f,0.f,0.f,0.f));       // transparent Wnd Background
+        ImGui::PushStyleColor(ImGuiCol_FrameBg,ImVec4(0.f,0.f,0.f,0.f));        // transparent frame Background
+        const float prevWindowBorderSize = style.WindowBorderSize;              // Save current border size...
+        style.WindowBorderSize = .0f;                                           // ... to draw the window with ZERO broder
+
+        bool isVisible = true;                                                  // visibility flag: always on
+        ImGui::Begin("##giz", &isVisible, ImGuiWindowFlags_NoTitleBar|          // noTitle / noResize / Noscrollbar
+                                          ImGuiWindowFlags_NoResize|
+                                          ImGuiWindowFlags_NoScrollbar);
+
+    // colored text for display quat(w,x,y,z) components
+        ImGui::SetCursorPos(ImVec2(0,0));
+        ImGui::PushItemWidth(widgetSize*.25-2);
+        ImGui::TextColored(ImVec4(1,1,1,1), "w: % 1.2f", track.getRotation().w); ImGui::SameLine();
+        ImGui::TextColored(ImVec4(1,0,0,1), "x: % 1.2f", track.getRotation().x); ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0,1,0,1), "y: % 1.2f", track.getRotation().y); ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0,0,1,1), "z: % 1.2f", track.getRotation().z);
+        ImGui::PopItemWidth();
+
+    // ImGuIZMO.quat widget
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        ImGui::gizmo3D("##aaa", track.refRotation(), track.refSecondRot(), widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
+
+    // ImGuIZMO.quat with also pan and Dolly/zoom
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        ImGui::gizmo3D("##a01", track.refPosition(), track.refRotation(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
+
+    // End Imgui window (container) block
+        ImGui::End();
+        style.WindowBorderSize = prevWindowBorderSize;              // restore border size
+        ImGui::PopStyleColor();                                     // frame color (pushed)
+        ImGui::PopStyleColor();                                     // Background (pushed)
 
     // transferring the rotation to cube model matrix...
         mat4 modelMatrix = cubeObj * mat4_cast(track.getRotation());
@@ -376,8 +455,17 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
     // draw the cube, passing matrices to the vtx shader
         draw();
 
+    // ImGui Rendering
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         SDL_GL_SwapWindow(sdlWindow);
     }
+
+    // Cleanup ImGui
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
 
     // Cleanup OpenGL
     glDeleteVertexArrays(1, &vao);

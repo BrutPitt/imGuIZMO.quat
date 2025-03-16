@@ -24,6 +24,16 @@
 
 #include "vkCube.h"
 
+/////////////////////////////////////////////////////////////////////////////
+// imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
+#include <imGuIZMOquat.h> // now also imguizmo_quat.h
+
+#include <imgui/backends/imgui_impl_vulkan.h>
+
+
+void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height);
+
+
 // passed from CMake: SPIR_V_EXT is different for DEBUG | RELEASE
 
 #ifndef APP_SHADERS_DIR
@@ -341,6 +351,9 @@ void vkAppBase::setCommandBuffer(uint32_t currentFrame)
 
     commandBuffer[currentFrame].draw( 12 * 3, 2, 0, 0 );      //
 
+    // ImGui: just before endRenderPass insert ImGui CommandBuffer data
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer[currentFrame]);
+
     commandBuffer[currentFrame].endRenderPass();
     commandBuffer[currentFrame].end();
 }
@@ -452,7 +465,30 @@ quat getQuatRotFromVec3(vec3 &lPos) {
 
 void vkApp::run()
 {
-    while(framework.pollEvents()) {
+    // initialize scene: lookAt, perspective, objs: size & pos
+    setScene();
+
+    // ImGui Vulkan initialization
+    imguiInit();
+
+/// vGizmo3D (3D screen manipulator) initialize:
+/// set/associate mouse BUTTON IDs and KEY Modifier IDs to vGizmo3D functionalities
+    framework.initVGizmo3D(vgTrackball);
+
+    // imGuIZMO: set mouse feeling and key mods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    imguiGizmo::setGizmoFeelingRot(.75f);          // default 1.0, >1 more mouse sensitivity, <1 less mouse sensitivity
+    imguiGizmo::setPanScale(.5f);                  // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyScale(.5f);                // default 1.0, >1 more, <1 less
+    imguiGizmo::setDollyWheelScale(.5f);           // default 1.0, > more, < less ... (from v3.1 separate values)
+    imguiGizmo::setPanModifier(vg::evSuperModifier);        // change KEY modifier: CTRL (default) ==> SUPER
+    imguiGizmo::setDollyModifier(vg::evControlModifier);    // change KEY modifier: SHIFT (default) ==> CTRL
+
+    // Main render loop
+    while(framework.pollEvents()) {     // glfwPollEvents | SDL_PollEvent ... with exit/quit check
+
+/// vGizmo3D: check changing button state to activate/deactivate drag movements
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         framework.checkVGizmo3DMouseEvent(vgTrackball);
 
 // vGizmo3D: call it every rendering loop if you want a continue rotation until you do not click on screen
@@ -460,7 +496,26 @@ void vkApp::run()
         vgTrackball.idle(); // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movement
                             // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                             // It can be stopped by click on screen (without mouse movement)
-        vgTrackball.idleSecond();
+        vgTrackball.idleSecond();  // also for "secondary" rotation
+
+
+    // ImGUI: prepare ImGUI new frame
+        ImGui_ImplVulkan_NewFrame();
+        framework.imguiNewFrame();      // ImGui_ImplGlfw_NewFrame | ImGui_ImplSDL2_NewFrame | ImGui_ImplSDL3_NewFrame
+        ImGui::NewFrame();
+
+    // ImGui: Your windows here
+
+
+    // using vec3 (lightPos) is necessary sync with vGizmo3D : in next example (08) this will no longer be necessary
+        lightPos = getLightPosFromQuat(vgTrackball.refSecondRot() ,length(lightPos)); //to syncronize trackball & lightPos passed to the Widgets call
+
+    // Render ALL ImGuIZMO_quat widgets
+        renderWidgets(vgTrackball, lightPos, width, height); // in next example (08) we will use directly quaternions
+
+    // using vec3 (lightPos) is necessary re-sync with vGizmo3D: in next example (08) this will no longer be necessary
+        vgTrackball.setSecondRot(getQuatRotFromVec3(lightPos));   //to re-syncronize trackball & lightPos passed to the Widgets call
+
 
     // transferring the rotation to cube model matrix...
         mat4 modelMatrix = cubeObj * mat4_cast(vgTrackball.getRotation());
@@ -491,9 +546,64 @@ void vkApp::run()
         // update uniform buffers to GPU
         for(auto &ubo : uboSceneMat) ubo.update();
 
+    // ImGui: Render/draw
+        ImGui::Render();
     // draw the cube, passing matrices to the vtx shader
         draw();             // Render framebuffer
     }
+
+    // Imgui cleanup
+    imguiExit();
+}
+
+void vkApp::imguiInit()
+{
+    // Initialize ImGui
+        const std::array pool_sizes { vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 1) } ; // array declaration C++ 17
+        vk::DescriptorPoolCreateInfo pool_info(vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, //flags
+                                               1 /* .maxSets */, pool_sizes.size(), pool_sizes.data() /*, .pNext = nullptr  */ );
+
+        vk::detail::resultCheck(logicalDevice.createDescriptorPool( &pool_info, nullptr, &imguiPool), "ImGui: createDescripptorPool...");
+
+    // Setup/Initialize Dear ImGui context
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+        ImGui::StyleColorsDark(); // ImGui style: or ImGui::StyleColorsLight();
+
+        // Setup Platform/Renderer backends
+        framework.imguiInitForVulkan(true);  // ImGui_ImplSDL2_InitForVulkan | ImGui_ImplSDL3_InitForVulkan | ImGui_ImplGLFW_InitForVulkan
+                                             // callback ImGui active: you don't even need to handle mouse events
+        ImGui_ImplVulkan_InitInfo init_info = {};
+        init_info.Instance = instance;
+        init_info.PhysicalDevice = physicalDevice;
+        init_info.Device = logicalDevice;
+        init_info.QueueFamily = graphQueueFamilyIdx;
+        init_info.Queue = queueGraphics;
+        init_info.PipelineCache = pipelineCache;
+        init_info.DescriptorPool = imguiPool;
+        init_info.RenderPass = renderPass;                   // Ignored if using dynamic rendering
+        init_info.UseDynamicRendering = false;
+        init_info.Subpass = 0;
+        init_info.MinImageCount = minImageCount;
+        init_info.ImageCount = swapChainImages.size();
+        init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+        init_info.Allocator = nullptr;
+        init_info.CheckVkResultFn = nullptr;
+        ImGui_ImplVulkan_Init(&init_info);
+
+        ImGui_ImplVulkan_SetMinImageCount(minImageCount);
+}
+
+void vkApp::imguiExit() {
+    ImGui_ImplVulkan_Shutdown();
+    framework.imguiShutdown();      // SDL: ImGui_ImplSDL2/3_Shutdown() | GLFW: ImGui_ImplGlfw_Shutdown()
+    ImGui::DestroyContext();
+    logicalDevice.destroyDescriptorPool( imguiPool );  // destroy ImGui DescriptorPool
+
 }
 
 void vkApp::onInit()        // called from constructor @ startup
@@ -525,6 +635,8 @@ void vkApp::onInit()        // called from constructor @ startup
     APP_FLIP_PAN_Y
     APP_FLIP_ROT_X
     APP_FLIP_DOLLY
+
+    APP_REVERSE_AXES
 }
 
 void vkApp::onExit()        // called from destructor @ exit

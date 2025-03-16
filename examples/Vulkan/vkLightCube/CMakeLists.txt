@@ -11,7 +11,7 @@
 #  This software is distributed under the terms of the BSD 2-Clause license
 #------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.16)
-project(vkLightCube)
+project(imguizmo_vkLightCube)
 
 # To use SDL2 | SDL3 as backend framework (instead of GLFW) type:
 #       cmake -DUSE_SDL2=ON
@@ -36,38 +36,54 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 set(SRC          ${CMAKE_SOURCE_DIR})
-set(COMMONS_DIR  ${SRC}/../commons)
-set(VGIZMO_PARENT_DIR ${SRC}/../../..)
-set(TOOLS_DIR  ${VGIZMO_PARENT_DIR}/libs)
-set(VGIZMO_DIR ${VGIZMO_PARENT_DIR}/vGizmo3D)
+set(GIZMO_PARENT_DIR ${SRC}/../../..)
+set(COMMONS_DIR  ${GIZMO_PARENT_DIR}/commons)
+set(TOOLS_DIR  ${GIZMO_PARENT_DIR}/libs)
+set(GIZMO_DIR ${GIZMO_PARENT_DIR}/imguizmo_quat)
 set(ASSETS_DIR ${SRC}/../../assets)
 
+set(IMGUI_DIR           ${TOOLS_DIR}/imgui)
+set(IMGUI_BACKEND_DIR   ${IMGUI_DIR}/backends)
 
 include_directories(${TOOLS_DIR})
-#include_directories(${VGIZMO_PARENT_DIR}) # CLion bug: when I add follow line COMMONS_DIR and VGIZMO_DIR are removed from project and relative contained files: "not belong to project" message
+#include_directories(${GIZMO_PARENT_DIR}) # CLion bug: when I add follow line COMMONS_DIR and GIZMO_DIR are removed from project and relative contained files: "not belong to project" message
 include_directories(${COMMONS_DIR})
-include_directories(${VGIZMO_DIR})
+include_directories(${GIZMO_DIR})
 include_directories(${ASSETS_DIR}) # CLion trik: to "include" (show) shaders (outside project folder) into Project tool window: not necessary otherwise
+include_directories(${IMGUI_DIR})
 
 
     set(SOURCE_FILES
         ${SRC}/vkCube.cpp
         ${SRC}/vkCube.h
-        ${COMMONS_DIR}/framework.h
-        ${COMMONS_DIR}/framework.cpp
-        ${COMMONS_DIR}/dbgValidationLayer.h
-        ${ASSETS_DIR}/shadersAndModel.h
-        ${VGIZMO_DIR}/vGizmo3D.h
-        ${VGIZMO_DIR}/vGizmo3D_config.h
-        ${VGIZMO_DIR}/vgMath.h
-        ${VGIZMO_DIR}/vgMath_config.h
+        ${COMMONS_DIR}/utils/framework.h
+        ${COMMONS_DIR}/utils/framework.cpp
+        ${COMMONS_DIR}/utils/dbgValidationLayer.h
+        ${GIZMO_DIR}/imguizmo_quat.h
+        ${GIZMO_DIR}/imguizmo_quat.cpp
+        ${COMMONS_DIR}/widgets/uiMainDlg.cpp
+        ${COMMONS_DIR}/widgets/uiSettings.cpp
     )
+
+set(SOURCE_FILES ${SOURCE_FILES}
+        ${IMGUI_DIR}/imgui.cpp
+        ${IMGUI_DIR}/imgui_widgets.cpp
+        ${IMGUI_DIR}/imgui_tables.cpp
+        ${IMGUI_DIR}/imgui_draw.cpp
+        ${IMGUI_DIR}/imgui_demo.cpp
+        ${IMGUI_BACKEND_DIR}/imgui_impl_vulkan.cpp
+)
+
+set(SOURCE_FILES_GLFW ${IMGUI_BACKEND_DIR}/imgui_impl_glfw.cpp)
+set(SOURCE_FILES_SDL2 ${IMGUI_BACKEND_DIR}/imgui_impl_sdl2.cpp)
+set(SOURCE_FILES_SDL3 ${IMGUI_BACKEND_DIR}/imgui_impl_sdl3.cpp)
+
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   SPIR-V shaders
 
-set(vkSHADERS_RELATIVE_DIR ../../Shaders/lightCube)
-set(vkSHADERS_DIR ${CMAKE_SOURCE_DIR}/${vkSHADERS_RELATIVE_DIR})
-add_compile_definitions("-DAPP_SHADERS_DIR=${vkSHADERS_RELATIVE_DIR}")  # Shaders RELATIVE_DIR is acquired from CMake and passed to code:
+set(vkSHADERS_DIR ${COMMONS_DIR}/shaders)
+add_compile_definitions("-DAPP_SHADERS_DIR=${vkSHADERS_DIR}")  # Shaders RELATIVE_DIR is acquired from CMake and passed to code:
 include_directories(${vkSHADERS_DIR}) # CLion trik: to "include" (show) shaders (outside project folder) into Project tool window: not necessary otherwise
 
 set(COMPILED_SHADERS_EXT ".spirv")
@@ -118,18 +134,18 @@ set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DIMGUI_IMPL_OPENGL_LOADER_GLAD -DGLFW_INC
 if(USE_SDL2)
     find_package(SDL2 REQUIRED)
     set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DAPP_USES_SDL2")
-    add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+    add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${SOURCE_FILES_SDL2})
     include_directories(${SDL2_INCLUDE_DIRS})
     target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
 elseif(USE_SDL3)
         find_package(SDL3 REQUIRED)
         set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DAPP_USES_SDL3")
-        add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+        add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${SOURCE_FILES_SDL3})
         include_directories(${SDL3_INCLUDE_DIRS})
         target_link_libraries(${PROJECT_NAME} ${SDL3_LIBRARIES})
     else()
         find_package(glfw3 REQUIRED)
-        add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+        add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${SOURCE_FILES_GLFW})
         target_link_libraries(${PROJECT_NAME} glfw)
 endif(USE_SDL2)
 
@@ -155,3 +171,5 @@ if(VULKAN_FOUND)
     target_include_directories(${PROJECT_NAME} PUBLIC $ENV{VULKAN_SDK}/include)
     target_link_libraries (${PROJECT_NAME} ${Vulkan_LIBRARIES} ${CMAKE_DL_LIBS}  ${SHADERC_LIB})
 endif (VULKAN_FOUND)
+
+#file(WRITE ${CMAKE_SOURCE_DIR}/.idea/.name ${PROJECT_NAME}) # used to rename a Project in clion (run once)

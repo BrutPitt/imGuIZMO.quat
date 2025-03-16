@@ -11,28 +11,31 @@ The **NEW** [**easy_examples**](https://github.com/BrutPitt/imGuIZMO.quat/tree/m
 
 <p align="right"> <span style="position:relative; top:-10px;"> <i> also  &nbsp; </i> </span> <a href="https://github.com/RenderKit/ospray-studio/tree/master/external/imGuIZMO.quat" target="_blank"><img width="200" height="40" src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/studio.png"/></a> &nbsp; <span style="position:relative; top:-10px;"> <i> uses <b> imGuIZMO.quat</b></i></span></p> 
 
-With **imGuIZMO.quat** you can manipulate objects starting from $\color{red}{\textbf{ only 4 code lines!}}$ &nbsp; *([read below](#how-to-implement-imguizmoquat))*
+With **imGuIZMOquat** you can manipulate objects starting from $\color{red}{\textbf{ only 4 code lines!}}$ &nbsp; *([read below](#how-to-implement-imguizmoquat))*
 
 <p align="center"><a href="https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSetVG.html"> 
 <img src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/imGuIZMO.gif"></a>
 </p>
 
-**imGuIZMO.quat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: it provides a way to rotate and move (pan/dolly) models, lights, objects, cameras (etc), with mouse, adding $\color{red}{\textbf{only 4 code lines!}}$ to your code.
+**imGuIZMOquat** is a [**ImGui**](https://github.com/ocornut/imgui) widget: it provides a way to rotate and move (pan/dolly) models, lights, objects, cameras (etc), with mouse, adding $\color{red}{\textbf{only 4 code lines!}}$ to your code.
 It uses **quaternions** algebra, internally, to manage rotations, and offers the possibility (also) to interfacing with **vec3**, **vec4**, **mat3x3** or **mat4x4**
 
-## Live **WebGPU** / **WebGL2** demo examples
+## **NEW** **WebGPU** / WebGL2 live demo examples
 
-You can run/try **WebGPU** / **WGPU** examples of **imGuIZMO** from following links:
+You can run/try **WebGPU** / **WGPU** examples of **imGuIZMO_quat** from following links:
 
-- **NEW [v4.0 WiP **WebGPU** cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuCube.html)** - from new [easy_examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) ( WebGPU / Vulkan / OpenGL )\
-also displayed in [full canvas](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuCube_full.html) (w/o instructions and mouse buttons helper)
+- **NEW [v4.0 WiP **WebGPU** lighted cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuCube.html)** - from new [easy_examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) ( WebGPU / Vulkan / OpenGL )\
+also displayed in [full resizable canvas](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuCube_full.html) (w/o instructions and mouse buttons helper)
+
+- **NEW [v4.0 WiP **WebGPU** cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuLightCube.html)** - from new [examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) ( WebGPU / Vulkan / OpenGL )\
+also displayed in [full resizable canvas](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuLightCube_full.html) (w/o instructions and mouse buttons helper)
 
 **It's necessary to use a browser with **WebGPU** capabilities: e.g. Chrome-Canary, FireFox Nightly, Safari Technology Preview ...*
 
 
 You can run/try **WebGL 2** examples of **imGuIZMO** from following links:
 
-- **NEW [v4.0 WiP Illuminated cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglLightCube.html)** - from new [LightCube example](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) ( WebGPU / Vulkan / OpenGL )
+- **NEW [v4.0 WiP lighted cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglLightCube.html)** - from new [LightCube example](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) ( WebGPU / Vulkan / OpenGL )
 - **NEW [v4.0 WiP cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglCubeExample.html)** - from new [easy_examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) ( WebGPU / Vulkan / OpenGL )
 - [**imGuIZMO.quat** used together **virtualGizmo3D**  direct 3D mouse/screen manipulator](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSetVG.html)
 - [**imGuIZMO.quat** manipulator (only)](https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wgl_qjSet.html), now with 3D Pan/Dolly (move/zoom) features - **since v3.0*

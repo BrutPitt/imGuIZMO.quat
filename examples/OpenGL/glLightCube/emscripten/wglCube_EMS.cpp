@@ -15,10 +15,10 @@
 #include <GLFW/glfw3.h>
 
 #include <GLFW/glfw3.h>
-#include <imgui/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_glfw.h>
 
-#include "oglDebug.h"
-#include "shadersAndModel.h"
+#include "utils/oglDebug.h"
+#include "assets/cubePNC.h"
 
 #define FRAG_NAME "vkLightCube.frag"
 #define VERT_NAME "vkLightCube.vert"
@@ -30,7 +30,7 @@ int width = 1280, height = 800;
 GLFWwindow *glfwWindow;
 
 const int nElemVtx = 4;
-const size_t nVertex = sizeof(cubeData)/sizeof(cubeData[0]);
+const size_t nVertex = sizeof(cubePNC)/sizeof(cubePNC[0]);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
@@ -172,17 +172,17 @@ void initGL()
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vaoBuffer);
     glBindBuffer(GL_ARRAY_BUFFER,vaoBuffer);
-    glBufferData(GL_ARRAY_BUFFER,sizeof(cubeData), cubeData, GL_STATIC_READ);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(cubePNC), cubePNC, GL_STATIC_READ);
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vaoBuffer);
-    glVertexAttribPointer(    loc::vtxIdx, nElemVtx, GL_FLOAT, GL_FALSE, sizeof(cubeData[0]), 0L);
+    glVertexAttribPointer(    loc::vtxIdx, nElemVtx, GL_FLOAT, GL_FALSE, sizeof(cubePNC[0]), 0L);
     glEnableVertexAttribArray(loc::vtxIdx);
 
-    glVertexAttribPointer(    loc::nrmIdx, nElemVtx, GL_FLOAT, GL_FALSE, sizeof(cubeData[0]), (void *) (  nElemVtx*sizeof(float)));
+    glVertexAttribPointer(    loc::nrmIdx, nElemVtx, GL_FLOAT, GL_FALSE, sizeof(cubePNC[0]), (void *) (  nElemVtx*sizeof(float)));
     glEnableVertexAttribArray(loc::nrmIdx);
 
-    glVertexAttribPointer(    loc::colIdx, nElemVtx, GL_FLOAT, GL_FALSE, sizeof(cubeData[0]), (void *) (2*nElemVtx*sizeof(float)));
+    glVertexAttribPointer(    loc::colIdx, nElemVtx, GL_FLOAT, GL_FALSE, sizeof(cubePNC[0]), (void *) (2*nElemVtx*sizeof(float)));
     glEnableVertexAttribArray(loc::colIdx);
 
     ubo.create(sizeof(_uboMat), &uboMat, program, "uBuffer", bind::matIdx );
@@ -372,6 +372,7 @@ void mainLoop()
 
     // vGizmo3D: check changing button state to activate/deactivate drag movements (pressing together left/right activate/deactivate both)
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    if(!ImGui::GetIO().WantCaptureMouse) {
         static int leftPress = 0, rightPress = 0, middlePress = 0;
         double x, y;
         glfwGetCursorPos(glfwWindow, &x, &y);
@@ -395,7 +396,8 @@ void mainLoop()
     // vGizmo3D: if "drag" active update internal rotations (primary and secondary)
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         track.motion(x,y);
-
+    }
+    
     // vGizmo3D: call it every rendering loop if you want a continue rotation until you do not click on screen
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         track.idle();   // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movement

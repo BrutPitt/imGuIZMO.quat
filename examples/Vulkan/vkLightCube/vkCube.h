@@ -13,11 +13,11 @@
 class vkApp;
 #define theApp vkApp::theMainApp
 
-#include "dbgValidationLayer.h"
-#include "framework.h"
+#include "utils/dbgValidationLayer.h"
+#include "utils/framework.h"
 
-#include "shadersAndModel.h"
-#include <vGizmo3D.h>
+#include "assets/cubePNC.h"
+#include <imguizmo_quat.h>
 
 #define VSYNC_ENABLED true         // true/false vSync on/off ==> pass from FiFo to Immediate presentation mode
 
@@ -262,7 +262,7 @@ protected:
     }
     // VK Data
     vk::Format surfaceFormat = vk::Format::eB8G8R8A8Unorm;  // preselected simple surface format
-    uint32_t vertexStride { sizeof( cubeData[0] ) };
+    uint32_t vertexStride { sizeof( cubePNC[0] ) };
     std::vector<std::pair<vk::Format, uint32_t>> vertexInputAttributeFormatOffset { { vk::Format::eR32G32B32A32Sfloat, 0 }, { vk::Format::eR32G32B32A32Sfloat, 4*sizeof(float) }, { vk::Format::eR32G32B32A32Sfloat, 8*sizeof(float) } };
 
     // preselected eImmediate with vsync=off ==> checking eMailbox is available in presentMode list: minor tearing
@@ -307,7 +307,7 @@ protected:
     uint32_t graphQueueFamilyIdx;
     uint32_t currentBufferIdx {0};
 
-    bufferSet vtxCubeData { (void *) cubeData, sizeof(cubeData) };
+    bufferSet vtxCubeData { (void *) cubePNC, sizeof(cubePNC) };
 };
 
 // Vulkan App
@@ -325,6 +325,10 @@ private:
 
     void onInit();
     void onExit();
+
+    void imguiInit();
+    void imguiExit();
+    vk::DescriptorPool imguiPool;
 
     void setPerspective();
     void setScene();

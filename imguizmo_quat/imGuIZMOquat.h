@@ -24,6 +24,10 @@
 
 #include "vGizmo3D.h"
 
+#if !defined(IMGUI_DEFINE_MATH_OPERATORS)
+    #define IMGUI_DEFINE_MATH_OPERATORS
+#endif
+
 #ifndef IMGUIZMO_MANUAL_IMGUI_INCLUDE
     #if !defined(IMGUIZMO_IMGUI_FOLDER)
         #define IMGUIZMO_IMGUI_FOLDER imgui/
@@ -36,7 +40,6 @@
     #include INC_PATH(imgui_internal.h)
 #endif
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 
 //--------------------------------------------------------------------------
 //
@@ -92,7 +95,6 @@ struct imguiGizmo
                 modeDual           = 0x0008, //0b0000'1000,
                 modePanDolly       = 0x0010, //0b0001'0000,
                 modeMask           = 0x00ff, 
-                
 
                 cubeAtOrigin       = 0x0100, //0b0000'0000, 
                 sphereAtOrigin     = 0x0200, //0b0001'0000,

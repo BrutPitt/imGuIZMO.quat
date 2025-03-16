@@ -13,10 +13,14 @@
 #include "oglCube.h"
 
 #include <GLFW/glfw3.h>
-#include <imgui/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_glfw.h>
 
-#include "oglDebug.h"
-#include "../../assets/shadersAndModel.h"
+#include "utils/oglDebug.h"
+#include "assets/cubePNC.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// vGizmo3D:
+#include <vGizmo3D.h>
 
 #define FRAG_NAME "vkLightCube.frag"
 #define VERT_NAME "vkLightCube.vert"
@@ -28,7 +32,7 @@ int width = 1280, height = 800;
 GLFWwindow *glfwWindow;
 
 const int nElemVtx = 4;
-const size_t nVertex = sizeof(cubeData)/sizeof(cubeData[0]);
+const size_t nVertex = sizeof(cubePNC)/sizeof(cubePNC[0]);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
@@ -168,7 +172,7 @@ void initGL()
 
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &vaoBuffer);
-    glNamedBufferStorage(vaoBuffer, sizeof(cubeData), cubeData, 0);
+    glNamedBufferStorage(vaoBuffer, sizeof(cubePNC), cubePNC, 0);
 
     glVertexArrayAttribBinding(vao,loc::vtxIdx, 0);
     glVertexArrayAttribFormat(vao, loc::vtxIdx, nElemVtx, GL_FLOAT, GL_FALSE, 0);
@@ -182,7 +186,7 @@ void initGL()
     glVertexArrayAttribFormat(vao, loc::colIdx, nElemVtx, GL_FLOAT, GL_FALSE, 2*nElemVtx*sizeof(float));
     glEnableVertexArrayAttrib(vao, loc::colIdx);
 
-    glVertexArrayVertexBuffer(vao, 0, vaoBuffer, 0, sizeof(cubeData[0]));
+    glVertexArrayVertexBuffer(vao, 0, vaoBuffer, 0, sizeof(cubePNC[0]));
 
     ubo.create(sizeof(_uboMat), &uboMat, bind::matIdx );
 
@@ -208,7 +212,7 @@ void initFramework()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
 
     glfwWindow = glfwCreateWindow(width, height, "glCube", NULL, NULL);
@@ -249,7 +253,7 @@ void initImGui()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void initVGizmo3D()     // Settings to control vGizmo3D
 {
-    // Initialization are necessary to associate your preferences to vGizmo3D
+    // Initialization is necessary to associate your preferences to vGizmo3D
     // These are also the DEFAULT values, so if you want to maintain these combinations you can omit they
     // and to override only the associations that you want modify
         track.setGizmoRotControl      (vg::evButton1  /* or vg::evLeftButton */, 0 /* vg::evNoModifier */ );
@@ -331,7 +335,10 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
     // vGizmo3D: is necessary intercept mouse event not destined to ImGui
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if(!ImGui::GetIO().WantCaptureMouse) {
-            static int leftPress = 0, rightPress = 0;
+
+    // vGizmo3D: check changing button state to activate/deactivate drag movements (pressing together left/right activate/deactivate both)
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            static int leftPress = 0, rightPress = 0, middlePress = 0;
             double x, y;
             glfwGetCursorPos(glfwWindow, &x, &y);
             if(glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) != leftPress) {   // check if leftButton state is changed
@@ -344,11 +351,20 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
                 track.mouse(vg::evRightButton, getModifier(glfwWindow),
                                                rightPress, x, y);
             }
-            track.motion(x,y);                                                          // if one button is pressed vGizmo3D catch the motion
+            // Just a trik: simulating a double press (left+right button together) using MIDDLE button,
+            // sending two "consecutive" activation/deactivation calls to rotate cube and light spot together
+            if(glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_MIDDLE) != middlePress) {   // check if middleButton state is changed
+                middlePress = middlePress == GLFW_PRESS ? GLFW_RELEASE : GLFW_PRESS;        // set new (different!) middle button state
+                track.mouse(vg::evLeftButton, getModifier(glfwWindow),  middlePress, x, y); // call Left activation/deactivation with same "middleStatus"
+                track.mouse(vg::evRightButton, getModifier(glfwWindow), middlePress, x, y); // call Right activation/deactivation with same "middleStatus"
+            }
+        // vGizmo3D: if "drag" active update internal rotations (primary and secondary)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            track.motion(x,y);
         }
     // vGizmo3D: call it every rendering loop if you want a continue rotation until you do not click on screen
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        track.idle();   // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movements
+        track.idle();   // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movement
                         // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                         // It can be stopped by click on screen (without mouse movement)
         track.idleSecond(); // set continuous rotation on Idle also for secondary rot

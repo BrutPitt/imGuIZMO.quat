@@ -25,13 +25,12 @@
 #include <glad/glad.h>
 #endif
 
-#include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
-#include <imgui/imgui_impl_opengl3.h>
-
 /////////////////////////////////////////////////////////////////////////////
 // ImGuIZMOquat / vGizmo3D:
 #include <imguizmo_quat.h>
+
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 
 void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height);
 
