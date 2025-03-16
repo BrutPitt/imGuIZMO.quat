@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{7853bd7a-e4d8-4fe8-9da1-52aafe2166ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs">
+      <UniqueIdentifier>{11da0c39-1ed6-459b-9167-329cf61bf6da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\imGui">
+      <UniqueIdentifier>{1d5143b7-a119-429c-bb23-8183a489f265}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\glad">
+      <UniqueIdentifier>{5185229a-c563-43e9-b72f-02a38351cc2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{0a478c20-b76c-480f-8fc6-7d45c4f30031}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\imguiTools">
+      <UniqueIdentifier>{64c24a70-4590-4d05-8722-5c94e3835068}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\glApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\glWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\qJulia.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ui\uiMainDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ui\uiSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\libs\imgui\imgui.cpp">
+      <Filter>libs\imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\libs\imgui\imgui_demo.cpp">
+      <Filter>libs\imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\libs\imgui\imgui_draw.cpp">
+      <Filter>libs\imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\libs\ImGui\imgui_impl_glfw.cpp">
+      <Filter>libs\imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\libs\ImGui\imgui_impl_opengl3.cpp">
+      <Filter>libs\imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\libs\ImGui\imgui_widgets.cpp">
+      <Filter>libs\imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\libs\glad\glad.c">
+      <Filter>libs\glad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tools\glslProgramObject.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tools\glslShaderObject.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\libs\ImGui\imgui_impl_sdl.cpp">
+      <Filter>libs\imGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tools\imGuIZMOquat.cpp">
+      <Filter>Tools\imguiTools</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\glApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\glWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\qJulia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ui\uiMainDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\libs\imgui\imconfig.h">
+      <Filter>libs\imGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\libs\imgui\imgui.h">
+      <Filter>libs\imGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\libs\ImGui\imgui_impl_glfw.h">
+      <Filter>libs\imGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\libs\ImGui\imgui_impl_opengl3.h">
+      <Filter>libs\imGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\libs\imgui\imgui_internal.h">
+      <Filter>libs\imGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\libs\glad\glad.h">
+      <Filter>libs\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tools\glslProgramObject.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tools\glslShaderObject.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tools\vGizmo.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tools\imGuIZMOquat.h">
+      <Filter>Tools\imguiTools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tools\vGizmoMath.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tools\vgConfig.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tools\vgMath.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Shaders\qjFragES2.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Shaders\qjVert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

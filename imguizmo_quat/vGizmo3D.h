@@ -23,6 +23,8 @@
         #define VGM_USES_TEMPLATE    // glm uses template ==> vGizmo needs to know
     #endif
 
+    #define GLM_ENABLE_EXPERIMENTAL
+
     #define VG_T_TYPE float
 
     #include <glm/glm.hpp>

@@ -13,24 +13,24 @@
 #include <cstdlib>
 #include <iostream>
 #include <glad/glad.h>
-#include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-#include <GLFW/glfw3.h>
-
-#include "oglDebug.h"
-#include "../commons/shadersAndModel.h"
-
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
+#include <imguizmo_quat.h> // now also imguizmo_quat.h
+
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends//imgui_impl_opengl3.h"
+
+#include <GLFW/glfw3.h>
+
+#include "utils/oglDebug.h"
+#include "assets/cubePC.h"
+#include "shaders/allShaders.h"
 
 int width = 1280, height = 800;
 GLFWwindow *glfwWindow;
 
 const int nElemVtx = 4;
-const int nVertex = sizeof(coloredCubeData)/(sizeof(float)*2*nElemVtx);
+const int nVertex = sizeof(cubePC)/(sizeof(float)*2*nElemVtx);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
@@ -139,7 +139,7 @@ void initGL()
 
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &vaoBuffer);
-    glNamedBufferStorage(vaoBuffer, sizeof(coloredCubeData), coloredCubeData, 0);
+    glNamedBufferStorage(vaoBuffer, sizeof(cubePC), cubePC, 0);
 
     glVertexArrayAttribBinding(vao,loc::vtxIdx, 0);
     glVertexArrayAttribFormat(vao, loc::vtxIdx, nElemVtx, GL_FLOAT, GL_FALSE, 0);

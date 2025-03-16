@@ -40,4 +40,5 @@
 *.db
 bfg.jar
 .idea/
+imgui.ini
 imgui_docking/

@@ -23,15 +23,7 @@
 #include <cfloat>
 
 #include "vkCube.h"
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_vulkan.h>
-#include <imgui/imgui_internal.h>
-
-/////////////////////////////////////////////////////////////////////////////
-// imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imGuIZMOquat.h> // now also imguizmo_quat.h
-
+#include <imgui/backends/imgui_impl_vulkan.h>
 
 uint32_t getGraphicsIndex(const vk::PhysicalDevice &physicalDevice)
 {

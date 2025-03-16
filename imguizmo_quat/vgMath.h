@@ -378,7 +378,7 @@ inline float uintBitsToFloat(uint32_t const v) { return *((float *)(&v)); }
 inline uint32_t floatBitsToUint(float const v) { return *((uint32_t *)(&v)); }
 // dot
 //////////////////////////
-TEMPLATE_TYPENAME_T inline T dot(const VEC2_T& v0, const VEC2_T& v1) { return v0.x * v1.x + v0.y * v1.y; }
+TEMPLATE_TYPENAME_T inline T dot(const  VEC2_T& v0, const VEC2_T& v1) { return v0.x * v1.x + v0.y * v1.y; }
 TEMPLATE_TYPENAME_T inline T dot(const VEC3_T& v0, const VEC3_T& v1) { return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z; }
 TEMPLATE_TYPENAME_T inline T dot(const VEC4_T& v0, const VEC4_T& v1) { return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z + v0.w * v1.w; }
 TEMPLATE_TYPENAME_T inline T dot(const QUAT_T& q0, const QUAT_T& q1) { return q0.x * q1.x + q0.y * q1.y + q0.z * q1.z + q0.w * q1.w; }
@@ -510,13 +510,27 @@ TEMPLATE_TYPENAME_T inline VEC3_T operator*(const QUAT_T& q, const VEC3_T& v) {
     const VEC3_T qV(q.x, q.y, q.z), uv(cross(qV, v));
     return v + ((uv * q.w) + cross(qV, uv)) * T(2); }
 TEMPLATE_TYPENAME_T inline  VEC3_T operator*(const VEC3_T& v, const QUAT_T& q) {  return inverse(q) * v; }
-// translate / scale
+// translate / scale / rotate
 //////////////////////////
 TEMPLATE_TYPENAME_T inline MAT4_T translate(MAT4_T const& m, VEC3_T const& v) {
     MAT4_T r(m); r[3] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3]; 
     return r; }
 TEMPLATE_TYPENAME_T inline MAT4_T scale(MAT4_T const& m, VEC3_T const& v) {
     return MAT4_T(m[0] * v[0], m[1] * v[1], m[2] * v[2], m[3]); }
+
+TEMPLATE_TYPENAME_T inline MAT4_T rotate(MAT4_T const& m, const T a, VEC3_T const& v) {
+    T const c = cos(a), s = sin(a);
+    VEC3_T axis { normalize(v) }, t { (T(1) - c) * axis };
+
+    MAT3_T rot = { { c + t.x * axis.x,          t.x * axis.y + s * axis.z, t.x * axis.z - s * axis.y },
+                   { t.y * axis.x - s * axis.z, c + t.y * axis.y,          t.y * axis.z + s * axis.x },
+                   { t.z * axis.x + s * axis.y, t.z * axis.y - s * axis.x, c + t.z * axis.z          } };
+
+    return { { m.v[0] * rot.m00 + m.v[1] * rot.m01 + m.v[2] * rot.m02 },
+             { m.v[0] * rot.m10 + m.v[1] * rot.m11 + m.v[2] * rot.m12 },
+             { m.v[0] * rot.m20 + m.v[1] * rot.m21 + m.v[2] * rot.m22 },
+             { m.v[3]                                                 } };
+}
 // quat angle/axis
 //////////////////////////
 TEMPLATE_TYPENAME_T inline QUAT_T angleAxis(T const &a, VEC3_T const &v) { return QUAT_T(cos(a * T(0.5)), v * sin(a * T(0.5))); }

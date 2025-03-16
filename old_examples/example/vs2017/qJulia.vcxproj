@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="qjulia_SDL|Win32">
+      <Configuration>qjulia_SDL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="qjulia_SDL|x64">
+      <Configuration>qjulia_SDL</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="SDL Debug|Win32">
+      <Configuration>SDL Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="SDL Debug|x64">
+      <Configuration>SDL Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="SDL Release|Win32">
+      <Configuration>SDL Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="SDL Release|x64">
+      <Configuration>SDL Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{BFDC9341-6260-43C5-B7D6-9E07611C69B3}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SDL Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SDL Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SDL Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SDL Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='qjulia_SDL|Win32'">
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='qjulia_SDL|x64'">
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SDL Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SDL Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SDL Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SDL Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(IncludePath);$(Include)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
+    <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SDL Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(IncludePath);$(Include)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
+    <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(IncludePath);$(Include)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
+    <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SDL Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(IncludePath);$(Include)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
+    <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(IncludePath);$(Include)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
+    <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SDL Debug|x64'">
+    <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(IncludePath);$(Include)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
+    <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(IncludePath);$(Include)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
+    <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SDL Release|x64'">
+    <ExecutablePath>D:\Lang\DeV\Bin$(PlatformArchitecture);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(IncludePath);$(Include)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(Lib)$(PlatformArchitecture)\GL;$(Lib)$(PlatformArchitecture)\SDL;$(Lib)$(PlatformArchitecture)\GLFW\$(Configuration);$(Lib);</LibraryPath>
+    <OutDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(RAMDISK)\$(MSBuildProjectDirectoryNoRoot)\$(DefaultPlatformToolset)\$(Platform)\$(Configuration)\obj\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>NotSet</SubSystem>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SDL Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>GLAPP_USE_SDL;IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>NotSet</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SDL Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>GLAPP_USE_SDL;IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>NotSet</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SDL Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>GLAPP_USE_SDL;IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>NotSet</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SDL Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>GLAPP_USE_SDL;IMGUI_IMPL_OPENGL_LOADER_GLAD;GLM_ENABLE_EXPERIMENTAL;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\libs\;$(ProjectDir)..\src\tools\;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\libs\ImGui\imgui_impl_sdl.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\src\tools\glslProgramObject.cpp" />
+    <ClCompile Include="..\src\tools\glslShaderObject.cpp" />
+    <ClCompile Include="..\src\glApp.cpp" />
+    <ClCompile Include="..\src\glWindow.cpp" />
+    <ClCompile Include="..\src\libs\glad\glad.c" />
+    <ClCompile Include="..\src\libs\imgui\imgui.cpp" />
+    <ClCompile Include="..\src\libs\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\src\libs\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\src\libs\ImGui\imgui_impl_glfw.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SDL Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SDL Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SDL Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SDL Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\src\libs\ImGui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\src\libs\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="..\src\qJulia.cpp" />
+    <ClCompile Include="..\src\tools\imGuIZMOquat.cpp" />
+    <ClCompile Include="..\src\ui\uiMainDlg.cpp" />
+    <ClCompile Include="..\src\ui\uiSettings.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\tools\glslProgramObject.h" />
+    <ClInclude Include="..\src\tools\glslShaderObject.h" />
+    <ClInclude Include="..\src\tools\imGuIZMOquat.h" />
+    <ClInclude Include="..\src\tools\vgConfig.h" />
+    <ClInclude Include="..\src\tools\vGizmo.h" />
+    <ClInclude Include="..\src\tools\vGizmoMath.h" />
+    <ClInclude Include="..\src\glApp.h" />
+    <ClInclude Include="..\src\glWindow.h" />
+    <ClInclude Include="..\src\libs\glad\glad.h" />
+    <ClInclude Include="..\src\libs\imgui\imconfig.h" />
+    <ClInclude Include="..\src\libs\imgui\imgui.h" />
+    <ClInclude Include="..\src\libs\ImGui\imgui_impl_glfw.h" />
+    <ClInclude Include="..\src\libs\ImGui\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\src\libs\imgui\imgui_internal.h" />
+    <ClInclude Include="..\src\qJulia.h" />
+    <ClInclude Include="..\src\tools\vgMath.h" />
+    <ClInclude Include="..\src\ui\uiMainDlg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Shaders\qjFragES2.glsl" />
+    <None Include="..\Shaders\qjVert.glsl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

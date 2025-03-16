@@ -42,7 +42,7 @@ int width = 1280, height = 800;
 GLFWwindow *glfwWindow;
 
 const int nElemVtx = 4;
-const size_t nVertex = sizeof(coloredCubeData)/(sizeof(float)*2*nElemVtx);
+const size_t nVertex = sizeof(cubePC)/(sizeof(float)*2*nElemVtx);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
@@ -187,7 +187,7 @@ void initGL()
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vaoBuffer);
     glBindBuffer(GL_ARRAY_BUFFER,vaoBuffer);
-    glBufferData(GL_ARRAY_BUFFER,sizeof(coloredCubeData), coloredCubeData, GL_STATIC_READ);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(cubePC), cubePC, GL_STATIC_READ);
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vaoBuffer);
@@ -199,7 +199,7 @@ void initGL()
 #else
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &vaoBuffer);
-    glNamedBufferStorage(vaoBuffer, sizeof(coloredCubeData), coloredCubeData, 0);
+    glNamedBufferStorage(vaoBuffer, sizeof(cubePC), cubePC, 0);
 
     glVertexArrayAttribBinding(vao,loc::vtxIdx, 0);
     glVertexArrayAttribFormat(vao, loc::vtxIdx, nElemVtx, GL_FLOAT, GL_FALSE, 0);

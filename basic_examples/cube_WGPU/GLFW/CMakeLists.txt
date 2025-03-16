@@ -26,7 +26,7 @@
 #  4. python -m http.server ... then open WGPU browser with url: http://localhost:8000/wgpu_mandelbrot.html
 
 cmake_minimum_required(VERSION 3.16) # DAWN required
-project(cube_wgpu_example)
+project(imbuizmo_wgpuCube)
 
 set(APP_NAME imguizmo_quat_wgpuCube)
 
@@ -93,9 +93,10 @@ endif()
 set(SRC          ${CMAKE_SOURCE_DIR})
 set(IMGUIZMO_PARENT_DIR ${SRC}/../../..)
 set(IMGUIZMO_DIR ${IMGUIZMO_PARENT_DIR}/imguizmo_quat)
-set(COMMONS_DIR  ${SRC}/../../commons)
+set(COMMONS_DIR  ${IMGUIZMO_PARENT_DIR}/commons)
 set(TOOLS_DIR    ${IMGUIZMO_PARENT_DIR}/libs)
 set(IMGUI_DIR    ${TOOLS_DIR}/imgui)
+set(IMGUI_BACKEND_DIR   ${IMGUI_DIR}/backends)
 
 include_directories(${TOOLS_DIR})
 include_directories(${IMGUIZMO_DIR})
@@ -109,12 +110,12 @@ set(SOURCE_FILES
   ${IMGUIZMO_DIR}/vgMath_config.h
   ${IMGUIZMO_DIR}/imguizmo_quat.h
   ${IMGUIZMO_DIR}/imguizmo_quat.cpp
-  ${COMMONS_DIR}/uiMainDlg.cpp
-  ${COMMONS_DIR}/uiSettings.cpp
-  ${COMMONS_DIR}/shadersAndModel.h
+  ${COMMONS_DIR}/widgets/uiMainDlg.cpp
+  ${COMMONS_DIR}/widgets/uiSettings.cpp
+  ${COMMONS_DIR}/assets/cubePC.h
   # backend files
-  ${IMGUI_DIR}/imgui_impl_glfw.cpp
-  ${IMGUI_DIR}/imgui_impl_wgpu.cpp
+  ${IMGUI_BACKEND_DIR}/imgui_impl_glfw.cpp
+  ${IMGUI_BACKEND_DIR}/imgui_impl_wgpu.cpp
   # Dear ImGui files
   ${IMGUI_DIR}/imgui.cpp
   ${IMGUI_DIR}/imgui_draw.cpp
@@ -158,9 +159,4 @@ if(EMSCRIPTEN)
   )
 endif()
 
-#These examples use Google DAWN (as WGPU SDK), currently a step forward in native development
-#Indeed EMSCRIPTEN still uses some old functions (already changed in DAWN/WGPU native) and Google DAWN maintain a private fork of the Emscripten WebGPU bindings (**emdawnwebgpu**) to speedup the WebGPU evolution ([emdawnwebgpu is available in DAWN repo](https://dawn.googlesource.com/dawn/+/refs/heads/main/src/emdawnwebgpu/))
-#These examples (for now) use the "original" EMSCRIPTEN, for this motive there is so many differences between native and web code
-#
-#
-#
+file(WRITE ${CMAKE_SOURCE_DIR}/.idea/.name ${PROJECT_NAME}) # used to rename a Project in clion (run once)

@@ -23,15 +23,7 @@
 #include <cfloat>
 
 #include "vkCube.h"
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_vulkan.h>
-#include <imgui/imgui_internal.h>
-
-/////////////////////////////////////////////////////////////////////////////
-// imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imGuIZMOquat.h> // now also imguizmo_quat.h
-
+#include <imgui/backends/imgui_impl_vulkan.h>
 
 uint32_t getGraphicsIndex(const vk::PhysicalDevice &physicalDevice)
 {
@@ -434,7 +426,7 @@ void vkApp::run()
         vgTrackball.idle(); // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movement
                             // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                             // It can be stopped by click on screen (without mouse movement)
-        vgTrackball.idleSecondary();  // also for "secondary" rotation
+        vgTrackball.idleSecond();  // also for "secondary" rotation
 
 
     // ImGUI: prepare ImGUI new frame
@@ -473,11 +465,11 @@ void vkApp::run()
 
     // ImGuIZMO.quat widget
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ImGui::gizmo3D("##aaa", vgTrackball.getRotationRef(), vgTrackball.getSecondRotRef(), widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
+        ImGui::gizmo3D("##aaa", vgTrackball.refRotation(), vgTrackball.refSecondRot(), widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
 
     // ImGuIZMO.quat with also pan and Dolly/zoom
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ImGui::gizmo3D("##a01", vgTrackball.getPositionRef(), vgTrackball.getRotationRef(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
+        ImGui::gizmo3D("##a01", vgTrackball.refPosition(), vgTrackball.refRotation(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
 
 
 

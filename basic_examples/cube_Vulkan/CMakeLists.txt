@@ -11,7 +11,7 @@
 #  This software is distributed under the terms of the BSD 2-Clause license
 #------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.16)
-project(vkCube)
+project(imguizmo_vkCube)
 
 # To use SDL2 | SDL3 as backend framework (instead of GLFW) type:
 #       cmake -DUSE_SDL2=ON
@@ -38,42 +38,38 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 
 set(SRC          ${CMAKE_SOURCE_DIR})
-set(COMMONS_DIR  ${SRC}/../commons)
-set(TOOLS_DIR    ${CMAKE_SOURCE_DIR}/../../libs)
-set(IMGUI_DIR    ${TOOLS_DIR}/imgui)
-set(IMGUIZMO_DIR ${CMAKE_SOURCE_DIR}/../../imguizmo_quat)
+set(IMGUIZMO_PARENT_DIR ${SRC}/../..)
+set(COMMONS_DIR  ${IMGUIZMO_PARENT_DIR}/commons)
+set(TOOLS_DIR    ${IMGUIZMO_PARENT_DIR}//libs)
+set(IMGUIZMO_DIR ${IMGUIZMO_PARENT_DIR}/imguizmo_quat)
 
-include_directories(${SRC})
+set(IMGUI_DIR           ${TOOLS_DIR}/imgui)
+set(IMGUI_BACKEND_DIR   ${IMGUI_DIR}/backends)
+
 include_directories(${TOOLS_DIR})
+include_directories(${COMMONS_DIR})
 include_directories(${IMGUIZMO_DIR})
-include_directories(${SRC}/../commons)
+include_directories(${IMGUI_DIR})
 
-
-    set(SOURCE_FILES
-        ${SRC}/vkCube.h
-        ${SRC}/framework.h
-        ${SRC}/framework.cpp
-        ${SRC}/dbgValidationLayer.h
-        ${COMMONS_DIR}/shadersAndModel.h
+set(SOURCE_FILES
+        ${COMMONS_DIR}/utils/framework.h
+        ${COMMONS_DIR}/utils/framework.cpp
+        ${COMMONS_DIR}/utils/dbgValidationLayer.h
+        ${COMMONS_DIR}/assets/cubePC.h
         ${IMGUIZMO_DIR}/imguizmo_quat.h
         ${IMGUIZMO_DIR}/imguizmo_quat.cpp
-        ${IMGUI_DIR}/imconfig.h
         ${IMGUI_DIR}/imgui.cpp
         ${IMGUI_DIR}/imgui_widgets.cpp
         ${IMGUI_DIR}/imgui_tables.cpp
-        ${IMGUI_DIR}/imgui.h
         ${IMGUI_DIR}/imgui_draw.cpp
         ${IMGUI_DIR}/imgui_demo.cpp
-        ${IMGUI_DIR}/imgui_impl_vulkan.cpp
-        ${IMGUI_DIR}/imgui_impl_vulkan.h
-        ${IMGUI_DIR}/imgui_internal.h
-        ${IMGUI_DIR}/imstb_rectpack.h
-        ${IMGUI_DIR}/imstb_textedit.h
-        ${IMGUI_DIR}/imstb_truetype.h)
+        ${IMGUI_BACKEND_DIR}/imgui_impl_vulkan.cpp
+        ${TOOLS_DIR}/glad/glad.cpp
+        ${TOOLS_DIR}/glad/glad.h)
 
-
-#    set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DIMGUI_IMPL_OPENGL_LOADER_GLAD -DGLFW_INCLUDE_NONE -DGLAPP_NO_OGL_DSA")
-
+set(SOURCE_FILES_GLFW ${IMGUI_BACKEND_DIR}/imgui_impl_glfw.cpp)
+set(SOURCE_FILES_SDL2 ${IMGUI_BACKEND_DIR}/imgui_impl_sdl2.cpp)
+set(SOURCE_FILES_SDL3 ${IMGUI_BACKEND_DIR}/imgui_impl_sdl3.cpp)
 
 file( GLOB APP_SOURCES ${SRC}/vkCube_*.cpp )
 foreach( vkCubeSourceFile ${APP_SOURCES} )
@@ -82,8 +78,8 @@ foreach( vkCubeSourceFile ${APP_SOURCES} )
 
     if(${vkCubeName} MATCHES "Cube_07")
         set(SOURCE_FILES ${SOURCE_FILES}
-                ${COMMONS_DIR}/uiMainDlg.cpp
-                ${COMMONS_DIR}/uiSettings.cpp
+                ${COMMONS_DIR}/widgets/uiMainDlg.cpp
+                ${COMMONS_DIR}/widgets/uiSettings.cpp
         )
     endif()
 
@@ -91,9 +87,7 @@ foreach( vkCubeSourceFile ${APP_SOURCES} )
         find_package(SDL2 REQUIRED)
         set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DAPP_USES_SDL2")
 
-        set(SOURCE_FILES ${SOURCE_FILES}
-            ${IMGUI_DIR}/imgui_impl_sdl2.cpp
-            ${IMGUI_DIR}/imgui_impl_sdl2.h )
+        set(SOURCE_FILES ${SOURCE_FILES} ${SOURCE_FILES_SDL2})
 
         add_executable(${PROJECT_NAME} ${vkCubeSourceFile} ${SOURCE_FILES})
         include_directories(${SDL2_INCLUDE_DIRS})
@@ -102,9 +96,7 @@ foreach( vkCubeSourceFile ${APP_SOURCES} )
             find_package(SDL3 REQUIRED)
             set(M_GLOBAL_FLAGS "${M_GLOBAL_FLAGS} -DAPP_USES_SDL3")
 
-            set(SOURCE_FILES ${SOURCE_FILES}
-                ${IMGUI_DIR}/imgui_impl_sdl3.cpp
-                ${IMGUI_DIR}/imgui_impl_sdl3.h )
+            set(SOURCE_FILES ${SOURCE_FILES} ${SOURCE_FILES_SDL3})
 
             add_executable(${PROJECT_NAME} ${vkCubeSourceFile} ${SOURCE_FILES})
             include_directories(${SDL3_INCLUDE_DIRS})
@@ -112,9 +104,7 @@ foreach( vkCubeSourceFile ${APP_SOURCES} )
         else()
             find_package(glfw3 REQUIRED)
 
-            set(SOURCE_FILES ${SOURCE_FILES}
-                    ${IMGUI_DIR}/imgui_impl_glfw.cpp
-                    ${IMGUI_DIR}/imgui_impl_glfw.h)
+            set(SOURCE_FILES ${SOURCE_FILES} ${SOURCE_FILES_GLFW})
 
             add_executable(${PROJECT_NAME} ${vkCubeSourceFile} ${SOURCE_FILES})
             target_link_libraries(${PROJECT_NAME} glfw)
@@ -148,3 +138,5 @@ foreach( vkCubeSourceFile ${APP_SOURCES} )
         target_link_libraries (${PROJECT_NAME} ${Vulkan_LIBRARIES} ${CMAKE_DL_LIBS}  ${SHADERC_LIB})
     endif (VULKAN_FOUND)
 endforeach( vkCubeSourceFile ${APP_SOURCES} )
+
+#file(WRITE ${CMAKE_SOURCE_DIR}/.idea/.name ${PROJECT_NAME}) # used to rename a Project in clion (run once)

@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Libs">
+      <UniqueIdentifier>{d37a2e8f-5433-4a9e-ac44-a4ded7205afd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libs\glad">
+      <UniqueIdentifier>{89f31955-49ac-4850-9a62-6808ed15644d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{f73cb061-e36f-4ff1-b8f0-d3124eec3789}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools">
+      <UniqueIdentifier>{3cb073fc-1dde-44f7-b1c7-36e048db77a3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\glApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\glad\glad.c">
+      <Filter>Libs\glad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\glslProgramObject.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\glslShaderObject.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\oglAxes.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\glApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\glad\glad.h">
+      <Filter>Libs\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tools\glslProgramObject.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tools\glslShaderObject.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tools\transforms.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tools\oglAxes.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tools\vGizmo.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tools\vGizmoMath.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tools\vgConfig.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tools\vgMath.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Shaders\oglAxesFrag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\oglAxesVert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

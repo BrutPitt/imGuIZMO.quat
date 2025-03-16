@@ -387,9 +387,9 @@ vec3 lightPos(2, 2.5, 3);        // Light Position
 void vkApp::setScene()
 {
     // LOOK_AT: depends from clipMatrix (+Z or -Z) ==> view in the end of vkCube.h
-    viewMatrix = LOOK_AT( { 12.0f,  6.0f,  4.0f },   // From / EyePos / PoV
-                          {  0.0f,  0.0f,  0.0f },   // To   /  Tgt
-                          {  3.0f,  1.0f,   .0f } ); // Up
+    viewMatrix = LOOK_AT( vec3(12.0f,  6.0f,  4.0f),   // From / EyePos / PoV
+                          vec3( 0.0f,  0.0f,  0.0f),   // To   /  Tgt
+                          vec3( 3.0f,  1.0f,   .0f) ); // Up
 
     // Now scale cube to better view light position
     cubeObj = mat4(1); // nothing to do ... scale( vec3(.5));

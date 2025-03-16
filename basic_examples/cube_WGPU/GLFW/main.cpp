@@ -14,7 +14,10 @@
 #include <cassert>
 #include <cfloat>
 
-#include "imgui.h"
+/////////////////////////////////////////////////////////////////////////////
+// imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
+#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
+
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_wgpu.h"
 
@@ -29,18 +32,14 @@
 #include <GLFW/glfw3.h>
 #endif
 
-#include "shadersAndModel.h"
-#include "sleepTimer.h"
-
-/////////////////////////////////////////////////////////////////////////////
-// imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
+#include "assets/cubePC.h"
+#include "utils/sleepTimer.h"
 
 void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height);
 
 // WGSL shader
 const char *shader  = {
-    #include "shader.wgsl"
+    #include "shaders/cube_base.wgsl"
 };
 
 /////////////////////////////////////////////
@@ -322,13 +321,13 @@ void initRenderPipeline()
 
     // Cube VertexBuffer
     wgpu::BufferDescriptor descriptor;
-    descriptor.size = sizeof(coloredCubeData);
+    descriptor.size = sizeof(cubePC);
     descriptor.usage = wgpu::BufferUsage::Vertex | wgpu::BufferUsage::CopyDst;
     vertexBuffer = device.CreateBuffer(&descriptor);
-    device.GetQueue().WriteBuffer(vertexBuffer, 0, coloredCubeData, sizeof(coloredCubeData));
+    device.GetQueue().WriteBuffer(vertexBuffer, 0, cubePC, sizeof(cubePC));
 
     wgpu::VertexBufferLayout vertexBufferLayout;
-    vertexBufferLayout.arrayStride    = sizeof( VertexPC );
+    vertexBufferLayout.arrayStride    = sizeof( vertexPC );
     vertexBufferLayout.stepMode       = wgpu::VertexStepMode::Vertex;
     vertexBufferLayout.attributeCount = std::size( attributes );
     vertexBufferLayout.attributes     = attributes.data();
@@ -582,7 +581,7 @@ void mainLoop()
     wgpu::RenderPassEncoder pass = encoder.BeginRenderPass(&renderPassDesc);
 
     pass.SetPipeline(pipeline);
-    pass.SetVertexBuffer(0, vertexBuffer, 0, sizeof(coloredCubeData));
+    pass.SetVertexBuffer(0, vertexBuffer, 0, sizeof(cubePC));
 
     // Bind the uniform buffer.
     wgpu::BindGroupEntry bindingEntry;
@@ -665,9 +664,9 @@ int main(int, char**)
 
     initRenderPipeline();
 
+    initImGui();
     resizeSurface(initialWindowWidth, initialWindowHeight);
 
-    initImGui();
 
 #ifdef __EMSCRIPTEN__
     // Main loop

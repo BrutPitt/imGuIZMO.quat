@@ -23,15 +23,7 @@
 #include <cfloat>
 
 #include "vkCube.h"
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_vulkan.h>
-#include <imgui/imgui_internal.h>
-
-/////////////////////////////////////////////////////////////////////////////
-// imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imGuIZMOquat.h> // now also imguizmo_quat.h
-
+#include <imgui/backends/imgui_impl_vulkan.h>
 
 uint32_t getGraphicsIndex(const vk::PhysicalDevice &physicalDevice)
 {
@@ -456,11 +448,11 @@ void vkApp::run()
 
     // ImGuIZMO.quat widget
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ImGui::gizmo3D("##aaa", vgTrackball.getRotationRef(), lightPos, widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
+        ImGui::gizmo3D("##aaa", vgTrackball.refRotation(), lightPos, widgetSize); // if(ImGui::gizmo3D(...) == true) ---> widget has been updated
 
     // ImGuIZMO.quat with also pan and Dolly/zoom
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        ImGui::gizmo3D("##a01", vgTrackball.getPositionRef(), vgTrackball.getRotationRef(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
+        ImGui::gizmo3D("##a01", vgTrackball.refPosition(), vgTrackball.refRotation(), widgetSize);    // Ctrl+LButton = Pan ... Shift+LButton = Dolly/Zoom
 
 
 

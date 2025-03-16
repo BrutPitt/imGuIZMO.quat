@@ -284,7 +284,7 @@ struct imguiGizmo
         vec3 dir { checkTowards(vDir) } ;
 
         float len = length(dir);
-        if(len<1.0 && len>= FLT_EPSILON) { normalize(dir); len = 1.0; }
+        if(len<1.0 && len>= FLT_EPSILON) { dir = normalize(dir); len = 1.0; }
         else if(len< FLT_EPSILON) { dir = vec3(1.f, 0.f, 0.f); len = 1.0; }
 
 #ifdef IMGUIZMO_HAS_NEGATIVE_VEC3_LIGHT

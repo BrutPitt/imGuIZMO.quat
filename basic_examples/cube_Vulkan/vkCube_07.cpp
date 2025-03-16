@@ -23,14 +23,7 @@
 #include <cfloat>
 
 #include "vkCube.h"
-
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_vulkan.h>
-#include <imgui/imgui_internal.h>
-
-/////////////////////////////////////////////////////////////////////////////
-// imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imGuIZMOquat.h> // now also imguizmo_quat.h
+#include <imgui/backends/imgui_impl_vulkan.h>
 
 void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height);
 
@@ -339,9 +332,9 @@ vec3 lightPos(2, 2.5, 3);        // Light Position
 void vkApp::setScene()
 {
     // LOOK_AT: depends from clipMatrix (+Z or -Z) ==> view in the end of vkCube.h
-    viewMatrix = LOOK_AT(vec3( 12.0f,  6.0f,  4.0f ),   // From / EyePos / PoV
-                         vec3(  0.0f,  0.0f,  0.0f ),   // To   /  Tgt
-                         vec3(  3.0f,  1.0f,   .0f));   // Up
+    viewMatrix = LOOK_AT( vec3(12.0f,  6.0f,  4.0f ),   // From / EyePos / PoV
+                          vec3( 0.0f,  0.0f,  0.0f ),   // To   /  Tgt
+                          vec3( 3.0f,  1.0f,   .0f ) ); // Up
 
     // Now scale cube to better view light position
     cubeObj = mat4(1); // nothing to do ... scale( vec3(.5));
@@ -442,7 +435,7 @@ void vkApp::run()
         vgTrackball.idle(); // set continuous rotation on Idle: the slow rotation depends on speed of last mouse movement
                             // It can be adjusted from setIdleRotSpeed(1.0) > more speed, < less
                             // It can be stopped by click on screen (without mouse movement)
-        vgTrackball.idleSecondary();  // also for "secondary" rotation
+        vgTrackball.idleSecond();  // also for "secondary" rotation
 
 
     // ImGUI: prepare ImGUI new frame
@@ -454,7 +447,7 @@ void vkApp::run()
 
 
     // using vec3 (lightPos) is necessary sync with vGizmo3D : in next example (08) this will no longer be necessary
-        lightPos = getLightPosFromQuat(vgTrackball.getSecondRotRef() ,length(lightPos)); //to syncronize trackball & lightPos passed to the Widgets call
+        lightPos = getLightPosFromQuat(vgTrackball.refSecondRot() ,length(lightPos)); //to syncronize trackball & lightPos passed to the Widgets call
 
     // Render ALL ImGuIZMO_quat widgets
         renderWidgets(vgTrackball, lightPos, width, height); // in next example (08) we will use directly quaternions

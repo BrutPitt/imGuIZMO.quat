@@ -13,18 +13,18 @@
 #include <cstdlib>
 #include <iostream>
 #include <glad/glad.h>
-#include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
-#include <imgui/imgui_impl_sdl2.h>
-#include <imgui/imgui_impl_opengl3.h>
-#include <SDL2/SDL.h>
-
-#include "oglDebug.h"
-#include "../commons/shadersAndModel.h"
-
 /////////////////////////////////////////////////////////////////////////////
 // imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
+#include <imguizmo_quat.h> // now also imguizmo_quat.h
+
+#include <imgui/backends/imgui_impl_sdl2.h>
+#include "imgui/backends//imgui_impl_opengl3.h"
+
+#include <SDL2/SDL.h>
+
+#include "utils/oglDebug.h"
+#include "assets/cubePC.h"
+#include "shaders/allShaders.h"
 
 void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height);
 
@@ -33,7 +33,7 @@ SDL_Window *sdlWindow = nullptr;
 SDL_GLContext gl_context;
 
 const int nElemVtx = 4;
-const int nVertex = sizeof(coloredCubeData)/(sizeof(float)*2*nElemVtx);
+const int nVertex = sizeof(cubePC)/(sizeof(float)*2*nElemVtx);
 
 // Shaders & Vertex attributes
 GLuint program, vao, vaoBuffer;
@@ -150,7 +150,7 @@ void initGL()
 
     glCreateVertexArrays(1, &vao);
     glCreateBuffers(1, &vaoBuffer);
-    glNamedBufferStorage(vaoBuffer, sizeof(coloredCubeData), coloredCubeData, 0);
+    glNamedBufferStorage(vaoBuffer, sizeof(cubePC), cubePC, 0);
 
     glVertexArrayAttribBinding(vao,loc::vtxIdx, 0);
     glVertexArrayAttribFormat(vao, loc::vtxIdx, nElemVtx, GL_FLOAT, GL_FALSE, 0);
@@ -328,7 +328,7 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
     // vGizmo3D: is necessary intercept mouse event not destined to ImGui
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if(!ImGui::GetIO().WantCaptureMouse) {
-            static int leftPress = 0, rightPress = 0;
+            static int leftPress = 0, rightPress = 0, middlePress = 0;
             int x, y;
             int mouseState = SDL_GetMouseState(&x, &y);
             if(leftPress != (mouseState & SDL_BUTTON_LMASK)) {                                   // check if leftButton state is changed
@@ -341,6 +341,15 @@ int main(int /* argc */, char ** /* argv */)    // necessary for SDLmain in Wind
                 track.mouse(vg::evRightButton, getModifier(sdlWindow),      // send communication to vGizmo3D...
                                                rightPress, x, y);           // ... checking if a key modifier currently is pressed
             }
+            // Simulating a double press (left+right button) using MIDDLE button,
+            // sending two "consecutive" activation/deactivation calls to rotate obj-model and light spot together
+            if(middlePress != (mouseState & SDL_BUTTON_MMASK)) {             // check if middleButton state is changed
+                middlePress = mouseState & SDL_BUTTON_MMASK;                 // set new (different!) middle button state
+                track.mouse(vg::evRightButton, getModifier(sdlWindow), middlePress, x, y);  // call Right activation/deactivation with same "middleStatus"
+                track.mouse(vg::evLeftButton,  getModifier(sdlWindow), middlePress, x, y);  // call Left  activation/deactivation with same "middleStatus"
+            }
+            // To put together to other mouse button checks, and before of `track.motion(x,y);` call
+
             track.motion(x,y);
         }
 

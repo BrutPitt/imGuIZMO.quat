@@ -24,11 +24,12 @@ It uses **quaternions** algebra, internally, to manage rotations, and offers the
 
 You can run/try **WebGPU** / **WGPU** examples of **imGuIZMO_quat** from following links:
 
-- **NEW [v4.0 WiP **WebGPU** lighted cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuCube.html)** - from new [easy_examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) ( WebGPU / Vulkan / OpenGL )\
+- **NEW [v4.0 WiP **WebGPU** lighted cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuLightCube.html)** - from new [examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) ( WebGPU / Vulkan / OpenGL )\
+also displayed in [full resizable canvas](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuLightCube_full.html) (w/o instructions and mouse buttons helper)
+
+- **NEW [v4.0 WiP **WebGPU** cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuCube.html)** - from new [easy_examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) ( WebGPU / Vulkan / OpenGL )\
 also displayed in [full resizable canvas](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuCube_full.html) (w/o instructions and mouse buttons helper)
 
-- **NEW [v4.0 WiP **WebGPU** cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuLightCube.html)** - from new [examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) ( WebGPU / Vulkan / OpenGL )\
-also displayed in [full resizable canvas](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuLightCube_full.html) (w/o instructions and mouse buttons helper)
 
 **It's necessary to use a browser with **WebGPU** capabilities: e.g. Chrome-Canary, FireFox Nightly, Safari Technology Preview ...*
 
