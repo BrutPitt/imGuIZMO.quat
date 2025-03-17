@@ -3,7 +3,7 @@
 
 
 
-**NEW** [**easy_examples**](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples)  (**WebGPU** / Vulkan / OpenGL ) and also **NEW** a bit more [complex examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) (**WebGPU** / Vulkan / OpenGL ) are added
+**NEW** [**easy_examples**](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples)  (**WebGPU** / Vulkan / OpenGL ) and also **NEW** a bit more [complex examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) (**WebGPU** / Vulkan / OpenGL ) has been added
 
 #### [imGuIZMO.quat v4.0 waths new](https://github.com/BrutPitt/imGuIZMO.quat/releases/edit/v4.0)
 
