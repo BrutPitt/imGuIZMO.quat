@@ -13,7 +13,7 @@
 #pragma once
 
 #include "vgMath_config.h"
-
+#include <limits>
 #ifdef VGM_USES_DOUBLE_PRECISION
     #define VG_T_TYPE double
     #define VGM_USES_TEMPLATE
