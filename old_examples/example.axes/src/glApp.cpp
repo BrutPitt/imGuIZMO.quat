@@ -13,6 +13,7 @@
 #include <chrono>
 #include <array>
 #include <vector>
+#include <limits>
 
 #ifdef __EMSCRIPTEN__
     #include <emscripten.h>

@@ -13,6 +13,8 @@
 class vkApp;
 #define theApp vkApp::theMainApp
 
+#include <limits>
+
 #include <imguizmo_quat.h>
 
 #include "utils/dbgValidationLayer.h"

@@ -14,6 +14,8 @@
 #include <vulkan/vulkan.hpp>
 #include <shaderc/shaderc.hpp>
 
+#include <limits>
+
 // declare before "imgui" includes, or anywhere if IMGUI_DEFINE_MATH_OPERATORS
 #include <imguizmo_quat.h>
 

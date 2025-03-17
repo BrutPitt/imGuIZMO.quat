@@ -13,6 +13,8 @@
 class vkApp;
 #define theApp vkApp::theMainApp
 
+#include <limits>
+
 #include "utils/dbgValidationLayer.h"
 #include "utils/framework.h"
 
