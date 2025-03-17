@@ -1,13 +1,11 @@
-# imGuIZMO.quat &nbsp;v4.0 WiP  
+# imGuIZMO.quat &nbsp;v4.0
 
 
 
-### v4.0 Work in Progress
-**Currently are maintained both v3.0 in `ImGuUIZMO.quat` folder and the new v4.0 WiP `imguizmo_quat`*
-*To make improvements, I am intervened simultaneously on the 3 components **ImGuIZMOquat** and also on **vGizmo3D** (the engine) and **vgMath** (optional math library)* 
- *Please feel free to report any malfunction, also via direct e-mail (if you don't have account on Github): addresses are in the source code*
 
-The **NEW** [**easy_examples**](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples)  (**WebGPU** / Vulkan / OpenGL ) added refer to the latter: soon a beta will be released and everything will be adequate to v4.0
+**NEW** [**easy_examples**](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples)  (**WebGPU** / Vulkan / OpenGL ) and also **NEW** a bit more [complex examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) (**WebGPU** / Vulkan / OpenGL ) are added
+
+#### [imGuIZMO.quat v4.0 waths new](https://github.com/BrutPitt/imGuIZMO.quat/releases/edit/v4.0)
 
 <p align="right"> <span style="position:relative; top:-10px;"> <i> also  &nbsp; </i> </span> <a href="https://github.com/RenderKit/ospray-studio/tree/master/external/imGuIZMO.quat" target="_blank"><img width="200" height="40" src="https://raw.githubusercontent.com/BrutPitt/myRepos/master/imGuIZMO/screenshots/studio.png"/></a> &nbsp; <span style="position:relative; top:-10px;"> <i> uses <b> imGuIZMO.quat</b></i></span></p> 
 

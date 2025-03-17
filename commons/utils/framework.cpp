@@ -143,7 +143,7 @@ int frameworkSDL::getVGizmo3DKeyModifier() {
 // vGizmo3D: check changing button state to activate/deactivate drag movements  (pressing both activate/deacivate both functionality)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void frameworkSDL::checkVGizmo3DMouseEvent(vg::vGizmo3D &vgTrackball) {
-    static int leftPress = 0, rightPress = 0, middlePress;
+    static int leftPress = 0, rightPress = 0, middlePress = 0;
     if(!ImGui::GetIO().WantCaptureMouse) {
 #ifdef APP_USES_SDL2
         int x, y;

@@ -26,7 +26,7 @@
 #  4. python -m http.server ... then open WGPU browser with url: http://localhost:8000/wgpu_mandelbrot.html
 
 cmake_minimum_required(VERSION 3.16) # DAWN required
-project(imbuizmo_wgpuCube)
+project(imguizmo_wgpuCube)
 
 set(APP_NAME imguizmo_quat_wgpuCube)
 
