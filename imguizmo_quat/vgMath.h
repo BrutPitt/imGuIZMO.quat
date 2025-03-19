@@ -13,7 +13,7 @@
 #pragma once
 
 #include "vgMath_config.h"
-#include <limits>
+
 #ifdef VGM_USES_DOUBLE_PRECISION
     #define VG_T_TYPE double
     #define VGM_USES_TEMPLATE
@@ -24,6 +24,8 @@
     #include <cmath>
     #include <cstdint>
     #include <assert.h>
+    #include <limits>
+
     #define VGM_NAMESPACE vgm
 
     #ifdef VGM_USES_TEMPLATE
@@ -619,8 +621,6 @@ TEMPLATE_TYPENAME_T inline MAT4_T ortho     (cT l, cT r, cT b, cT t, cT n, cT f)
 //////////////////////////
 TEMPLATE_TYPENAME_T inline MAT4_T perspective_call(cT fov, cT a, cT K, cT f_n, cT fn_fMn)
 {
-    assert(std::abs(a - std::numeric_limits<T>::epsilon()) > T(0));
-
     const T hFov = tan(fov * T(.5));
     return { T(1)/(a*hFov),  T(0),           T(0),      T(0),
                T(0),        T(1)/(hFov),     T(0),      T(0),
