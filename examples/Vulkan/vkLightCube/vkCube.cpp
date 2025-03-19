@@ -378,7 +378,7 @@ void vkApp::setPerspective()
     float aspectRatio = float(height) / float(width);       // Set "camera" position and perspective
     float fov = radians( 45.0f ) * aspectRatio;
     // PERSPECTIVE: depends from clipMatrix (+Z or -Z) ==> view in the end of vkCube.h
-    projMatrix = PERSPECTIVE( fov, 1/aspectRatio, 0.1f, 100.0f );
+    projMatrix = perspective( fov, 1/aspectRatio, 0.1f, 100.0f );
 
 }
 

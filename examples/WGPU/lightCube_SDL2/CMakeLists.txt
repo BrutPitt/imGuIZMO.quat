@@ -74,7 +74,7 @@ else()
   # You can override this using: cmake -DDAWN_USE_WAYLAND=X (X = ON | OFF)
   if(UNIX)
     if ($ENV{XDG_SESSION_TYPE} MATCHES wayland)
-      option(DAWN_USE_WAYLAND "Enable support for Wayland surface" ON)
+      option(DAWN_USE_WAYLAND "Enable support for Wayland surface" OFF)
     endif()
   endif()
 
@@ -92,6 +92,7 @@ set(IMGUIZMO_DIR ${IMGUIZMO_PARENT_DIR}/imguizmo_quat)
 set(COMMONS_DIR  ${IMGUIZMO_PARENT_DIR}/commons)
 set(TOOLS_DIR    ${IMGUIZMO_PARENT_DIR}/libs)
 set(IMGUI_DIR    ${TOOLS_DIR}/imgui)
+set(IMGUI_BACKEND_DIR   ${IMGUI_DIR}/backends)
 
 include_directories(${TOOLS_DIR})
 include_directories(${IMGUIZMO_DIR})
@@ -107,12 +108,11 @@ set(SOURCE_FILES
   ${IMGUIZMO_DIR}/imguizmo_quat.cpp
   ${COMMONS_DIR}/widgets/uiMainDlg.cpp
   ${COMMONS_DIR}/widgets/uiSettings.cpp
-  ${COMMONS_DIR}/assets/shadersAndModel.h
   ${COMMONS_DIR}/assets/cubePC.h
   ${COMMONS_DIR}/utils/sdl2wgpu.cpp
   # backend files
-  ${IMGUI_DIR}/imgui_impl_sdl2.cpp
-  ${IMGUI_DIR}/imgui_impl_wgpu.cpp
+  ${IMGUI_BACKEND_DIR}/imgui_impl_sdl2.cpp
+  ${IMGUI_BACKEND_DIR}/imgui_impl_wgpu.cpp
   # Dear ImGui files
   ${IMGUI_DIR}/imgui.cpp
   ${IMGUI_DIR}/imgui_draw.cpp
@@ -126,7 +126,7 @@ add_executable(${APP_NAME} ${SOURCE_FILES})
 target_include_directories(${APP_NAME} PUBLIC
   ${CMAKE_SOURCE_DIR}/..
   ${IMGUI_DIR}
-  ${IMGUI_DIR}/backends
+  ${IMGUI_BACKEND_DIR}
 )
 
 IF(NOT EMSCRIPTEN) # it's necessary for IMGUI

@@ -13,8 +13,10 @@
 #include <cstdio>
 #include <cassert>
 #include <cfloat>
+/////////////////////////////////////////////////////////////////////////////
+// imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
+#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
 
-#include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_wgpu.h"
 
@@ -31,10 +33,6 @@
 
 #include "assets/cubePNC.h"
 #include "utils/sleepTimer.h"
-
-/////////////////////////////////////////////////////////////////////////////
-// imGuIZMO: include imGuIZMOquat.h or imguizmo_quat.h
-#include <imguizmo_quat.h> // now also imguizmo_quat.h from v3.1
 
 void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height);
 
@@ -661,7 +659,7 @@ int main(int, char**)
     #warning "LINUX USER: Please read here..."
     // Currently sdl2wgpu works only X11 on Xorg or/and wayland on wayland: X11 on wayland crash with seg-fault (x11->xGetWindowAttributes)
     // if not specified SDL_getWGPUSurface prefers always X11 also on Wayland, uncomment to force to use Wayland
-    SDL_SetHint(SDL_HINT_VIDEODRIVER, "wayland");  // or (outside code) export SDL_VIDEODRIVER=wayland environment variable
+    SDL_SetHint(SDL_HINT_VIDEODRIVER, "x11");  // or (outside code) export SDL_VIDEODRIVER=wayland environment variable
     #endif                                         // or    "      "    export SDL_VIDEODRIVER=$XDG_SESSION_TYPE to get the current session type
 #endif
     // Init SDL
