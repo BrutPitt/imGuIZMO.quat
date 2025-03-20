@@ -16,7 +16,8 @@
 #include <unistd.h>
     void waitFor(unsigned usec = 16000) { usleep(usec); }
 #elif defined(_WIN32) || defined(_WIN64)
-void waitFor(unsigned usec = 16000)  Sleep(static_cast<unsigned>(usecs / 1000));
+#include <windows.h>
+void waitFor(DWORD usec = 16000)  { Sleep(static_cast<DWORD>(usec / 1000)); }
 #elif defined(__EMSCRIPTEN__)
 #else
 void waitFor(unsigned usec = 16000) {}
