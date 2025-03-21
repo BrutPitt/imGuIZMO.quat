@@ -26,7 +26,7 @@
 #  4. python -m http.server ... then open WGPU browser with url: http://localhost:8000/wgpu_mandelbrot.html
 
 cmake_minimum_required(VERSION 3.16) # DAWN required
-project(lightCube_wgpu_example)
+project(imguizmo_wgpuLightCube)
 
 set(APP_NAME imguizmo_wgpuLightCube)
 
@@ -161,4 +161,4 @@ if(EMSCRIPTEN)
   )
 endif()
 
-#file(WRITE ${CMAKE_SOURCE_DIR}/.idea/.name ${PROJECT_NAME}) # used to rename a Project in clion (run once)
+file(WRITE ${CMAKE_SOURCE_DIR}/.idea/.name ${PROJECT_NAME}) # used to rename a Project in clion (run once)

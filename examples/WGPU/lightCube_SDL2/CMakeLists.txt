@@ -26,9 +26,9 @@
 #  4. python -m http.server ... then open WGPU browser with url: http://localhost:8000/wgpu_mandelbrot.html
 
 cmake_minimum_required(VERSION 3.16) # DAWN required
-project(lightCube_wgpu_example)
+project(imguizmo_wgpuLightCube)
 
-set(APP_NAME imguizmo_quat_wgpuLightCube)
+set(APP_NAME imguizmo_wgpuLightCube)
 
 # Dear ImGui
 set(IMGUI_DIR ../imgui)
@@ -74,7 +74,7 @@ else()
   # You can override this using: cmake -DDAWN_USE_WAYLAND=X (X = ON | OFF)
   if(UNIX)
     if ($ENV{XDG_SESSION_TYPE} MATCHES wayland)
-      option(DAWN_USE_WAYLAND "Enable support for Wayland surface" OFF)
+      option(DAWN_USE_WAYLAND "Enable support for Wayland surface" ON)
     endif()
   endif()
 
@@ -156,5 +156,5 @@ if(EMSCRIPTEN)
   )
 endif()
 
+# file(WRITE ${CMAKE_SOURCE_DIR}/.idea/.name ${PROJECT_NAME}) # used to rename a Project in clion (run once)
 
-# file(WRITE ${SRC}/.idea/.name ${APP_NAME})

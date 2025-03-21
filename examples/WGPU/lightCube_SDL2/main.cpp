@@ -21,9 +21,13 @@
 #include "imgui_impl_wgpu.h"
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
-#include <emscripten/html5_webgpu.h>
+    #include <emscripten.h>
+    #include <emscripten/html5.h>
+    #include <emscripten/html5_webgpu.h>
+    #define DEVICE_TICK
+#else
+    // Tick needs to be called in Dawn to display validation errors
+    #define DEVICE_TICK  device.Tick();
 #endif
 
 #define SDL_MAIN_HANDLED
@@ -32,7 +36,6 @@
 #include <webgpu/webgpu_cpp.h>
 
 #include "assets/cubePNC.h"
-#include "utils/sleepTimer.h"
 
 void renderWidgets(vg::vGizmo3D &track, vec3& vLight, int width, int height);
 
@@ -220,14 +223,6 @@ void initWGPU()
     static wgpu::Adapter localAdapter;
     wgpu::RequestAdapterOptions adapterOptions;
 
-    // uncomment to force backend Vulkan (e.g. instead of Metal on MacOS)
-    //adapterOptions.backendType = wgpu::BackendType::Vulkan;
-#if defined(_WIN32) || defined(WIN32)
-    // Windows users: uncomment to force DirectX backend instead of Vulkan
-    // adapterOptions.backendType = wgpu::BackendType::D3D12; // to use D3D12 backend in W10/W11
-    // adapterOptions.backendType = wgpu::BackendType::D3D11; // to use D3D11 backend in W10/W11
-#endif
-
     auto onRequestAdapter = [](wgpu::RequestAdapterStatus status, wgpu::Adapter adapter, wgpu::StringView message) {
         if (status != wgpu::RequestAdapterStatus::Success) {
             printf("Failed to get an adapter: %s\n", message.data);
@@ -264,10 +259,13 @@ void initWGPU()
     surface.GetCapabilities(localAdapter, &capabilities);
     preferredFormat = capabilities.formats[0];
 
-    surfaceConfig.width       = initialWindowWidth;
-    surfaceConfig.height      = initialWindowHeight;
-    surfaceConfig.device      = device;
-    surfaceConfig.format      = preferredFormat;
+    surfaceConfig.device          = device;
+    surfaceConfig.format          = preferredFormat;
+    surfaceConfig.usage           = wgpu::TextureUsage::RenderAttachment;
+    surfaceConfig.width           = initialWindowWidth;
+    surfaceConfig.height          = initialWindowHeight;
+    surfaceConfig.alphaMode       = wgpu::CompositeAlphaMode::Auto;
+    surfaceConfig.presentMode     = wgpu::PresentMode::Fifo;
 
     surface.Configure(&surfaceConfig);
 }
@@ -538,6 +536,41 @@ void renderImGui()
     ImGui::Render();
 }
 
+WGPUTexture checkTextureStatus()
+{
+    WGPUSurfaceTexture surfaceTexture;
+    wgpuSurfaceGetCurrentTexture(surface.Get(), &surfaceTexture);
+
+    switch ( surfaceTexture.status ) {
+#if !defined(__EMSCRIPTEN__)
+        case WGPUSurfaceGetCurrentTextureStatus_SuccessOptimal:
+            break;
+        case WGPUSurfaceGetCurrentTextureStatus_SuccessSuboptimal:
+#else
+        case WGPUSurfaceGetCurrentTextureStatus_Success:
+            break;
+#endif
+        case WGPUSurfaceGetCurrentTextureStatus_Timeout:
+        case WGPUSurfaceGetCurrentTextureStatus_Outdated:
+        case WGPUSurfaceGetCurrentTextureStatus_Lost:
+        {
+            int width, height;
+            SDL_GetWindowSize(fwWindow, &width, &height);
+            if ( width > 0 && height > 0 )
+            {
+                surfaceConfig.width  = width;
+                surfaceConfig.height = height;
+
+                surface.Configure(&surfaceConfig);
+            }
+            return nullptr;
+        }
+        default:
+            // Handle the error.
+            return nullptr;
+    }
+    return surfaceTexture.texture;
+}
 
 void mainLoop()
 {
@@ -557,14 +590,10 @@ void mainLoop()
         setPerspective(width, height);       // recalibrate perspective aspect ratio
     }
 
-    renderImGui();
+    wgpu::Texture texture = checkTextureStatus();
+    if(!texture) return;
 
-#ifndef __EMSCRIPTEN__
-    // Tick needs to be called in Dawn to display validation errors
-    device.Tick();
-#endif
-    wgpu::SurfaceTexture surfaceTexture;
-    surface.GetCurrentTexture(&surfaceTexture);
+    renderImGui();
 
     wgpu::TextureViewDescriptor viewDescriptor;
     viewDescriptor.format          = preferredFormat;
@@ -574,7 +603,7 @@ void mainLoop()
     colorAttach.loadOp     = wgpu::LoadOp::Clear;
     colorAttach.storeOp    = wgpu::StoreOp::Store;
     colorAttach.clearValue = {};                      //wgpu::Color
-    colorAttach.view       = surfaceTexture.texture.CreateView(&viewDescriptor);
+    colorAttach.view       = texture.CreateView(&viewDescriptor);
 
     wgpu::RenderPassDepthStencilAttachment depthAttach;
     depthAttach.view              = depthTextureView;
@@ -582,7 +611,6 @@ void mainLoop()
     depthAttach.depthStoreOp      = wgpu::StoreOp::Store;
     depthAttach.depthClearValue   = 1.0f;
     depthAttach.depthReadOnly     = false;
-
 
     wgpu::RenderPassDescriptor renderPassDesc;
     renderPassDesc.colorAttachmentCount   = 1;
@@ -620,6 +648,11 @@ void mainLoop()
     wgpu::CommandBufferDescriptor cmd_buffer_desc;
     wgpu::CommandBuffer cmd_buffer = encoder.Finish(&cmd_buffer_desc);
     device.GetQueue().Submit(1, &cmd_buffer);
+
+#if !defined(__EMSCRIPTEN__)
+    surface.Present();
+    device.Tick();
+#endif
 }
 
 void initImGui()
@@ -657,10 +690,9 @@ int main(int, char**)
 #if !defined(__EMSCRIPTEN__)
     #if defined(__linux__)
     #warning "LINUX USER: Please read here..."
-    // Currently sdl2wgpu works only X11 on Xorg or/and wayland on wayland: X11 on wayland crash with seg-fault (x11->xGetWindowAttributes)
-    // if not specified SDL_getWGPUSurface prefers always X11 also on Wayland, uncomment to force to use Wayland
+    // it's necessary to specify  X11 or Wayland: use "wayland" instead of "x11" or ... default x11: it works also in wayland
     SDL_SetHint(SDL_HINT_VIDEODRIVER, "x11");  // or (outside code) export SDL_VIDEODRIVER=wayland environment variable
-    #endif                                         // or    "      "    export SDL_VIDEODRIVER=$XDG_SESSION_TYPE to get the current session type
+    #endif                                     // or    "      "    export SDL_VIDEODRIVER=$XDG_SESSION_TYPE to get the current session type
 #endif
     // Init SDL
     SDL_Init(SDL_INIT_VIDEO);
@@ -700,9 +732,6 @@ int main(int, char**)
                 canCloseWindow = true;
         }
         mainLoop();
-        surface.Present();
-        // this is really a "SLEEP timer" (16ms = 60 FPS), it's present in all DAWN examples
-        waitFor(16000);     // w/o (sometime) you get "Device Lost" error
     }
 
     // Cleanup
@@ -711,5 +740,9 @@ int main(int, char**)
     ImGui::DestroyContext();
 #endif
     // All class destructors release the own object
+
+    SDL_DestroyWindow(fwWindow);
+    SDL_Quit();
+    
     return 0;
 }
