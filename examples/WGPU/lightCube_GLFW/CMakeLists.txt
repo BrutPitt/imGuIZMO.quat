@@ -37,7 +37,7 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
 endif()
 
-set(CMAKE_CXX_STANDARD 17) # Dawn requires C++17
+set(CMAKE_CXX_STANDARD 20)
 
 # Libraries
 if(EMSCRIPTEN)
@@ -78,7 +78,7 @@ else()
 
   # check if WAYLAND is the current Session Type and enable DAWN_USE_WAYLAND Wayland option @compile time
   # You can override this using: cmake -DDAWN_USE_WAYLAND=X (X = ON | OFF)
-  if(UNIX)
+  if(LINUX)
     if ($ENV{XDG_SESSION_TYPE} MATCHES wayland)
       option(DAWN_USE_WAYLAND "Enable support for Wayland surface" ON)
     endif()

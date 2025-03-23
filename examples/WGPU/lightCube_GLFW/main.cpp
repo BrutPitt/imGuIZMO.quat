@@ -550,24 +550,30 @@ void renderImGui()
     ImGui::Render();
 }
 
-WGPUTexture checkTextureStatus()
+WGPUTexture checkSurfaceTextureStatus()
 {
     WGPUSurfaceTexture surfaceTexture;
     wgpuSurfaceGetCurrentTexture(surface.Get(), &surfaceTexture);
 
     switch ( surfaceTexture.status ) {
-#if !defined(__EMSCRIPTEN__)
+#if defined(__EMSCRIPTEN__)
+        case WGPUSurfaceGetCurrentTextureStatus_Success:
+            break;
+#else
         case WGPUSurfaceGetCurrentTextureStatus_SuccessOptimal:
             break;
         case WGPUSurfaceGetCurrentTextureStatus_SuccessSuboptimal:
-#else
-        case WGPUSurfaceGetCurrentTextureStatus_Success:
-            break;
 #endif
         case WGPUSurfaceGetCurrentTextureStatus_Timeout:
         case WGPUSurfaceGetCurrentTextureStatus_Outdated:
         case WGPUSurfaceGetCurrentTextureStatus_Lost:
+        // if the status is NOT Optimal let's try to reconfigure the surface
         {
+#ifndef NDEBUG
+            printf("Bad surface texture status: %d\n", surfaceTexture.status);
+#endif
+            if (surfaceTexture.texture)
+                wgpuTextureRelease(surfaceTexture.texture);
             int width, height;
             glfwGetFramebufferSize(fwWindow, &width, &height);
             if ( width > 0 && height > 0 )
@@ -579,8 +585,8 @@ WGPUTexture checkTextureStatus()
             }
             return nullptr;
         }
-        default:
-            // Handle the error.
+        default:            // should never be reached
+            assert(!"Unexpected Surface Texture status error\n");
             return nullptr;
     }
     return surfaceTexture.texture;
@@ -604,7 +610,7 @@ void mainLoop()
         setPerspective(width, height);       // recalibrate perspective aspect ratio
     }
 
-    wgpu::Texture texture = checkTextureStatus();
+    wgpu::Texture texture = checkSurfaceTextureStatus();
     if(!texture) return;
 
     renderImGui();

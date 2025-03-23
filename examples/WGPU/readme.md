@@ -1,11 +1,15 @@
 # vGizmo3D - WGPU / WebGPU example
 
-This is a easy example that use **WebGPU** as graphics backend .
+This is a bit more complex example (respect to [basic_examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples)) that use **WebGPU** as graphics backend .
 It was written in C++ and can be compiled in native mode (for a standalone desktop application) or with EMSCRIPTEN to perform it via the web browser
 
+<p align="center"><a href="https://brutpitt.github.io/myRepos/imGuIZMO/example/WebGL/wglCubeExample.html"> 
+<img width="640" height="400" src="https://brutpitt.github.io/myRepos/imGuIZMO/screenshots/lightCube.png"></a>
+</p>
 
-- **NEW [v4.0 WiP **WebGPU** cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuCube.html)** - from new [easy_examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/basic_examples) ( WebGPU / Vulkan / OpenGL )\
-also displayed in [full canvas](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuCube_full.html) (w/o instructions and mouse buttons helper)
+- **NEW [v4.0 **WebGPU** lighted cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuLightCube.html)** - from new [examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) ( WebGPU / Vulkan / OpenGL )\
+also displayed in [full resizable canvas](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuLightCube_full.html) (w/o instructions and mouse buttons helper)
+
 
 **It's necessary to use a browser with **WebGPU** capabilities: e.g. Chrome-Canary, FireFox Nightly, Safari Technology Preview ...*
 
