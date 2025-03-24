@@ -7,16 +7,18 @@ It was written in C++ and can be compiled in native mode (for a standalone deskt
 <img width="640" height="400" src="https://brutpitt.github.io/myRepos/imGuIZMO/screenshots/lightCube.png"></a>
 </p>
 
+### Live WebGPU demo
 - **NEW [v4.0 **WebGPU** lighted cube example](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuLightCube.html)** - from new [examples](https://github.com/BrutPitt/imGuIZMO.quat/tree/master/examples) ( WebGPU / Vulkan / OpenGL )\
 also displayed in [full resizable canvas](https://brutpitt.github.io/myRepos/imGuIZMO/example/WGPU/imguizmo_quat_wgpuLightCube_full.html) (w/o instructions and mouse buttons helper)
 
 
 **It's necessary to use a browser with **WebGPU** capabilities: e.g. Chrome-Canary, FireFox Nightly, Safari Technology Preview ...*
 
-This example use Google DAWN (as WGPU SDK) to build native executable (CMakeLists.txt). 
 
 
 ## How to Build                 
+This example use Google DAWN (as WGPU SDK) to build native executable (CMakeLists.txt). 
+
 
 It's necessary to have installed **GLFW** (development package) and python3 (Google DAWN requires)
 
