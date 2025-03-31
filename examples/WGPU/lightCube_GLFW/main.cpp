@@ -31,10 +31,13 @@
 #include <webgpu/webgpu_glfw.h>
 #include <GLFW/glfw3.h>
 #endif
+#define _STRING(x) #x
+#define STRING(x) _STRING(x)
+
 
 // WGSL shader
 const char *shader  = {
-    #include "shaders/cube_light.wgsl"
+        #include "shaders/cube_light.wgsl"
 };
 // cube data
 #include "assets/cubePNC.h"
@@ -191,7 +194,7 @@ static void wgpu_device_lost_callback(const wgpu::Device&, wgpu::DeviceLostReaso
     switch (reason) {
         case wgpu::DeviceLostReason::Unknown:         reasonName = "Unknown";         break;
         case wgpu::DeviceLostReason::Destroyed:       reasonName = "Destroyed";       break;
-        case wgpu::DeviceLostReason::InstanceDropped: reasonName = "InstanceDropped"; break;
+        case wgpu::DeviceLostReason::CallbackCancelled: reasonName = "InstanceDropped"; break;
         case wgpu::DeviceLostReason::FailedCreation:  reasonName = "FailedCreation";  break;
         default:                                      reasonName = "UNREACHABLE";     break;
     }

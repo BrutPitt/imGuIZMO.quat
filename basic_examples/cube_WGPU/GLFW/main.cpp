@@ -186,7 +186,7 @@ static void wgpu_device_lost_callback(const wgpu::Device&, wgpu::DeviceLostReaso
     switch (reason) {
         case wgpu::DeviceLostReason::Unknown:         reasonName = "Unknown";         break;
         case wgpu::DeviceLostReason::Destroyed:       reasonName = "Destroyed";       break;
-        case wgpu::DeviceLostReason::InstanceDropped: reasonName = "InstanceDropped"; break;
+        case wgpu::DeviceLostReason::CallbackCancelled: reasonName = "InstanceDropped"; break;
         case wgpu::DeviceLostReason::FailedCreation:  reasonName = "FailedCreation";  break;
         default:                                      reasonName = "UNREACHABLE";     break;
     }
