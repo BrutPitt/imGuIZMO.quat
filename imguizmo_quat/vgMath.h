@@ -380,7 +380,7 @@ inline float uintBitsToFloat(uint32_t const v) { return *((float *)(&v)); }
 inline uint32_t floatBitsToUint(float const v) { return *((uint32_t *)(&v)); }
 // dot
 //////////////////////////
-TEMPLATE_TYPENAME_T inline T dot(const  VEC2_T& v0, const VEC2_T& v1) { return v0.x * v1.x + v0.y * v1.y; }
+TEMPLATE_TYPENAME_T inline T dot(const VEC2_T& v0, const VEC2_T& v1) { return v0.x * v1.x + v0.y * v1.y; }
 TEMPLATE_TYPENAME_T inline T dot(const VEC3_T& v0, const VEC3_T& v1) { return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z; }
 TEMPLATE_TYPENAME_T inline T dot(const VEC4_T& v0, const VEC4_T& v1) { return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z + v0.w * v1.w; }
 TEMPLATE_TYPENAME_T inline T dot(const QUAT_T& q0, const QUAT_T& q1) { return q0.x * q1.x + q0.y * q1.y + q0.z * q1.z + q0.w * q1.w; }
@@ -621,6 +621,7 @@ TEMPLATE_TYPENAME_T inline MAT4_T ortho     (cT l, cT r, cT b, cT t, cT n, cT f)
 //////////////////////////
 TEMPLATE_TYPENAME_T inline MAT4_T perspective_call(cT fov, cT a, cT K, cT f_n, cT fn_fMn)
 {
+    assert(std::abs(a - std::numeric_limits<T>::epsilon()) > T(0));
     const T hFov = tan(fov * T(.5));
     return { T(1)/(a*hFov),  T(0),           T(0),      T(0),
                T(0),        T(1)/(hFov),     T(0),      T(0),

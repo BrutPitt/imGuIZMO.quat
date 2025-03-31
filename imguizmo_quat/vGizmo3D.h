@@ -278,7 +278,7 @@ public:
         T AdotB = dot(a, b);
         T angle = acos( AdotB>T(1) ? T(1) : (AdotB<-T(1) ? -T(1) : AdotB)); // clamp necessary!!! corss float is approximate to FLT_EPSILON
 
-        auto flipRotation = [=] (quat q) {
+        auto flipRotation = [&] (quat q) {
             return quat(q.w, rotOnX * q.x, rotOnY * q.y, rotOnZ * -q.z);
         };
 
